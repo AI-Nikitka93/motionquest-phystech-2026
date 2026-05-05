@@ -60,7 +60,7 @@ MotionQuest: a browser-based webcam exergame for older adults and seated/standin
 ## Deployment
 - Host: Vercel.
 - Production URL: `https://motionquest-app.vercel.app`.
-- Deployment id: `dpl_8sTZY7XCGYDaJTuYXfc12HDrUseg`.
+- Deployment id: `dpl_B1m73Bmz1xCwsR2A4CANH6DKKLFK`.
 - Public source package: `https://github.com/AI-Nikitka93/motionquest-phystech-2026`.
 - Vercel local project metadata is in `motionquest-app/.vercel/` and ignored by `.gitignore`.
 

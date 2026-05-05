@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import type { NormalizedLandmark, PoseConfidence, PoseMode } from "@/lib/gameLogic";
 import {
   LANDMARK_VISIBILITY_THRESHOLD,
+  countVisibleLandmarks,
   getPoseConfidence,
   hasUsablePose,
   isVisibleLandmark,
@@ -152,7 +153,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
         } else {
           missingFramesRef.current += 1;
           setConfidence("low");
-          setStatus(framingHint(mode));
+          setStatus(framingHint(mode, rawLandmarks));
           if (missingFramesRef.current >= MAX_MISSING_FRAMES_BEFORE_CLEAR) {
             smoothedLandmarksRef.current = [];
             setLandmarks([]);
@@ -335,12 +336,19 @@ function smoothLandmarks(
   });
 }
 
-function framingHint(mode: PoseMode) {
+function framingHint(mode: PoseMode, landmarks: NormalizedLandmark[]) {
+  const upperBodyCandidate = countVisibleLandmarks(landmarks, [
+    11, 12, 13, 14, 15, 16, 23, 24,
+  ]);
+  if (upperBodyCandidate >= 5) {
+    return "Body frame unstable. Move hands away from the lens and show your shoulders and hips";
+  }
+
   if (mode === "reach") {
-    return "Show shoulders and both wrists clearly";
+    return "Step back and show shoulders, hips, elbows, and both wrists";
   }
   if (mode === "seated") {
-    return "Stay seated and show shoulders, elbows, and wrists clearly";
+    return "Stay seated, move hands away from the lens, and show shoulders, elbows, and wrists";
   }
   return "Step back until shoulders, hips and knees are visible";
 }

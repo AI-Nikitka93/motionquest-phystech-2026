@@ -93,7 +93,68 @@ export function hasUsablePose(
   mode: PoseMode,
 ) {
   const required = MIN_USABLE_LANDMARKS[mode];
-  return required.every((index) => isVisibleLandmark(landmarks[index]));
+  return (
+    required.every((index) => isVisibleLandmark(landmarks[index])) &&
+    hasPlausibleBodyFrame(landmarks, mode)
+  );
+}
+
+export function hasPlausibleBodyFrame(
+  landmarks: NormalizedLandmark[],
+  mode: PoseMode,
+) {
+  const leftShoulder = landmarks[11];
+  const rightShoulder = landmarks[12];
+  const leftHip = landmarks[23];
+  const rightHip = landmarks[24];
+
+  if (
+    !isVisibleLandmark(leftShoulder) ||
+    !isVisibleLandmark(rightShoulder) ||
+    !isVisibleLandmark(leftHip, 0.45) ||
+    !isVisibleLandmark(rightHip, 0.45)
+  ) {
+    return false;
+  }
+
+  const shoulderWidth = distance(leftShoulder, rightShoulder);
+  const hipWidth = distance(leftHip, rightHip);
+  const shoulderMid = midpoint(leftShoulder, rightShoulder);
+  const hipMid = midpoint(leftHip, rightHip);
+  const torsoHeight = hipMid.y - shoulderMid.y;
+  const torsoDiagonal = distance(shoulderMid, hipMid);
+  const widthRatio = hipWidth / Math.max(shoulderWidth, 0.001);
+
+  if (
+    shoulderWidth < 0.08 ||
+    shoulderWidth > 0.62 ||
+    torsoHeight < 0.1 ||
+    torsoHeight > 0.68 ||
+    torsoDiagonal < 0.13 ||
+    widthRatio < 0.35 ||
+    widthRatio > 2.25
+  ) {
+    return false;
+  }
+
+  if (mode === "chair" || mode === "calibration") {
+    const leftKnee = landmarks[25];
+    const rightKnee = landmarks[26];
+    if (!isVisibleLandmark(leftKnee) || !isVisibleLandmark(rightKnee)) {
+      return false;
+    }
+
+    const kneeMid = midpoint(leftKnee, rightKnee);
+    const thighLength = distance(hipMid, kneeMid);
+    return kneeMid.y > hipMid.y + 0.06 && thighLength >= 0.08;
+  }
+
+  if (mode === "seated" || mode === "reach") {
+    return hasPlausibleArm(landmarks, "left", torsoDiagonal) ||
+      hasPlausibleArm(landmarks, "right", torsoDiagonal);
+  }
+
+  return true;
 }
 
 export function classifyPoseReadiness(
@@ -132,6 +193,8 @@ export function getPoseConfidence(
   landmarks: NormalizedLandmark[],
   mode: PoseMode,
 ): PoseConfidence {
+  if (!hasPlausibleBodyFrame(landmarks, mode)) return "low";
+
   const required = REQUIRED_LANDMARKS[mode];
   const visible = countVisibleLandmarks(landmarks, required);
   const ratio = visible / required.length;
@@ -257,4 +320,57 @@ function calculateJointAngle(
 
   const cosine = Math.min(1, Math.max(-1, dot / (firstLength * secondLength)));
   return (Math.acos(cosine) * 180) / Math.PI;
+}
+
+function hasPlausibleArm(
+  landmarks: NormalizedLandmark[],
+  side: "left" | "right",
+  torsoDiagonal: number,
+) {
+  const [shoulderIndex, elbowIndex, wristIndex] =
+    side === "left" ? [11, 13, 15] : [12, 14, 16];
+  const shoulder = landmarks[shoulderIndex];
+  const elbow = landmarks[elbowIndex];
+  const wrist = landmarks[wristIndex];
+
+  if (
+    !isVisibleLandmark(shoulder) ||
+    !isVisibleLandmark(elbow) ||
+    !isVisibleLandmark(wrist)
+  ) {
+    return false;
+  }
+
+  const upperArm = distance(shoulder, elbow);
+  const forearm = distance(elbow, wrist);
+  const wholeArm = distance(shoulder, wrist);
+  const maxSegment = Math.max(upperArm, forearm);
+  const zDelta =
+    Number.isFinite(wrist.z) && Number.isFinite(shoulder.z)
+      ? Math.abs((wrist.z ?? 0) - (shoulder.z ?? 0))
+      : 0;
+
+  return (
+    upperArm >= 0.035 &&
+    forearm >= 0.035 &&
+    wholeArm >= 0.06 &&
+    maxSegment <= Math.max(0.36, torsoDiagonal * 1.6) &&
+    zDelta <= 0.75
+  );
+}
+
+function distance(first: NormalizedLandmark, second: NormalizedLandmark) {
+  return Math.hypot(first.x - second.x, first.y - second.y);
+}
+
+function midpoint(first: NormalizedLandmark, second: NormalizedLandmark) {
+  return {
+    x: (first.x + second.x) / 2,
+    y: (first.y + second.y) / 2,
+    z:
+      first.z !== undefined && second.z !== undefined
+        ? (first.z + second.z) / 2
+        : undefined,
+    visibility: Math.min(first.visibility ?? 1, second.visibility ?? 1),
+  };
 }

@@ -7,6 +7,7 @@ import {
   detectReachHit,
   detectSeatedArmTransition,
   getPoseConfidence,
+  hasPlausibleBodyFrame,
   hasUsablePose,
   type ChairStandPhase,
   type NormalizedLandmark,
@@ -71,12 +72,31 @@ test("getPoseConfidence returns low when required landmarks are missing", () => 
 
 test("getPoseConfidence returns medium for usable but incomplete full-body pose", () => {
   const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.05));
-  for (const index of [11, 12, 23, 24, 25, 26]) {
-    landmarks[index] = landmark(0.5, 0.5, 0.9);
-  }
+  landmarks[11] = landmark(0.42, 0.28, 0.9);
+  landmarks[12] = landmark(0.58, 0.28, 0.9);
+  landmarks[23] = landmark(0.44, 0.56, 0.9);
+  landmarks[24] = landmark(0.56, 0.56, 0.9);
+  landmarks[25] = landmark(0.44, 0.72, 0.9);
+  landmarks[26] = landmark(0.56, 0.72, 0.9);
 
   assert.equal(hasUsablePose(landmarks, "chair"), true);
   assert.equal(getPoseConfidence(landmarks, "chair"), "medium");
+});
+
+test("hasUsablePose rejects hand-close false body geometry even when required landmarks are visible", () => {
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
+  landmarks[11] = landmark(0.32, 0.35, 0.96);
+  landmarks[12] = landmark(0.39, 0.36, 0.96);
+  landmarks[13] = landmark(0.28, 0.43, 0.96);
+  landmarks[14] = landmark(0.52, 0.42, 0.96);
+  landmarks[15] = landmark(0.22, 0.49, 0.96,);
+  landmarks[16] = landmark(0.58, 0.48, 0.96);
+  landmarks[23] = landmark(0.41, 0.62, 0.96);
+  landmarks[24] = landmark(0.46, 0.63, 0.96);
+
+  assert.equal(hasPlausibleBodyFrame(landmarks, "reach"), false);
+  assert.equal(hasUsablePose(landmarks, "reach"), false);
+  assert.equal(getPoseConfidence(landmarks, "reach"), "low");
 });
 
 test("hasUsablePose rejects a single noisy limb so the overlay does not pretend tracking is valid", () => {
@@ -137,9 +157,14 @@ test("buildDemoSession labels fallback data explicitly", () => {
 
 test("classifyPoseReadiness accepts seated upper-body tracking without visible knees", () => {
   const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
-  for (const index of [11, 12, 13, 14, 15, 16, 23, 24]) {
-    landmarks[index] = landmark(0.5, 0.5, 0.9);
-  }
+  landmarks[11] = landmark(0.42, 0.26, 0.9);
+  landmarks[12] = landmark(0.58, 0.26, 0.9);
+  landmarks[13] = landmark(0.36, 0.4, 0.9);
+  landmarks[14] = landmark(0.64, 0.4, 0.9);
+  landmarks[15] = landmark(0.34, 0.54, 0.9);
+  landmarks[16] = landmark(0.66, 0.54, 0.9);
+  landmarks[23] = landmark(0.44, 0.58, 0.9);
+  landmarks[24] = landmark(0.56, 0.58, 0.9);
   landmarks[25] = landmark(0.5, 0.9, 0.04);
   landmarks[26] = landmark(0.5, 0.9, 0.04);
 

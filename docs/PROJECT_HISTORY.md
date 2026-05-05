@@ -323,3 +323,12 @@
 Локальный account context: обновлён в /docs/ACCOUNT_REGISTRY.local.md
 Локальная карта секретов: обновлена в /docs/SECRETS_INDEX.local.md
 Следующий шаг: run physical webcam evidence and final Devpost/Discord submission workflow at the required dates; do not close T086-T089, T092-T093, T104, T131-T134, T143-T155, T157-T159 or T165-T168 until evidence exists.
+
+Дата и время: 2026-05-05 03:38
+Роль: P-FRONTEND / P-DEBUG / Verification
+Сделано: исправлен false-positive tracking bug from user screenshot: крупная рука у камеры больше не проходит как high-confidence body pose; добавлен geometric body-frame gate, plausible arm gate, Reach Stars no-score state while pose is unstable, corrected Reach Stars status copy and HUD overlap.
+Изменены файлы: `motionquest-app/src/lib/gameLogic.ts`, `motionquest-app/src/lib/gameLogic.test.ts`, `motionquest-app/src/hooks/usePoseTracking.ts`, `motionquest-app/src/components/CameraStage.tsx`, `motionquest-app/src/components/MotionQuestApp.tsx`, `docs/STATE.md`, `docs/PROJECT_MAP.md`, `docs/PROJECT_HISTORY.md`, `output/playwright/reach-stars-layout-after-tracking-gate-fix.png`.
+Результат/доказательство: `npm run lint` passed; `npm test` 12/12 passed including false-positive hand geometry regression; `npm run build` passed; `npm run test:e2e` 7/7 passed; local screenshot artifact `output/playwright/reach-stars-layout-after-tracking-gate-fix.png` created; Vercel production deployment `dpl_B1m73Bmz1xCwsR2A4CANH6DKKLFK` Ready and aliased to `https://motionquest-app.vercel.app`; production alias returned HTTP 200.
+Локальный account context: без изменений
+Локальная карта секретов: без изменений
+Следующий шаг: user should retry live camera with full upper body visible and hands away from lens; if false positives remain, capture another screenshot from the same stage.

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import { usePoseTracking } from "@/hooks/usePoseTracking";
 import {
   LANDMARK_VISIBILITY_THRESHOLD,
+  hasUsablePose,
   isVisibleLandmark,
   type NormalizedLandmark,
   type PoseConfidence,
@@ -46,6 +47,7 @@ export function CameraStage({
     error,
     isReady,
   };
+  const poseUsable = hasUsablePose(landmarks, mode);
 
   return (
     <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
@@ -85,16 +87,20 @@ export function CameraStage({
           status before the report treats the session as usable practice data.
         </p>
         <div className="mt-5 space-y-4 text-xl leading-relaxed">
-          <StageStatusItem tone={confidence !== "low" ? "success" : "warning"}>
-            {mode === "seated"
+          <StageStatusItem tone={poseUsable ? "success" : "warning"}>
+            {mode === "seated" || mode === "reach"
               ? "Shoulders, elbows and wrists are visible"
               : "Shoulders, hips and knees are visible"}
           </StageStatusItem>
           <StageStatusItem tone={isReady ? "success" : "warning"}>
-            Camera is active
+            {isReady ? "Camera is active" : "Camera not started"}
           </StageStatusItem>
-          <StageStatusItem tone={!error ? "success" : "error"}>
-            {error ? "Camera/model needs attention" : "Pose model is ready"}
+          <StageStatusItem tone={error ? "error" : isReady ? "success" : "warning"}>
+            {error
+              ? "Camera/model needs attention"
+              : isReady
+                ? "Pose model is ready"
+                : "Pose model not started"}
           </StageStatusItem>
         </div>
         <JointVisibilityPanel mode={mode} landmarks={landmarks} />
@@ -275,6 +281,7 @@ function JointVisibilityPanel({
         return isVisibleLandmark(point, LANDMARK_VISIBILITY_THRESHOLD);
       }),
     );
+  const poseUsable = hasUsablePose(landmarks, mode);
 
   return (
     <div className="mt-5 rounded-lg border-2 border-[#D8F3DC] bg-[#FFF8E7] p-4">
@@ -283,15 +290,17 @@ function JointVisibilityPanel({
       </p>
       <div
         className={`mt-3 rounded-lg p-4 ${
-          allVisible ? "bg-[#D8F3DC]" : "bg-[#FFE8A3]"
+          allVisible && poseUsable ? "bg-[#D8F3DC]" : "bg-[#FFE8A3]"
         }`}
       >
         <p className="text-xl font-black">
-          {allVisible ? "Ready to start" : "Adjust camera"}
+          {allVisible && poseUsable ? "Ready to start" : "Adjust camera"}
         </p>
         <p className="mt-1 text-base font-bold leading-relaxed text-[#394B45]">
-          {allVisible
+          {allVisible && poseUsable
             ? "Required joints are visible enough for this activity."
+            : allVisible
+              ? "Joints are detected, but the body frame is not stable. Move hands away from the lens and show your upper body."
             : "Show every required joint before treating the session as usable."}
         </p>
       </div>

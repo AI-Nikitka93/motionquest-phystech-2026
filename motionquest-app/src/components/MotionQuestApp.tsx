@@ -687,6 +687,9 @@ function ReachStarsHud({
   const completedRef = useRef(false);
   const target = targetState.target;
   const hasUsableReachPose = hasUsablePose(tracking.landmarks, "reach");
+  const displayFeedback = hasUsableReachPose
+    ? feedback
+    : "Step back. Show shoulders, hips, elbows, and wrists.";
 
   const finish = useCallback(
     (confidence: PoseConfidence) => {
@@ -712,6 +715,11 @@ function ReachStarsHud({
   }, []);
 
   useEffect(() => {
+    if (!hasUsableReachPose) {
+      dwellStartedAtRef.current = null;
+      return;
+    }
+
     const nowMs = performance.now();
     const dwell = detectReachDwellHit({
       landmarks: tracking.landmarks,
@@ -738,7 +746,7 @@ function ReachStarsHud({
     } else {
       setFeedback("Reach and hold the yellow star");
     }
-  }, [target, tracking.landmarks]);
+  }, [hasUsableReachPose, target, tracking.landmarks]);
 
   useEffect(() => {
     hitGuardRef.current = false;
@@ -774,13 +782,13 @@ function ReachStarsHud({
         ★
       </div>
       <div className="absolute bottom-28 left-4 rounded-xl bg-[#D8F3DC] p-4 text-xl font-bold text-[#10231F] shadow-camera">
-        {feedback}
+        {displayFeedback}
       </div>
-      <HudChip className="left-4 right-4 top-4 md:left-auto md:right-4 md:max-w-sm">
+      <HudChip className="left-4 right-4 top-44 md:left-auto md:right-4 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
-          Move either wrist into the yellow target and hold for half a second.
-          Comfortable reach is enough.
+          Step back first. Move either wrist into the yellow target and hold
+          for half a second.
         </span>
       </HudChip>
       <button
@@ -788,7 +796,7 @@ function ReachStarsHud({
         onClick={() => finish(getPoseConfidence(tracking.landmarks, "reach"))}
         className="absolute bottom-4 right-4 min-h-14 rounded-xl bg-[#075E54] px-7 text-xl font-bold text-white hover:bg-[#064C45] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
       >
-        View Report
+        Finish & View Report
       </button>
     </>
   );
