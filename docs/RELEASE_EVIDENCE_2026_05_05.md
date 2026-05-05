@@ -15,7 +15,7 @@ Contest-condition source checked: https://phystech-2026.devpost.com/
 | GitHub repository visibility | PUBLIC, default branch `master` |
 | Initial public package commit | `0aa645fd5a19eb96a08a6ed5a18ca2cbc4317265` |
 | Release-evidence push commit | `cb3b84bdbb09844525200bfff2e40735690cbe18` |
-| Latest production deployment recorded in state | `dpl_2qhbJ1xCbc11WD1XFPX3D8eYS479` |
+| Latest production deployment recorded in state | `dpl_D5JKs8JbbaLgGL4EXYDz6UedEc3Z` |
 
 ## Fresh Verification Commands
 
@@ -116,6 +116,20 @@ Fix shipped:
   elbow-angle skeletons.
 - Hand model URL returned HTTP 200 before deployment.
 - E2E was rerun against production after deployment `dpl_2qhbJ1xCbc11WD1XFPX3D8eYS479`.
+
+## Pose Arm Rejection Fix
+
+User screenshot on 2026-05-05 still showed false lower-frame arm points after
+HandLandmarker integration.
+
+Fix shipped:
+
+- In seated/reach modes, PoseLandmarker elbow and wrist landmarks are cleared
+  before any hand data is merged.
+- A real hand is accepted only from HandLandmarker.
+- If no hand is detected, the arm remains missing instead of drawing a false
+  lower-frame limb.
+- E2E was rerun against production after deployment `dpl_D5JKs8JbbaLgGL4EXYDz6UedEc3Z`.
 
 ## MediaPipe Production Asset Checks
 

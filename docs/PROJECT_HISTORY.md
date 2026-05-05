@@ -377,3 +377,12 @@
 Локальный account context: без изменений
 Локальная карта секретов: без изменений
 Следующий шаг: user should hard-refresh production URL and retry seated mode with the hand visible; if it still fails, paste `Copy live evidence`.
+
+Дата и время: 2026-05-05 14:34
+Роль: P-FRONTEND / P-DEBUG / Verification
+Сделано: после нового пользовательского скрина с ложной нижней линией полностью отключены PoseLandmarker arm landmarks in seated/reach modes; elbow/wrist очищаются перед merge, and only real HandLandmarker wrist data can create a hand/arm overlay.
+Изменены файлы: `motionquest-app/src/hooks/usePoseTracking.ts`, `motionquest-app/src/components/CameraStage.tsx`, `motionquest-app/src/components/MotionQuestApp.tsx`, `docs/STATE.md`, `docs/PROJECT_MAP.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: `npm run lint` passed; `npm test` 16/16 passed; `npm run build` passed; no-placeholder scan returned no matches; Vercel production deployment `dpl_D5JKs8JbbaLgGL4EXYDz6UedEc3Z` Ready and aliased to `https://motionquest-app.vercel.app`; `npm run test:e2e` 7/7 passed against production.
+Локальный account context: без изменений
+Локальная карта секретов: без изменений
+Следующий шаг: user should hard-refresh and retry with open hand visible; if no hand is detected, use `Copy live evidence` to inspect hand/pose status.

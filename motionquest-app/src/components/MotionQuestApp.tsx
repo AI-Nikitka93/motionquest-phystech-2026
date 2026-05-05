@@ -648,7 +648,7 @@ function ReachStarsScreen({
           title="Ready for Reach Stars"
           checks={[
             "Sit or stand far enough back to show shoulders.",
-            "Raise one hand until elbow and wrist are visible.",
+            "Raise one open hand where the camera can see it.",
             "Reach only within a comfortable range.",
           ]}
           action="Start Reach Stars"
@@ -801,7 +801,7 @@ function ReachStarsHud({
       <HudChip className="left-4 right-4 top-44 md:left-auto md:right-4 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
-          First show shoulders and one raised hand. Then hold your wrist inside
+          First show shoulders and one raised hand. Then hold your hand inside
           the yellow target for half a second.
         </span>
       </HudChip>

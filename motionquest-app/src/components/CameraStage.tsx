@@ -275,12 +275,12 @@ const JOINT_GROUPS: Record<
     {
       label: "Left arm",
       indexes: [13, 15],
-      help: "Raise your left hand until elbow and wrist are visible.",
+      help: "Raise your left hand where the camera can see it.",
     },
     {
       label: "Right arm",
       indexes: [14, 16],
-      help: "Raise your right hand until elbow and wrist are visible.",
+      help: "Raise your right hand where the camera can see it.",
     },
   ],
   seated: [

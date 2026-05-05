@@ -324,13 +324,28 @@ function mergeHandLandmarksIntoPose(
   mode: PoseMode,
 ) {
   if ((mode !== "seated" && mode !== "reach") || handLandmarks.length === 0) {
-    return poseLandmarks;
+    if (mode !== "seated" && mode !== "reach") return poseLandmarks;
   }
 
   const merged = Array.from({ length: Math.max(33, poseLandmarks.length) }, (
     _,
     index,
   ) => poseLandmarks[index]);
+
+  if (mode === "seated" || mode === "reach") {
+    for (const index of [13, 14, 15, 16]) {
+      merged[index] = {
+        x: 0,
+        y: 0,
+        z: 0,
+        visibility: 0,
+      };
+    }
+  }
+
+  if (handLandmarks.length === 0) {
+    return merged;
+  }
   const leftShoulder = merged[11];
   const rightShoulder = merged[12];
   const shoulderMidX =
@@ -456,7 +471,7 @@ function framingHint(mode: PoseMode, landmarks: NormalizedLandmark[]) {
   }
 
   if (mode === "reach") {
-    return "Show shoulders, then raise one hand until elbow and wrist are visible";
+    return "Show shoulders, then raise one open hand where the camera can see it";
   }
   if (mode === "seated") {
     return "Keep shoulders in frame, then raise one forearm until elbow and wrist are visible";
