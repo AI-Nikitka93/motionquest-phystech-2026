@@ -112,15 +112,19 @@ export function CameraStage({
         </p>
         <h2 className="text-3xl font-extrabold leading-tight">{title}</h2>
         <p className="mt-3 text-lg font-bold leading-relaxed text-[#394B45]">
-          This stage verifies body visibility, camera readiness and pose model
+          This stage verifies camera readiness and tracking model
           status before the report treats the session as usable practice data.
         </p>
         <div className="mt-5 space-y-4 text-xl leading-relaxed">
           <StageStatusItem tone={poseUsable ? "success" : "warning"}>
             {mode === "seated"
-              ? "Seated upper body and one hand are visible"
+              ? poseUsable
+                ? "Seated mode is selected and one hand is visible"
+                : "Seated mode is selected; raise one open hand"
               : mode === "reach"
-                ? "Upper body and at least one reaching hand are visible"
+                ? poseUsable
+                  ? "At least one reaching hand is visible"
+                  : "Raise one open hand for tracking"
                 : "Shoulders, hips and knees are visible"}
           </StageStatusItem>
           <StageStatusItem tone={isReady ? "success" : "warning"}>
@@ -161,7 +165,7 @@ export function CameraStage({
           </p>
           <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
             Copy this after each real camera stage. It records the camera
-            state, visible joints and body-frame verdict for T086-T104.
+            state, visible tracking points and stage verdict for T086-T104.
           </p>
           <button
             type="button"
@@ -268,35 +272,25 @@ const JOINT_GROUPS: Record<
   ],
   reach: [
     {
-      label: "Shoulders",
-      indexes: [11, 12],
-      help: "Shoulders anchor the reach frame.",
-    },
-    {
-      label: "Left arm",
-      indexes: [13, 15],
+      label: "Left hand",
+      indexes: [15],
       help: "Raise your left hand where the camera can see it.",
     },
     {
-      label: "Right arm",
-      indexes: [14, 16],
+      label: "Right hand",
+      indexes: [16],
       help: "Raise your right hand where the camera can see it.",
     },
   ],
   seated: [
     {
-      label: "Shoulders",
-      indexes: [11, 12],
-      help: "Keep upper body centered while seated.",
-    },
-    {
-      label: "Left arm",
-      indexes: [13, 15],
+      label: "Left hand",
+      indexes: [15],
       help: "Raise your left hand where the camera can see it.",
     },
     {
-      label: "Right arm",
-      indexes: [14, 16],
+      label: "Right hand",
+      indexes: [16],
       help: "Raise your right hand where the camera can see it.",
     },
   ],
@@ -312,9 +306,7 @@ function JointVisibilityPanel({
   const requiredGroups = JOINT_GROUPS[mode];
   const allVisible =
     mode === "reach" || mode === "seated"
-      ? isGroupVisible(requiredGroups[0], landmarks) &&
-        (isGroupVisible(requiredGroups[1], landmarks) ||
-          isGroupVisible(requiredGroups[2], landmarks))
+      ? requiredGroups.some((group) => isGroupVisible(group, landmarks))
       : requiredGroups.length > 0 &&
         requiredGroups.every((group) => isGroupVisible(group, landmarks));
   const poseUsable = hasUsablePose(landmarks, mode);
@@ -334,11 +326,13 @@ function JointVisibilityPanel({
         </p>
         <p className="mt-1 text-base font-bold leading-relaxed text-[#394B45]">
           {allVisible && poseUsable
-            ? "Required joints are visible enough for this activity."
+            ? mode === "reach" || mode === "seated"
+              ? "One hand is visible enough for this activity."
+              : "Required joints are visible enough for this activity."
             : allVisible
-              ? "Joints are detected, but the body frame is not stable. Move hands away from the lens and keep shoulders visible."
+              ? "Tracking points are detected, but the stage is not stable yet."
               : mode === "reach" || mode === "seated"
-                ? "Show shoulders and raise at least one hand where the camera can see it."
+                ? "Raise one open hand where the camera can see it."
                 : "Show every required joint before treating the session as usable."}
         </p>
       </div>
@@ -426,12 +420,12 @@ function buildCameraEvidenceText({
     `mode: ${mode}`,
     `cameraActive: ${isReady ? "yes" : "no"}`,
     `poseConfidence: ${confidence}`,
-    `bodyFrameUsable: ${poseUsable ? "yes" : "no"}`,
+    `stageTrackingUsable: ${poseUsable ? "yes" : "no"}`,
     `status: ${status}`,
     `error: ${error ?? "none"}`,
     `visibleKeypoints: ${visibleKeypoints}`,
     `jointGroups: ${groups.join("; ")}`,
-    "setupTarget: seated/reach modes need shoulders plus one visible elbow/wrist pair; standing mode needs shoulders/hips/knees",
+    "setupTarget: seated/reach modes need one visible open hand; standing mode needs shoulders/hips/knees",
   ].join("\n");
 }
 

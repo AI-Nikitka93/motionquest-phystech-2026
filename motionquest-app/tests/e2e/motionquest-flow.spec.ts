@@ -7,7 +7,7 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
 }) => {
   await page.goto(appUrl);
 
-  await expect(page.getByText("Judge Demo")).toBeVisible();
+  await expect(page.getByText("Judge Proof")).toBeVisible();
   await expect(page.getByText("Use Safe Demo Data")).toBeVisible();
   await expect(page.getByRole("button", { name: "I can stand safely" })).toBeVisible();
   await expect(page.getByRole("button", { name: "I will stay seated" })).toBeVisible();
@@ -26,7 +26,7 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
 
   await page.getByRole("button", { name: "Start seated mode" }).click();
   await expect(
-    page.getByText("First show shoulders and one hand."),
+    page.getByText("Seated mode is already selected."),
   ).toBeVisible();
   await page.getByRole("button", { name: "Finish early" }).click();
 
@@ -35,7 +35,7 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
 
   await page.getByRole("button", { name: "Start Reach Stars" }).click();
   await expect(
-    page.getByText("First show shoulders and one raised hand."),
+    page.getByText("Raise one visible hand."),
   ).toBeVisible();
   await page.getByRole("button", { name: "Finish & View Report" }).click();
 
@@ -112,7 +112,7 @@ test("key visual sections keep accessible contrast", async ({ page }) => {
 
   const samples = [
     page.getByRole("heading", { name: "MotionQuest" }),
-    page.getByText("Judge Demo").first(),
+    page.getByText("Judge Proof").first(),
     page.getByRole("button", { name: "Start Seated Judge Walkthrough" }),
     page.getByText("Lower-friction movement practice"),
     page.getByRole("button", { name: "Verify Seated Camera Flow" }),

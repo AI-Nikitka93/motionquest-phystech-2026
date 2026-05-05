@@ -115,7 +115,7 @@ export function MotionQuestApp() {
             </div>
             <div>
               <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-                PhysTech 2026 · Evidence-aligned exergame prototype
+                PhysTech 2026 · Evidence-aligned exergame session
               </p>
               <h1 className="mt-2 text-4xl font-black leading-tight md:text-5xl">
                 MotionQuest
@@ -223,7 +223,7 @@ function HomeScreen({
             report.
           </p>
           <p className="mt-4 text-xl leading-relaxed text-[#394B45]">
-            The prototype estimates reps, target hits, timing, and tracking
+            MotionQuest estimates reps, target hits, timing, and tracking
             quality. It is research-aligned practice, not a medical test.
           </p>
         </article>
@@ -237,7 +237,7 @@ function HomeScreen({
       <CameraStage
         mode="calibration"
         title="Camera setup"
-        instruction="Choose standing only if it is safe. Seated mode works with visible shoulders and arms."
+        instruction="Choose standing only if it is safe. Seated mode uses one visible open hand."
       />
       <div className="flex flex-col gap-4 rounded-lg bg-white p-6 shadow-camera md:flex-row">
         <div className="flex-1">
@@ -268,8 +268,8 @@ function HomeScreen({
             I will stay seated
           </button>
           <p className="mt-3 text-base font-bold leading-relaxed text-[#394B45]">
-            Uses visible shoulders, elbows and wrists for seated upper-body
-            movement. It is not a fallback failure state.
+            Uses hand tracking for seated upper-body movement. It is not a
+            fallback failure state.
           </p>
         </div>
         <div className="flex-1">
@@ -329,7 +329,7 @@ function ChairStandScreen({
             ? [
                 "Visible seated arm movement repetitions",
                 "30-second session duration",
-                "Upper-body pose tracking confidence",
+                "Hand tracking confidence",
               ]
             : [
                 "Visible sit-to-stand repetitions",
@@ -339,7 +339,7 @@ function ChairStandScreen({
         }
         whatCounts={
           isSeated
-            ? "One seated rep counts after the arm visibly bends and returns to extended."
+            ? "One seated rep counts after one visible hand raises and lowers."
             : "One standing rep counts after a full stand and return to seated position."
         }
       />
@@ -349,8 +349,8 @@ function ChairStandScreen({
           checks={
             isSeated
               ? [
-                  "Stay seated in a stable chair and keep shoulders visible.",
-                  "Raise and lower one visible hand in a comfortable range.",
+                  "Stay seated in a stable chair.",
+                  "Raise and lower one open hand where the camera can see it.",
                   "Move only in a comfortable range.",
                 ]
               : [
@@ -367,7 +367,7 @@ function ChairStandScreen({
           mode="seated"
           autoStart
           title="Seated Adaptive Movement"
-          instruction="Keep shoulders visible, then raise and lower one hand."
+          instruction="Stay seated, then raise and lower one open hand."
         >
           {(tracking) => (
             <SeatedArmHud
@@ -594,14 +594,13 @@ function SeatedArmHud({
       <HudChip className="left-4 right-4 top-4 md:left-auto md:right-4 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
-          First show shoulders and one hand. Then raise and lower the same hand
+          Seated mode is already selected. Raise and lower the same visible hand
           to complete the rep.
         </span>
       </HudChip>
       {!hasUsableSeatedPose ? (
         <div className="absolute bottom-28 left-4 max-w-xl rounded-xl bg-[#D8F3DC] p-4 text-xl font-bold text-[#10231F] shadow-camera">
-          Timer is paused. Keep shoulders visible and raise one hand until it is
-          visible.
+          Timer is paused. Raise one open hand where the camera can see it.
         </div>
       ) : null}
       {pulse ? (
@@ -647,7 +646,7 @@ function ReachStarsScreen({
         <ReadinessConfirmation
           title="Ready for Reach Stars"
           checks={[
-            "Sit or stand far enough back to show shoulders.",
+            "Sit or stand in a comfortable position.",
             "Raise one open hand where the camera can see it.",
             "Reach only within a comfortable range.",
           ]}
@@ -699,7 +698,7 @@ function ReachStarsHud({
   const hasUsableReachPose = hasUsablePose(tracking.landmarks, "reach");
   const displayFeedback = hasUsableReachPose
     ? feedback
-    : "Show shoulders, then raise one hand until elbow and wrist are visible.";
+    : "Raise one open hand where the camera can see it.";
 
   const finish = useCallback(
     (confidence: PoseConfidence) => {
@@ -801,8 +800,8 @@ function ReachStarsHud({
       <HudChip className="left-4 right-4 top-44 md:left-auto md:right-4 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
-          First show shoulders and one raised hand. Then hold your hand inside
-          the yellow target for half a second.
+          Raise one visible hand. Then hold it inside the yellow target for half
+          a second.
         </span>
       </HudChip>
       <button
@@ -1059,7 +1058,7 @@ function JudgeDemoEntry({
   return (
     <section className="rounded-lg bg-[#10231F] p-6 text-white shadow-camera md:p-8">
       <p className="text-base font-bold uppercase tracking-wide text-[#F6C85F]">
-        Judge Demo · 90 seconds
+        Judge Proof · 90 seconds
       </p>
       <h2 className="mt-2 text-3xl font-black leading-tight">
         A guided walkthrough from problem to camera proof to report.
@@ -1353,7 +1352,7 @@ function MethodAndTrust({ id }: { id: string }) {
           for this MVP.
         </p>
         <p className="mt-4 text-lg font-bold leading-relaxed text-[#394B45]">
-          MotionQuest is a hackathon prototype. It does not diagnose, predict
+          MotionQuest is a hackathon build. It does not diagnose, predict
           falls, or replace professional evaluation.
         </p>
       </article>

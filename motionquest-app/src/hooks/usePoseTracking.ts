@@ -41,19 +41,13 @@ const CHAIR_CONNECTIONS = [
   [26, 28],
 ] as const;
 
-const REACH_CONNECTIONS = [
-  [11, 12],
-  [11, 13],
-  [13, 15],
-  [12, 14],
-  [14, 16],
-] as const;
+const REACH_CONNECTIONS = [] as const;
 
 const KEY_POINTS: Record<PoseMode, number[]> = {
   calibration: [11, 12, 23, 24, 25, 26, 27, 28],
   chair: [11, 12, 23, 24, 25, 26, 27, 28],
-  seated: [11, 12, 13, 14, 15, 16],
-  reach: [11, 12, 13, 14, 15, 16],
+  seated: [15, 16],
+  reach: [15, 16],
 };
 
 const SMOOTHING_ALPHA = 0.38;
@@ -323,63 +317,30 @@ function mergeHandLandmarksIntoPose(
   handLandmarks: NormalizedLandmark[][],
   mode: PoseMode,
 ) {
-  if ((mode !== "seated" && mode !== "reach") || handLandmarks.length === 0) {
-    if (mode !== "seated" && mode !== "reach") return poseLandmarks;
+  if (mode !== "seated" && mode !== "reach") {
+    return poseLandmarks;
   }
 
-  const merged = Array.from({ length: Math.max(33, poseLandmarks.length) }, (
-    _,
-    index,
-  ) => poseLandmarks[index]);
-
-  if (mode === "seated" || mode === "reach") {
-    for (const index of [13, 14, 15, 16]) {
-      merged[index] = {
-        x: 0,
-        y: 0,
-        z: 0,
-        visibility: 0,
-      };
-    }
-  }
+  const merged: NormalizedLandmark[] = Array.from({ length: Math.max(33, poseLandmarks.length) }, () => ({
+    x: 0,
+    y: 0,
+    visibility: 0,
+  }));
 
   if (handLandmarks.length === 0) {
     return merged;
   }
-  const leftShoulder = merged[11];
-  const rightShoulder = merged[12];
-  const shoulderMidX =
-    isVisibleLandmark(leftShoulder, DIAGNOSTIC_VISIBILITY_THRESHOLD) &&
-    isVisibleLandmark(rightShoulder, DIAGNOSTIC_VISIBILITY_THRESHOLD)
-      ? (leftShoulder.x + rightShoulder.x) / 2
-      : 0.5;
 
   for (const hand of handLandmarks) {
     const wrist = hand[0];
     if (!isVisibleLandmark(wrist, 0.2)) continue;
 
-    const side: "left" | "right" = wrist.x < shoulderMidX ? "left" : "right";
-    const shoulderIndex = side === "left" ? 11 : 12;
-    const elbowIndex = side === "left" ? 13 : 14;
-    const wristIndex = side === "left" ? 15 : 16;
-    const shoulder = merged[shoulderIndex];
-    if (!isVisibleLandmark(shoulder, DIAGNOSTIC_VISIBILITY_THRESHOLD)) continue;
-
-    const handWrist = {
+    const wristIndex = wrist.x < 0.5 ? 15 : 16;
+    merged[wristIndex] = {
       x: wrist.x,
       y: wrist.y,
       z: wrist.z,
       visibility: 0.96,
-    };
-    merged[wristIndex] = handWrist;
-    merged[elbowIndex] = {
-      x: shoulder.x + (handWrist.x - shoulder.x) * 0.55,
-      y: shoulder.y + (handWrist.y - shoulder.y) * 0.55,
-      z:
-        shoulder.z !== undefined && handWrist.z !== undefined
-          ? shoulder.z + (handWrist.z - shoulder.z) * 0.55
-          : handWrist.z,
-      visibility: 0.9,
     };
   }
 
@@ -459,23 +420,20 @@ function smoothLandmarks(
 }
 
 function framingHint(mode: PoseMode, landmarks: NormalizedLandmark[]) {
+  if (mode === "reach") {
+    return "Raise one open hand where the camera can see it";
+  }
+  if (mode === "seated") {
+    return "Seated mode is selected. Raise and lower one open hand in view";
+  }
+
   const upperBodyCandidate = countVisibleLandmarks(landmarks, [
     11, 12, 13, 14, 15, 16, 23, 24,
   ], DIAGNOSTIC_VISIBILITY_THRESHOLD);
   if (upperBodyCandidate >= 5) {
-    return mode === "reach"
-      ? "Reach tracking unstable. Keep shoulders visible and raise one hand away from the lens"
-      : mode === "seated"
-        ? "Seated tracking unstable. Keep shoulders visible and raise one forearm away from the lens"
-        : "Body frame unstable. Move hands away from the lens and show your shoulders and hips";
+    return "Body frame unstable. Move hands away from the lens and show your shoulders and hips";
   }
 
-  if (mode === "reach") {
-    return "Show shoulders, then raise one open hand where the camera can see it";
-  }
-  if (mode === "seated") {
-    return "Keep shoulders in frame, then raise one forearm until elbow and wrist are visible";
-  }
   return "Step back until shoulders, hips and knees are visible";
 }
 
@@ -485,9 +443,9 @@ function hasDiagnosticPose(landmarks: NormalizedLandmark[], mode: PoseMode) {
   if (mode === "seated" || mode === "reach") {
     return countVisibleLandmarks(
       landmarks,
-      [11, 12, 13, 14, 15, 16],
+      [15, 16],
       DIAGNOSTIC_VISIBILITY_THRESHOLD,
-    ) >= 2;
+    ) >= 1;
   }
 
   return countVisibleLandmarks(

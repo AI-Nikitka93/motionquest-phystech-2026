@@ -58,15 +58,15 @@ export const REACH_TARGET_DWELL_MS = 500;
 const REQUIRED_LANDMARKS: Record<PoseMode, number[]> = {
   calibration: [11, 12, 23, 24, 25, 26, 27, 28],
   chair: [11, 12, 23, 24, 25, 26, 27, 28],
-  seated: [11, 12, 13, 14, 15, 16],
-  reach: [11, 12, 13, 14, 15, 16],
+  seated: [15, 16],
+  reach: [15, 16],
 };
 
 const MIN_USABLE_LANDMARKS: Record<PoseMode, number[]> = {
   calibration: [11, 12, 23, 24, 25, 26],
   chair: [11, 12, 23, 24, 25, 26],
-  seated: [11, 12],
-  reach: [11, 12],
+  seated: [15, 16],
+  reach: [15, 16],
 };
 
 export function isVisibleLandmark(
@@ -98,6 +98,10 @@ export function hasUsablePose(
   landmarks: NormalizedLandmark[],
   mode: PoseMode,
 ) {
+  if (mode === "seated" || mode === "reach") {
+    return hasVisibleHand(landmarks);
+  }
+
   const required = MIN_USABLE_LANDMARKS[mode];
   return (
     required.every((index) => isVisibleLandmark(landmarks[index])) &&
@@ -112,11 +116,7 @@ export function hasPlausibleBodyFrame(
   const leftShoulder = landmarks[11];
   const rightShoulder = landmarks[12];
   if (mode === "reach" || mode === "seated") {
-    if (!hasPlausibleShoulderFrame(leftShoulder, rightShoulder)) {
-      return false;
-    }
-    return hasPlausibleReachArm(landmarks, "left") ||
-      hasPlausibleReachArm(landmarks, "right");
+    return hasVisibleHand(landmarks);
   }
 
   const leftHip = landmarks[23];
@@ -206,6 +206,13 @@ export function getPoseConfidence(
   landmarks: NormalizedLandmark[],
   mode: PoseMode,
 ): PoseConfidence {
+  if (mode === "seated" || mode === "reach") {
+    const visibleHands = countVisibleLandmarks(landmarks, [15, 16], 0.42);
+    if (visibleHands >= 2) return "high";
+    if (visibleHands === 1) return "medium";
+    return "low";
+  }
+
   if (!hasPlausibleBodyFrame(landmarks, mode)) return "low";
 
   const required = REQUIRED_LANDMARKS[mode];
@@ -222,9 +229,6 @@ export function getPoseConfidence(
 
   const usable = hasUsablePose(landmarks, mode);
   if (ratio >= 0.95 && averageVisibility >= 0.72) return "high";
-  if (mode === "seated" || mode === "reach") {
-    if (usable && ratio >= 0.5 && averageVisibility >= 0.55) return "medium";
-  }
   if (ratio >= 0.7 && usable) return "medium";
   return "low";
 }
@@ -294,8 +298,8 @@ export function getVisibleElbowAngles(landmarks: NormalizedLandmark[]) {
 }
 
 export function getVisibleWristLiftDeltas(landmarks: NormalizedLandmark[]) {
-  const left = calculateWristLiftDelta(landmarks[11], landmarks[15]);
-  const right = calculateWristLiftDelta(landmarks[12], landmarks[16]);
+  const left = calculateWristLiftDelta(landmarks[15]);
+  const right = calculateWristLiftDelta(landmarks[16]);
   return [left, right].filter((delta): delta is number => delta !== null);
 }
 
@@ -368,15 +372,16 @@ function calculateJointAngle(
   return (Math.acos(cosine) * 180) / Math.PI;
 }
 
-function calculateWristLiftDelta(
-  shoulder: NormalizedLandmark | undefined,
-  wrist: NormalizedLandmark | undefined,
-) {
-  if (!isVisibleLandmark(shoulder) || !isVisibleLandmark(wrist)) {
+function calculateWristLiftDelta(wrist: NormalizedLandmark | undefined) {
+  if (!isVisibleLandmark(wrist, 0.42)) {
     return null;
   }
 
-  return shoulder.y - wrist.y;
+  return 0.65 - wrist.y;
+}
+
+function hasVisibleHand(landmarks: NormalizedLandmark[]) {
+  return countVisibleLandmarks(landmarks, [15, 16], 0.42) >= 1;
 }
 
 function hasPlausibleArm(
@@ -413,42 +418,6 @@ function hasPlausibleArm(
     wholeArm >= 0.06 &&
     maxSegment <= Math.max(0.36, torsoDiagonal * 1.6) &&
     zDelta <= 0.75
-  );
-}
-
-function hasPlausibleReachArm(
-  landmarks: NormalizedLandmark[],
-  side: "left" | "right",
-) {
-  const [shoulderIndex, elbowIndex, wristIndex] =
-    side === "left" ? [11, 13, 15] : [12, 14, 16];
-  const shoulder = landmarks[shoulderIndex];
-  const elbow = landmarks[elbowIndex];
-  const wrist = landmarks[wristIndex];
-
-  if (
-    !isVisibleLandmark(shoulder) ||
-    !isVisibleLandmark(elbow, 0.42) ||
-    !isVisibleLandmark(wrist, 0.42)
-  ) {
-    return false;
-  }
-
-  const upperArm = distance(shoulder, elbow);
-  const forearm = distance(elbow, wrist);
-  const wholeArm = distance(shoulder, wrist);
-  const zDelta =
-    Number.isFinite(wrist.z) && Number.isFinite(shoulder.z)
-      ? Math.abs((wrist.z ?? 0) - (shoulder.z ?? 0))
-      : 0;
-
-  return (
-    upperArm >= 0.025 &&
-    forearm >= 0.025 &&
-    wholeArm >= 0.045 &&
-    upperArm <= 0.48 &&
-    forearm <= 0.48 &&
-    zDelta <= 0.85
   );
 }
 

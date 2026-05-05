@@ -386,3 +386,12 @@
 Локальный account context: без изменений
 Локальная карта секретов: без изменений
 Следующий шаг: user should hard-refresh and retry with open hand visible; if no hand is detected, use `Copy live evidence` to inspect hand/pose status.
+
+Дата и время: 2026-05-05 19:04
+Роль: P-FRONTEND / P-DEBUG / Product Hardening
+Сделано: после пользовательского скрина с close seated PC webcam полностью переведены seated/reach modes на hand-only tracking: выбранный seated mode больше не доказывает sitting через body landmarks, PoseLandmarker body/shoulder/arm landmarks игнорируются для seated/reach usability and overlay, and only HandLandmarker wrist data can draw/count a hand. Product copy tightened from `prototype` / `Judge Demo` to `Evidence-aligned exergame session` / `Judge Proof`.
+Изменены файлы: `motionquest-app/src/lib/gameLogic.ts`, `motionquest-app/src/lib/gameLogic.test.ts`, `motionquest-app/src/hooks/usePoseTracking.ts`, `motionquest-app/src/components/CameraStage.tsx`, `motionquest-app/src/components/MotionQuestApp.tsx`, `motionquest-app/src/lib/sessionStorage.ts`, `motionquest-app/tests/e2e/motionquest-flow.spec.ts`, `docs/STATE.md`, `docs/PROJECT_MAP.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`, `output/playwright/seated-hand-only-local.png`, `output/playwright/seated-hand-only-production.png`.
+Результат/доказательство: `npm run lint` passed; `npm test` 16/16 passed; `npm run build` passed; local browser smoke confirmed `hasOldContract=false` and `hasHandOnly=true`; Vercel production deployment `dpl_2cZWQerAMoowNVrKM56ySApA5p7j` Ready and aliased to `https://motionquest-app.vercel.app`; `npm run test:e2e` 7/7 passed against production; production browser smoke confirmed `hasOldContract=false` and `hasProductCopy=true`; no-placeholder scan returned no matches.
+Локальный account context: без изменений
+Локальная карта секретов: без изменений
+Следующий шаг: user should hard-refresh production URL and retry seated/reach with one open hand visible; if tracking still fails, copy live evidence from the app and save it with screenshots in `evidence/camera-smoke/`.

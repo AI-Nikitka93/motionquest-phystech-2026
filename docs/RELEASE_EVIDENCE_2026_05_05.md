@@ -131,6 +131,64 @@ Fix shipped:
   lower-frame limb.
 - E2E was rerun against production after deployment `dpl_D5JKs8JbbaLgGL4EXYDz6UedEc3Z`.
 
+## Hand-Only Seated / Reach Fix
+
+User screenshots on 2026-05-05 showed that close seated PC webcam framing still
+made PoseLandmarker body/shoulder logic unstable and could leave the user stuck
+even while seated in front of the camera.
+
+Fix shipped:
+
+- User-selected seated mode is now treated as the seated branch; the app no
+  longer tries to infer "sitting" from body landmarks in seated mode.
+- Seated Adaptive and Reach Stars now require one visible open hand, not
+  shoulders, elbows, hips or knees.
+- Seated/reach modes ignore PoseLandmarker body, shoulder, elbow and wrist
+  landmarks for usability and overlay drawing.
+- Only HandLandmarker wrist data can create visible hand points or trigger
+  seated/reach scoring.
+- Seated reps now use one-hand raise/lower cycles.
+- Product-facing copy was tightened from `prototype` / `Judge Demo` to
+  `Evidence-aligned exergame session` / `Judge Proof`.
+- Local and production browser smoke checks confirmed no old seated/reach copy:
+  `First show shoulders`, `Keep shoulders`, `Show shoulders`, `elbow and wrist`,
+  `Left arm`, `Right arm`.
+- Screenshot evidence:
+  `output/playwright/seated-hand-only-local.png` and
+  `output/playwright/seated-hand-only-production.png`.
+- E2E was rerun against production after deployment `dpl_2cZWQerAMoowNVrKM56ySApA5p7j`.
+
+## Hand-Only Seated / Reach Fix
+
+User screenshot on 2026-05-05 showed that close seated PC webcam framing still
+made the app depend on unreliable shoulder/body pose. The practical issue was
+product-level: when the user chooses seated mode, the app should not try to
+prove that the user is seated from body-pose landmarks.
+
+Fix shipped:
+
+- Seated Adaptive and Reach Stars now use HandLandmarker-only usability.
+- User-selected seated mode is treated as the seated branch.
+- Seated/reach modes no longer use PoseLandmarker body, shoulder, elbow or
+  wrist landmarks for scoring or overlay.
+- A seated/reach stage becomes usable when one real HandLandmarker wrist is
+  visible.
+- Overlay for seated/reach draws only visible hand points and no fake arm/body
+  skeleton.
+- Seated reps count one visible hand raise/lower cycle.
+- HUD and diagnostics now say `one open hand`, `Left hand`, `Right hand` instead
+  of `shoulders`, `elbow` and `wrist`.
+- Local browser smoke confirmed old shoulder/elbow contract is gone and
+  hand-only copy is present.
+- Production browser smoke confirmed old shoulder/elbow contract is gone and
+  hand-only copy is present.
+- E2E was rerun against production after deployment `dpl_7ba5eAUjCkbmnYpzL4JXJhi4NUcm`.
+
+Evidence artifacts:
+
+- `output/playwright/seated-hand-only-local.png`
+- `output/playwright/seated-hand-only-production.png`
+
 ## MediaPipe Production Asset Checks
 
 | Asset | Result |

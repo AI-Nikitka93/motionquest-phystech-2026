@@ -59,10 +59,7 @@ test("detectReachHit returns true when either wrist enters the star target box",
     shownAt: 0,
   };
 
-  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.9));
-  landmarks[11] = landmark(0.42, 0.28, 0.95);
-  landmarks[12] = landmark(0.58, 0.29, 0.95);
-  landmarks[13] = landmark(0.34, 0.38, 0.95);
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
   landmarks[15] = landmark(0.22, 0.48, 0.96);
 
   assert.equal(detectReachHit(landmarks, target), true);
@@ -88,7 +85,7 @@ test("getPoseConfidence returns medium for usable but incomplete full-body pose"
   assert.equal(getPoseConfidence(landmarks, "chair"), "medium");
 });
 
-test("hasUsablePose rejects hand-close false body geometry even when required landmarks are visible", () => {
+test("standing pose rejects hand-close false body geometry even when required landmarks are visible", () => {
   const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
   landmarks[11] = landmark(0.32, 0.35, 0.96);
   landmarks[12] = landmark(0.39, 0.36, 0.96);
@@ -99,25 +96,21 @@ test("hasUsablePose rejects hand-close false body geometry even when required la
   landmarks[23] = landmark(0.41, 0.62, 0.96);
   landmarks[24] = landmark(0.46, 0.63, 0.96);
 
-  assert.equal(hasPlausibleBodyFrame(landmarks, "reach"), false);
-  assert.equal(hasUsablePose(landmarks, "reach"), false);
-  assert.equal(getPoseConfidence(landmarks, "reach"), "low");
+  assert.equal(hasPlausibleBodyFrame(landmarks, "chair"), false);
+  assert.equal(hasUsablePose(landmarks, "chair"), false);
+  assert.equal(getPoseConfidence(landmarks, "chair"), "low");
 });
 
-test("Reach Stars accepts a seated upper-body frame with one visible arm and no hips", () => {
+test("Reach Stars accepts one visible hand without shoulders, elbows or hips", () => {
   const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
-  landmarks[11] = landmark(0.42, 0.28, 0.9);
-  landmarks[12] = landmark(0.58, 0.29, 0.9);
-  landmarks[13] = landmark(0.35, 0.37, 0.88);
   landmarks[15] = landmark(0.24, 0.32, 0.88);
-  landmarks[23] = landmark(0.44, 0.8, 0.03);
-  landmarks[24] = landmark(0.56, 0.8, 0.03);
 
   assert.equal(hasPlausibleBodyFrame(landmarks, "reach"), true);
   assert.equal(hasUsablePose(landmarks, "reach"), true);
+  assert.equal(getPoseConfidence(landmarks, "reach"), "medium");
 });
 
-test("Reach Stars rejects shoulders only until at least one elbow and wrist are visible", () => {
+test("Reach Stars rejects shoulders only until at least one hand is visible", () => {
   const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
   landmarks[11] = landmark(0.42, 0.28, 0.9);
   landmarks[12] = landmark(0.58, 0.29, 0.9);
@@ -182,18 +175,9 @@ test("buildDemoSession labels fallback data explicitly", () => {
   assert.match(session.report.disclaimer, /Safe demo data only/);
 });
 
-test("classifyPoseReadiness accepts seated upper-body tracking without visible knees", () => {
+test("classifyPoseReadiness accepts seated hand tracking without visible knees", () => {
   const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
-  landmarks[11] = landmark(0.42, 0.26, 0.9);
-  landmarks[12] = landmark(0.58, 0.26, 0.9);
-  landmarks[13] = landmark(0.36, 0.4, 0.9);
   landmarks[15] = landmark(0.34, 0.54, 0.9);
-  landmarks[14] = landmark(0.64, 0.4, 0.04);
-  landmarks[16] = landmark(0.66, 0.54, 0.04);
-  landmarks[23] = landmark(0.44, 0.58, 0.04);
-  landmarks[24] = landmark(0.56, 0.58, 0.04);
-  landmarks[25] = landmark(0.5, 0.9, 0.04);
-  landmarks[26] = landmark(0.5, 0.9, 0.04);
 
   assert.equal(classifyPoseReadiness(landmarks), "seated-ready");
   assert.equal(hasUsablePose(landmarks, "seated"), true);
@@ -238,12 +222,11 @@ test("detectSeatedWristLiftTransition counts one visible hand raise and lower cy
   assert.equal(phase, "extended");
 });
 
-test("getVisibleWristLiftDeltas reads a hand above the shoulder as positive lift", () => {
+test("getVisibleWristLiftDeltas reads a raised hand as positive lift without shoulders", () => {
   const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
-  landmarks[11] = landmark(0.42, 0.44, 0.9);
   landmarks[15] = landmark(0.3, 0.22, 0.95);
 
-  assert.deepEqual(getVisibleWristLiftDeltas(landmarks), [0.22]);
+  assert.equal(getVisibleWristLiftDeltas(landmarks)[0]?.toFixed(2), "0.43");
 });
 
 test("detectReachDwellHit requires the wrist to stay inside the target for 500ms", () => {
@@ -255,10 +238,7 @@ test("detectReachDwellHit requires the wrist to stay inside the target for 500ms
     size: 16,
     shownAt: 1000,
   };
-  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.9));
-  landmarks[11] = landmark(0.42, 0.28, 0.95);
-  landmarks[12] = landmark(0.58, 0.29, 0.95);
-  landmarks[13] = landmark(0.34, 0.38, 0.95);
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
   landmarks[15] = landmark(0.22, 0.48, 0.96);
 
   const first = detectReachDwellHit({

@@ -52,7 +52,7 @@ MotionQuest: a browser-based webcam exergame for older adults and seated/standin
 ## Implementation Structure
 - `motionquest-app/src/app/` - Next.js App Router entrypoint.
 - `motionquest-app/src/components/` - MotionQuest screens and camera stage.
-- `motionquest-app/src/hooks/usePoseTracking.ts` - webcam and MediaPipe Pose integration.
+- `motionquest-app/src/hooks/usePoseTracking.ts` - webcam, MediaPipe Pose and MediaPipe HandLandmarker integration.
 - `motionquest-app/src/lib/gameLogic.ts` - pure Adaptive Chair Movement / Reach Stars heuristics.
 - `motionquest-app/src/lib/sessionStorage.ts` - localStorage session persistence.
 - `motionquest-app/tailwind.config.ts` - visual tokens from `docs/visual-spec.md`.
@@ -60,13 +60,13 @@ MotionQuest: a browser-based webcam exergame for older adults and seated/standin
 ## Deployment
 - Host: Vercel.
 - Production URL: `https://motionquest-app.vercel.app`.
-- Deployment id: `dpl_D5JKs8JbbaLgGL4EXYDz6UedEc3Z`.
+- Deployment id: `dpl_2cZWQerAMoowNVrKM56ySApA5p7j`.
 - Public source package: `https://github.com/AI-Nikitka93/motionquest-phystech-2026`.
 - Vercel local project metadata is in `motionquest-app/.vercel/` and ignored by `.gitignore`.
 
 ## Risks
 - Browser pose tracking calibration may be fragile.
-- Pose overlay now rejects single-limb/partial-body noise and supports seated upper-body tracking without requiring hips for seated-adaptive/reach branches. Seated/reach modes clear PoseLandmarker arm landmarks, then combine PoseLandmarker shoulders with HandLandmarker wrist data, but real-room camera distance, lighting and framing still need physical smoke testing.
+- Pose overlay now rejects single-limb/partial-body noise and supports seated/reach tracking without requiring hips or shoulders for seated-adaptive/reach branches. Seated/reach modes ignore PoseLandmarker body/arm landmarks and accept only real HandLandmarker wrist data, but real-room camera distance, lighting and framing still need physical smoke testing.
 - Webcam permission and lighting can break live demo.
 - Clinical claims must stay conservative.
 - Dev server uses port `3001` in this workspace because `3000` was already occupied during verification.

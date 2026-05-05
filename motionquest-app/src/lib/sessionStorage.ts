@@ -248,7 +248,7 @@ function buildLimitations(
   }
   if (draft.primaryMovement === "seated-arm-movement") {
     limitations.push(
-      "Seated adaptive mode uses visible upper-body landmarks and is not a clinical strength score.",
+      "Seated adaptive mode uses visible hand tracking and is not a clinical strength score.",
     );
   }
   if (draft.primaryMovement === "chair-stand" && draft.chairReps === 0) {
