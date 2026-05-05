@@ -368,3 +368,12 @@
 Локальный account context: без изменений
 Локальная карта секретов: без изменений
 Следующий шаг: deploy diagnostic landmark retention and rerun production e2e.
+
+Дата и время: 2026-05-05 05:24
+Роль: P-FRONTEND / P-DEBUG / Verification
+Сделано: исправлена ложная нижняя arm-skeleton линия в seated/reach modes: добавлен MediaPipe HandLandmarker для видимой кисти, hips removed from seated/reach overlay, seated reps теперь считают visible hand raise/lower cycles instead of relying only on pose elbow angles.
+Изменены файлы: `motionquest-app/src/hooks/usePoseTracking.ts`, `motionquest-app/src/components/CameraStage.tsx`, `motionquest-app/src/components/MotionQuestApp.tsx`, `motionquest-app/src/lib/gameLogic.ts`, `motionquest-app/src/lib/gameLogic.test.ts`, `motionquest-app/tests/e2e/motionquest-flow.spec.ts`, `docs/STATE.md`, `docs/PROJECT_MAP.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: HandLandmarker model URL returned HTTP 200; `npm run lint` passed; `npm test` 16/16 passed; `npm run build` passed; Vercel production deployment `dpl_2qhbJ1xCbc11WD1XFPX3D8eYS479` Ready and aliased to `https://motionquest-app.vercel.app`; `npm run test:e2e` 7/7 passed against production.
+Локальный account context: без изменений
+Локальная карта секретов: без изменений
+Следующий шаг: user should hard-refresh production URL and retry seated mode with the hand visible; if it still fails, paste `Copy live evidence`.

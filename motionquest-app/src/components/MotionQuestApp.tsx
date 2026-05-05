@@ -9,8 +9,8 @@ import {
   averageY,
   detectReachDwellHit,
   detectChairStandTransition,
-  detectSeatedArmTransition,
-  getVisibleElbowAngles,
+  detectSeatedWristLiftTransition,
+  getVisibleWristLiftDeltas,
   getPoseConfidence,
   hasUsablePose,
   type ChairStandPhase,
@@ -350,7 +350,7 @@ function ChairStandScreen({
             isSeated
               ? [
                   "Stay seated in a stable chair and keep shoulders visible.",
-                  "Raise one forearm until its elbow and wrist are visible.",
+                  "Raise and lower one visible hand in a comfortable range.",
                   "Move only in a comfortable range.",
                 ]
               : [
@@ -367,7 +367,7 @@ function ChairStandScreen({
           mode="seated"
           autoStart
           title="Seated Adaptive Movement"
-          instruction="Keep shoulders visible, then bend and extend one forearm."
+          instruction="Keep shoulders visible, then raise and lower one hand."
         >
           {(tracking) => (
             <SeatedArmHud
@@ -556,14 +556,14 @@ function SeatedArmHud({
   useEffect(() => {
     if (!hasUsableSeatedPose) return;
 
-    const elbowAngles = getVisibleElbowAngles(tracking.landmarks);
-    if (elbowAngles.length === 0) return;
+    const liftDeltas = getVisibleWristLiftDeltas(tracking.landmarks);
+    if (liftDeltas.length === 0) return;
 
-    const elbowAngle = Math.min(...elbowAngles);
-    const result = detectSeatedArmTransition({
+    const liftDelta = Math.max(...liftDeltas);
+    const result = detectSeatedWristLiftTransition({
       previousPhase: phaseRef.current,
       reps: repsRef.current,
-      elbowAngle,
+      liftDelta,
     });
 
     if (result.reps !== repsRef.current) {
@@ -594,14 +594,14 @@ function SeatedArmHud({
       <HudChip className="left-4 right-4 top-4 md:left-auto md:right-4 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
-          First show shoulders and one forearm. Then bend and extend the same
-          arm to complete the rep.
+          First show shoulders and one hand. Then raise and lower the same hand
+          to complete the rep.
         </span>
       </HudChip>
       {!hasUsableSeatedPose ? (
         <div className="absolute bottom-28 left-4 max-w-xl rounded-xl bg-[#D8F3DC] p-4 text-xl font-bold text-[#10231F] shadow-camera">
-          Timer is paused. Keep shoulders visible and raise one forearm until
-          elbow and wrist are visible.
+          Timer is paused. Keep shoulders visible and raise one hand until it is
+          visible.
         </div>
       ) : null}
       {pulse ? (

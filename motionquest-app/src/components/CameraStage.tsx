@@ -118,7 +118,7 @@ export function CameraStage({
         <div className="mt-5 space-y-4 text-xl leading-relaxed">
           <StageStatusItem tone={poseUsable ? "success" : "warning"}>
             {mode === "seated"
-              ? "Seated upper body and one moving arm are visible"
+              ? "Seated upper body and one hand are visible"
               : mode === "reach"
                 ? "Upper body and at least one reaching hand are visible"
                 : "Shoulders, hips and knees are visible"}
@@ -292,12 +292,12 @@ const JOINT_GROUPS: Record<
     {
       label: "Left arm",
       indexes: [13, 15],
-      help: "Raise your left forearm until elbow and wrist are visible.",
+      help: "Raise your left hand where the camera can see it.",
     },
     {
       label: "Right arm",
       indexes: [14, 16],
-      help: "Raise your right forearm until elbow and wrist are visible.",
+      help: "Raise your right hand where the camera can see it.",
     },
   ],
 };
@@ -338,7 +338,7 @@ function JointVisibilityPanel({
             : allVisible
               ? "Joints are detected, but the body frame is not stable. Move hands away from the lens and keep shoulders visible."
               : mode === "reach" || mode === "seated"
-                ? "Show shoulders and raise at least one forearm until elbow and wrist are visible."
+                ? "Show shoulders and raise at least one hand where the camera can see it."
                 : "Show every required joint before treating the session as usable."}
         </p>
       </div>

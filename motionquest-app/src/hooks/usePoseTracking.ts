@@ -16,10 +16,19 @@ type PoseLandmarkerInstance = {
   ) => { landmarks?: NormalizedLandmark[][] };
 };
 
+type HandLandmarkerInstance = {
+  detectForVideo: (
+    video: HTMLVideoElement,
+    timestampMs: number,
+  ) => { landmarks?: NormalizedLandmark[][] };
+};
+
 const TASKS_VERSION = "0.10.35";
 const WASM_ROOT = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${TASKS_VERSION}/wasm`;
 const MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task";
+const HAND_MODEL_URL =
+  "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task";
 
 const CHAIR_CONNECTIONS = [
   [11, 12],
@@ -38,16 +47,13 @@ const REACH_CONNECTIONS = [
   [13, 15],
   [12, 14],
   [14, 16],
-  [11, 23],
-  [12, 24],
-  [23, 24],
 ] as const;
 
 const KEY_POINTS: Record<PoseMode, number[]> = {
   calibration: [11, 12, 23, 24, 25, 26, 27, 28],
   chair: [11, 12, 23, 24, 25, 26, 27, 28],
-  seated: [11, 12, 13, 14, 15, 16, 23, 24],
-  reach: [11, 12, 13, 14, 15, 16, 23, 24],
+  seated: [11, 12, 13, 14, 15, 16],
+  reach: [11, 12, 13, 14, 15, 16],
 };
 
 const SMOOTHING_ALPHA = 0.38;
@@ -58,6 +64,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const landmarkerRef = useRef<PoseLandmarkerInstance | null>(null);
+  const handmarkerRef = useRef<HandLandmarkerInstance | null>(null);
   const frameRef = useRef<number | null>(null);
   const runFrameRef = useRef<() => void>(() => undefined);
   const streamRef = useRef<MediaStream | null>(null);
@@ -132,11 +139,22 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
   useEffect(() => {
     runFrameRef.current = () => {
       const landmarker = landmarkerRef.current;
+      const handmarker = handmarkerRef.current;
       const video = videoRef.current;
 
       if (landmarker && video && video.readyState >= 2) {
-        const result = landmarker.detectForVideo(video, performance.now());
-        const rawLandmarks = result.landmarks?.[0] ?? [];
+        const now = performance.now();
+        const result = landmarker.detectForVideo(video, now);
+        const rawPoseLandmarks = result.landmarks?.[0] ?? [];
+        const handResult =
+          mode === "seated" || mode === "reach"
+            ? handmarker?.detectForVideo(video, now)
+            : undefined;
+        const rawLandmarks = mergeHandLandmarksIntoPose(
+          rawPoseLandmarks,
+          handResult?.landmarks ?? [],
+          mode,
+        );
         const usable = hasUsablePose(rawLandmarks, mode);
 
         if (usable || hasDiagnosticPose(rawLandmarks, mode)) {
@@ -203,6 +221,40 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
           },
         )) as PoseLandmarkerInstance;
       }
+
+      if (mode === "seated" || mode === "reach") {
+        try {
+          handmarkerRef.current = (await vision.HandLandmarker.createFromOptions(
+            filesetResolver,
+            {
+              baseOptions: {
+                modelAssetPath: HAND_MODEL_URL,
+                delegate: "GPU",
+              },
+              runningMode: "VIDEO",
+              numHands: 2,
+              minHandDetectionConfidence: 0.35,
+              minHandPresenceConfidence: 0.35,
+              minTrackingConfidence: 0.35,
+            },
+          )) as HandLandmarkerInstance;
+        } catch {
+          handmarkerRef.current = (await vision.HandLandmarker.createFromOptions(
+            filesetResolver,
+            {
+              baseOptions: {
+                modelAssetPath: HAND_MODEL_URL,
+                delegate: "CPU",
+              },
+              runningMode: "VIDEO",
+              numHands: 2,
+              minHandDetectionConfidence: 0.35,
+              minHandPresenceConfidence: 0.35,
+              minTrackingConfidence: 0.35,
+            },
+          )) as HandLandmarkerInstance;
+        }
+      }
     } catch {
       setError(
         "Pose model could not load. Check internet connection, reload the page, or use safe demo data for the presentation fallback.",
@@ -235,7 +287,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
       setError(formatCameraError(cause));
       setStatus("Demo mode available");
     }
-  }, []);
+  }, [mode]);
 
   useEffect(() => {
     let autoStartTimer: number | null = null;
@@ -264,6 +316,59 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
     isReady,
     startCamera,
   };
+}
+
+function mergeHandLandmarksIntoPose(
+  poseLandmarks: NormalizedLandmark[],
+  handLandmarks: NormalizedLandmark[][],
+  mode: PoseMode,
+) {
+  if ((mode !== "seated" && mode !== "reach") || handLandmarks.length === 0) {
+    return poseLandmarks;
+  }
+
+  const merged = Array.from({ length: Math.max(33, poseLandmarks.length) }, (
+    _,
+    index,
+  ) => poseLandmarks[index]);
+  const leftShoulder = merged[11];
+  const rightShoulder = merged[12];
+  const shoulderMidX =
+    isVisibleLandmark(leftShoulder, DIAGNOSTIC_VISIBILITY_THRESHOLD) &&
+    isVisibleLandmark(rightShoulder, DIAGNOSTIC_VISIBILITY_THRESHOLD)
+      ? (leftShoulder.x + rightShoulder.x) / 2
+      : 0.5;
+
+  for (const hand of handLandmarks) {
+    const wrist = hand[0];
+    if (!isVisibleLandmark(wrist, 0.2)) continue;
+
+    const side: "left" | "right" = wrist.x < shoulderMidX ? "left" : "right";
+    const shoulderIndex = side === "left" ? 11 : 12;
+    const elbowIndex = side === "left" ? 13 : 14;
+    const wristIndex = side === "left" ? 15 : 16;
+    const shoulder = merged[shoulderIndex];
+    if (!isVisibleLandmark(shoulder, DIAGNOSTIC_VISIBILITY_THRESHOLD)) continue;
+
+    const handWrist = {
+      x: wrist.x,
+      y: wrist.y,
+      z: wrist.z,
+      visibility: 0.96,
+    };
+    merged[wristIndex] = handWrist;
+    merged[elbowIndex] = {
+      x: shoulder.x + (handWrist.x - shoulder.x) * 0.55,
+      y: shoulder.y + (handWrist.y - shoulder.y) * 0.55,
+      z:
+        shoulder.z !== undefined && handWrist.z !== undefined
+          ? shoulder.z + (handWrist.z - shoulder.z) * 0.55
+          : handWrist.z,
+      visibility: 0.9,
+    };
+  }
+
+  return merged;
 }
 
 function formatCameraError(cause: unknown) {

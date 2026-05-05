@@ -4,12 +4,12 @@
 
 current_goal: Win PhysTech 2026 with a focused MotionQuest MVP.
 current_task: Fix seated-adaptive and Reach Stars for real seated webcam framing.
-status: Seated Adaptive and Reach Stars now separate diagnostic tracking from scoring: partial upper-body landmarks remain visible for guidance, but timers/scoring wait for shoulders plus one usable elbow/wrist pair.
+status: Seated Adaptive and Reach Stars now use PoseLandmarker for shoulders plus HandLandmarker for the visible hand, so a close seated webcam frame no longer depends on noisy pose-arm landmarks or hip landmarks.
 active_step: Contest-winning product upgrade.
 next_step: On the user's physical webcam, run the production flow and save `home-calibration.png`, `chair-stand-tracking.png`, `reach-stars-tracking.png`, `caregiver-report.png` and `live-evidence.txt` in `evidence/camera-smoke/`; then close T086-T089, T092-T093, T104 and T105.
 blockers: Physical webcam is not available in the current agent environment (`NotFoundError: Requested device not found`), Edge/second browser is not available here, and Devpost submission / Discord registration / live rehearsals / post-contest updates are future human-time actions that cannot be honestly completed on 2026-05-05.
 artifacts: docs/mvp-plan.md, docs/visual-spec.md, docs/CONDITIONS_GAP_AUDIT.md, docs/CONDITIONS_GAP_ACTION_CHECKLIST.md, docs/JUDGING_CLAIMS_AND_LIMITS.md, docs/SUBMISSION_PACKAGE_PLAN.md, docs/MASTER_TODO_WINNING_PROJECT.md, docs/DEVPOST_SUBMISSION_COPY.md, docs/PRESENTATION_SCRIPT.md, docs/JUDGE_QA_ANSWER_BANK.md, docs/FINAL_SUBMISSION_CHECKLIST.md, docs/FINAL_REHEARSAL_PLAN.md, docs/RELEASE_RISK_REGISTER.md, docs/RELEASE_EVIDENCE_2026_05_05.md, docs/PHASE5_T086_T105_REAL_CAMERA_CLOSEOUT.md, docs/POST_CONTEST_CONTINUITY.md, docs/ADAPTIVE_SEATED_METRICS_RESEARCH_2026_05_05.md, docs/ADAPTIVE_SEATED_IMPLEMENTATION_2026_05_05.md, output/devpost-screenshots/01-home-desktop.png, output/devpost-screenshots/02-seated-adaptive-stage.png, output/devpost-screenshots/03-reach-stars-stage.png, output/devpost-screenshots/04-caregiver-report.png, output/devpost-screenshots/05-home-mobile.png, output/demo-video/motionquest-adaptive-demo.webm, output/playwright/reach-stars-layout-after-tracking-gate-fix.png, evidence/camera-smoke/README.md, research-synthesis-MotionQuest.md, motionquest-app/, https://github.com/AI-Nikitka93/motionquest-phystech-2026
-updated_at: 2026-05-05 05:11 Europe/Minsk
+updated_at: 2026-05-05 05:24 Europe/Minsk
 
 ## Notes
 
@@ -98,3 +98,5 @@ Seated Adaptive live-camera fix update: after user screenshot showed seated-adap
 Partial-landmark diagnostic update: after user screenshots still showed all required groups as missing while the person was visibly seated in frame, the camera pipeline now keeps diagnostic landmarks visible even before the pose is scoreable. This lets the right panel and overlay show partial shoulders/arms while keeping timers and scoring gated behind usable pose.
 
 Deployment update: production alias `https://motionquest-app.vercel.app` points to deployment `dpl_EXh6hjLJVYUPRLKeZyxbLoFZBh6Q` and includes the partial-landmark diagnostic fix.
+
+Hand tracking update: after user screenshots showed MediaPipe Pose drawing false arm lines in the lower empty part of the seated camera frame, seated/reach modes now combine PoseLandmarker shoulders with HandLandmarker wrist data. Seated/reach overlay no longer draws hip connections, and seated reps use visible hand raise/lower cycles instead of unreliable elbow-angle skeletons. Production deployment `dpl_2qhbJ1xCbc11WD1XFPX3D8eYS479` is aliased to `https://motionquest-app.vercel.app`.

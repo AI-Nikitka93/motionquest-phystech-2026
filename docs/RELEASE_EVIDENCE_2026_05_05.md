@@ -15,7 +15,7 @@ Contest-condition source checked: https://phystech-2026.devpost.com/
 | GitHub repository visibility | PUBLIC, default branch `master` |
 | Initial public package commit | `0aa645fd5a19eb96a08a6ed5a18ca2cbc4317265` |
 | Release-evidence push commit | `cb3b84bdbb09844525200bfff2e40735690cbe18` |
-| Latest production deployment recorded in state | `dpl_EXh6hjLJVYUPRLKeZyxbLoFZBh6Q` |
+| Latest production deployment recorded in state | `dpl_2qhbJ1xCbc11WD1XFPX3D8eYS479` |
 
 ## Fresh Verification Commands
 
@@ -98,6 +98,25 @@ Fix shipped:
   what the model is starting to see without treating it as a valid measurement.
 - E2E was rerun against production after deployment `dpl_EXh6hjLJVYUPRLKeZyxbLoFZBh6Q`.
 
+## Hand Tracking Fix For Seated Webcam
+
+User screenshots on 2026-05-05 showed MediaPipe Pose drawing false seated arm
+lines in the lower empty part of the camera frame while the real hand was near
+the face.
+
+Fix shipped:
+
+- Seated and Reach modes load MediaPipe HandLandmarker in addition to
+  PoseLandmarker.
+- PoseLandmarker shoulders anchor the body frame.
+- HandLandmarker wrist data replaces unreliable pose-arm wrist data when a hand
+  is visible.
+- Seated/reach overlay no longer draws hip connections.
+- Seated Adaptive counts hand raise/lower cycles instead of relying only on
+  elbow-angle skeletons.
+- Hand model URL returned HTTP 200 before deployment.
+- E2E was rerun against production after deployment `dpl_2qhbJ1xCbc11WD1XFPX3D8eYS479`.
+
 ## MediaPipe Production Asset Checks
 
 | Asset | Result |
@@ -107,6 +126,7 @@ Fix shipped:
 | `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/wasm/vision_wasm_module_internal.wasm` | HTTP 206 with byte-range GET |
 | `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.35/vision_bundle.mjs` | HTTP 206 with byte-range GET |
 | `https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task` | HTTP 200 |
+| `https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task` | HTTP 200 |
 
 ## Demo Media Evidence
 

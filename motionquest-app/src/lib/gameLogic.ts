@@ -38,6 +38,12 @@ export type SeatedArmTransitionInput = {
   elbowAngle: number;
 };
 
+export type SeatedWristLiftTransitionInput = {
+  previousPhase: SeatedArmPhase;
+  reps: number;
+  liftDelta: number;
+};
+
 export type ReachDwellInput = {
   landmarks: NormalizedLandmark[];
   target: StarTarget;
@@ -262,10 +268,35 @@ export function detectSeatedArmTransition({
   return { phase: previousPhase, reps };
 }
 
+export function detectSeatedWristLiftTransition({
+  previousPhase,
+  reps,
+  liftDelta,
+}: SeatedWristLiftTransitionInput): { phase: SeatedArmPhase; reps: number } {
+  const raisedThreshold = 0.02;
+  const loweredThreshold = -0.06;
+
+  if (previousPhase === "extended" && liftDelta > raisedThreshold) {
+    return { phase: "flexed", reps };
+  }
+
+  if (previousPhase === "flexed" && liftDelta < loweredThreshold) {
+    return { phase: "extended", reps: reps + 1 };
+  }
+
+  return { phase: previousPhase, reps };
+}
+
 export function getVisibleElbowAngles(landmarks: NormalizedLandmark[]) {
   const left = calculateJointAngle(landmarks[11], landmarks[13], landmarks[15]);
   const right = calculateJointAngle(landmarks[12], landmarks[14], landmarks[16]);
   return [left, right].filter((angle): angle is number => angle !== null);
+}
+
+export function getVisibleWristLiftDeltas(landmarks: NormalizedLandmark[]) {
+  const left = calculateWristLiftDelta(landmarks[11], landmarks[15]);
+  const right = calculateWristLiftDelta(landmarks[12], landmarks[16]);
+  return [left, right].filter((delta): delta is number => delta !== null);
 }
 
 export function detectReachHit(
@@ -335,6 +366,17 @@ function calculateJointAngle(
 
   const cosine = Math.min(1, Math.max(-1, dot / (firstLength * secondLength)));
   return (Math.acos(cosine) * 180) / Math.PI;
+}
+
+function calculateWristLiftDelta(
+  shoulder: NormalizedLandmark | undefined,
+  wrist: NormalizedLandmark | undefined,
+) {
+  if (!isVisibleLandmark(shoulder) || !isVisibleLandmark(wrist)) {
+    return null;
+  }
+
+  return shoulder.y - wrist.y;
 }
 
 function hasPlausibleArm(

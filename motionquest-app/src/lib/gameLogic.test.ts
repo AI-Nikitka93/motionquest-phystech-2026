@@ -6,7 +6,9 @@ import {
   detectReachDwellHit,
   detectReachHit,
   detectSeatedArmTransition,
+  detectSeatedWristLiftTransition,
   getPoseConfidence,
+  getVisibleWristLiftDeltas,
   hasPlausibleBodyFrame,
   hasUsablePose,
   type ChairStandPhase,
@@ -215,6 +217,33 @@ test("detectSeatedArmTransition counts one full extended flexed extended cycle",
 
   assert.equal(reps, 1);
   assert.equal(phase, "extended");
+});
+
+test("detectSeatedWristLiftTransition counts one visible hand raise and lower cycle", () => {
+  let phase: SeatedArmPhase = "extended";
+  let reps = 0;
+  const frames = [-0.12, 0.04, 0.16, 0.03, -0.09];
+
+  for (const liftDelta of frames) {
+    const result = detectSeatedWristLiftTransition({
+      previousPhase: phase,
+      reps,
+      liftDelta,
+    });
+    phase = result.phase;
+    reps = result.reps;
+  }
+
+  assert.equal(reps, 1);
+  assert.equal(phase, "extended");
+});
+
+test("getVisibleWristLiftDeltas reads a hand above the shoulder as positive lift", () => {
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
+  landmarks[11] = landmark(0.42, 0.44, 0.9);
+  landmarks[15] = landmark(0.3, 0.22, 0.95);
+
+  assert.deepEqual(getVisibleWristLiftDeltas(landmarks), [0.22]);
 });
 
 test("detectReachDwellHit requires the wrist to stay inside the target for 500ms", () => {
