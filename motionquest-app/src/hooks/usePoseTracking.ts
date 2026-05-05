@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { NormalizedLandmark, PoseConfidence, PoseMode } from "@/lib/gameLogic";
 import {
-  LANDMARK_VISIBILITY_THRESHOLD,
   countVisibleLandmarks,
   getPoseConfidence,
   hasUsablePose,
@@ -53,6 +52,7 @@ const KEY_POINTS: Record<PoseMode, number[]> = {
 
 const SMOOTHING_ALPHA = 0.38;
 const MAX_MISSING_FRAMES_BEFORE_CLEAR = 8;
+const DIAGNOSTIC_VISIBILITY_THRESHOLD = 0.3;
 
 export function usePoseTracking(mode: PoseMode, autoStart = false) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -139,7 +139,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
         const rawLandmarks = result.landmarks?.[0] ?? [];
         const usable = hasUsablePose(rawLandmarks, mode);
 
-        if (usable) {
+        if (usable || hasDiagnosticPose(rawLandmarks, mode)) {
           missingFramesRef.current = 0;
           const nextLandmarks = smoothLandmarks(
             smoothedLandmarksRef.current,
@@ -147,8 +147,10 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
           );
           smoothedLandmarksRef.current = nextLandmarks;
           setLandmarks(nextLandmarks);
-          setConfidence(getPoseConfidence(nextLandmarks, mode));
-          setStatus("Tracking stable body pose");
+          setConfidence(usable ? getPoseConfidence(nextLandmarks, mode) : "low");
+          setStatus(
+            usable ? "Tracking stable body pose" : framingHint(mode, nextLandmarks),
+          );
           drawOverlay(nextLandmarks);
         } else {
           missingFramesRef.current += 1;
@@ -298,8 +300,8 @@ function drawLine(
 ) {
   if (!from || !to) return;
   if (
-    !isVisibleLandmark(from, LANDMARK_VISIBILITY_THRESHOLD) ||
-    !isVisibleLandmark(to, LANDMARK_VISIBILITY_THRESHOLD)
+    !isVisibleLandmark(from, DIAGNOSTIC_VISIBILITY_THRESHOLD) ||
+    !isVisibleLandmark(to, DIAGNOSTIC_VISIBILITY_THRESHOLD)
   ) {
     return;
   }
@@ -339,7 +341,7 @@ function smoothLandmarks(
 function framingHint(mode: PoseMode, landmarks: NormalizedLandmark[]) {
   const upperBodyCandidate = countVisibleLandmarks(landmarks, [
     11, 12, 13, 14, 15, 16, 23, 24,
-  ]);
+  ], DIAGNOSTIC_VISIBILITY_THRESHOLD);
   if (upperBodyCandidate >= 5) {
     return mode === "reach"
       ? "Reach tracking unstable. Keep shoulders visible and raise one hand away from the lens"
@@ -355,4 +357,22 @@ function framingHint(mode: PoseMode, landmarks: NormalizedLandmark[]) {
     return "Keep shoulders in frame, then raise one forearm until elbow and wrist are visible";
   }
   return "Step back until shoulders, hips and knees are visible";
+}
+
+function hasDiagnosticPose(landmarks: NormalizedLandmark[], mode: PoseMode) {
+  if (landmarks.length === 0) return false;
+
+  if (mode === "seated" || mode === "reach") {
+    return countVisibleLandmarks(
+      landmarks,
+      [11, 12, 13, 14, 15, 16],
+      DIAGNOSTIC_VISIBILITY_THRESHOLD,
+    ) >= 2;
+  }
+
+  return countVisibleLandmarks(
+    landmarks,
+    [11, 12, 23, 24, 25, 26],
+    DIAGNOSTIC_VISIBILITY_THRESHOLD,
+  ) >= 3;
 }

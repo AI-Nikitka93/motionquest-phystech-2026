@@ -4,12 +4,12 @@
 
 current_goal: Win PhysTech 2026 with a focused MotionQuest MVP.
 current_task: Fix seated-adaptive and Reach Stars for real seated webcam framing.
-status: Seated Adaptive and Reach Stars now work as upper-body seated tasks: shoulders plus one visible elbow/wrist pair are enough, hips are no longer required for the seated branch, Seated Adaptive and Reach Stars timers wait for usable upper-body pose, and Reach targets stay in the upper reachable camera area.
+status: Seated Adaptive and Reach Stars now separate diagnostic tracking from scoring: partial upper-body landmarks remain visible for guidance, but timers/scoring wait for shoulders plus one usable elbow/wrist pair.
 active_step: Contest-winning product upgrade.
 next_step: On the user's physical webcam, run the production flow and save `home-calibration.png`, `chair-stand-tracking.png`, `reach-stars-tracking.png`, `caregiver-report.png` and `live-evidence.txt` in `evidence/camera-smoke/`; then close T086-T089, T092-T093, T104 and T105.
 blockers: Physical webcam is not available in the current agent environment (`NotFoundError: Requested device not found`), Edge/second browser is not available here, and Devpost submission / Discord registration / live rehearsals / post-contest updates are future human-time actions that cannot be honestly completed on 2026-05-05.
 artifacts: docs/mvp-plan.md, docs/visual-spec.md, docs/CONDITIONS_GAP_AUDIT.md, docs/CONDITIONS_GAP_ACTION_CHECKLIST.md, docs/JUDGING_CLAIMS_AND_LIMITS.md, docs/SUBMISSION_PACKAGE_PLAN.md, docs/MASTER_TODO_WINNING_PROJECT.md, docs/DEVPOST_SUBMISSION_COPY.md, docs/PRESENTATION_SCRIPT.md, docs/JUDGE_QA_ANSWER_BANK.md, docs/FINAL_SUBMISSION_CHECKLIST.md, docs/FINAL_REHEARSAL_PLAN.md, docs/RELEASE_RISK_REGISTER.md, docs/RELEASE_EVIDENCE_2026_05_05.md, docs/PHASE5_T086_T105_REAL_CAMERA_CLOSEOUT.md, docs/POST_CONTEST_CONTINUITY.md, docs/ADAPTIVE_SEATED_METRICS_RESEARCH_2026_05_05.md, docs/ADAPTIVE_SEATED_IMPLEMENTATION_2026_05_05.md, output/devpost-screenshots/01-home-desktop.png, output/devpost-screenshots/02-seated-adaptive-stage.png, output/devpost-screenshots/03-reach-stars-stage.png, output/devpost-screenshots/04-caregiver-report.png, output/devpost-screenshots/05-home-mobile.png, output/demo-video/motionquest-adaptive-demo.webm, output/playwright/reach-stars-layout-after-tracking-gate-fix.png, evidence/camera-smoke/README.md, research-synthesis-MotionQuest.md, motionquest-app/, https://github.com/AI-Nikitka93/motionquest-phystech-2026
-updated_at: 2026-05-05 04:58 Europe/Minsk
+updated_at: 2026-05-05 05:11 Europe/Minsk
 
 ## Notes
 
@@ -94,3 +94,7 @@ Real-camera closeout preparation update: `Copy live evidence` is now available o
 Reach Stars real-camera fix update: after user screenshot showed a seated upper body visible but Reach Stars still stuck on missing joints, Reach Stars was relaxed to an upper-body task. It no longer requires hips, accepts shoulders plus one visible elbow/wrist, pauses the timer until usable reach pose exists, hides targets until tracking is usable, and places targets in upper reachable zones. Production deployment `dpl_2ywFSKkkehRRx55NevPWNGbjxfVh` is aliased to `https://motionquest-app.vercel.app`.
 
 Seated Adaptive live-camera fix update: after user screenshot showed seated-adaptive mode still stuck on missing hips/arms while the timer ran, the seated branch now uses the same upper-body accessibility contract: shoulders plus one visible forearm are enough, hips are no longer required, the timer pauses until usable seated arm pose exists, and the HUD tells the user to raise one forearm instead of only saying `Move into frame`. Production deployment `dpl_HxrY5sN9bamDrqULiJvripyVXiZP` is aliased to `https://motionquest-app.vercel.app`.
+
+Partial-landmark diagnostic update: after user screenshots still showed all required groups as missing while the person was visibly seated in frame, the camera pipeline now keeps diagnostic landmarks visible even before the pose is scoreable. This lets the right panel and overlay show partial shoulders/arms while keeping timers and scoring gated behind usable pose.
+
+Deployment update: production alias `https://motionquest-app.vercel.app` points to deployment `dpl_EXh6hjLJVYUPRLKeZyxbLoFZBh6Q` and includes the partial-landmark diagnostic fix.

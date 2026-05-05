@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { usePoseTracking } from "@/hooks/usePoseTracking";
 import {
-  LANDMARK_VISIBILITY_THRESHOLD,
   countVisibleLandmarks,
   hasUsablePose,
   isVisibleLandmark,
@@ -12,6 +11,8 @@ import {
   type PoseConfidence,
   type PoseMode,
 } from "@/lib/gameLogic";
+
+const DIAGNOSTIC_VISIBILITY_THRESHOLD = 0.3;
 
 export type CameraStageRenderProps = ReturnType<typeof usePoseTracking>;
 export type CameraTrackingData = Pick<
@@ -382,7 +383,7 @@ function isGroupVisible(
 ) {
   return group.indexes.every((index) => {
     const point = landmarks[index];
-    return isVisibleLandmark(point, LANDMARK_VISIBILITY_THRESHOLD);
+    return isVisibleLandmark(point, DIAGNOSTIC_VISIBILITY_THRESHOLD);
   });
 }
 
@@ -407,13 +408,14 @@ function buildCameraEvidenceText({
 }) {
   const groups = JOINT_GROUPS[mode].map((group) => {
     const visible = group.indexes.every((index) =>
-      isVisibleLandmark(landmarks[index], LANDMARK_VISIBILITY_THRESHOLD),
+      isVisibleLandmark(landmarks[index], DIAGNOSTIC_VISIBILITY_THRESHOLD),
     );
     return `${group.label}: ${visible ? "visible" : "missing"}`;
   });
   const visibleKeypoints = countVisibleLandmarks(
     landmarks,
     JOINT_GROUPS[mode].flatMap((group) => group.indexes),
+    DIAGNOSTIC_VISIBILITY_THRESHOLD,
   );
 
   return [
@@ -429,7 +431,7 @@ function buildCameraEvidenceText({
     `error: ${error ?? "none"}`,
     `visibleKeypoints: ${visibleKeypoints}`,
     `jointGroups: ${groups.join("; ")}`,
-    "setupTarget: camera 1.8-2.4m away, waist/chest height, front light, shoulders/hips visible, hands away from lens",
+    "setupTarget: seated/reach modes need shoulders plus one visible elbow/wrist pair; standing mode needs shoulders/hips/knees",
   ].join("\n");
 }
 

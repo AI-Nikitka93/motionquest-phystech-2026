@@ -359,3 +359,12 @@
 Локальный account context: без изменений
 Локальная карта секретов: без изменений
 Следующий шаг: user should hard-refresh production URL, run Seated Adaptive with shoulders visible and one forearm raised into frame, then use `Copy live evidence` if tracking still does not become usable.
+
+Дата и время: 2026-05-05 05:11
+Роль: P-FRONTEND / P-DEBUG / Verification
+Сделано: исправлена диагностическая проблема live camera: partial upper-body landmarks больше не очищаются только потому, что pose ещё не scoreable; overlay/right panel теперь могут показывать найденные shoulders/arms, while timers and scoring remain gated by usable pose.
+Изменены файлы: `motionquest-app/src/hooks/usePoseTracking.ts`, `motionquest-app/src/components/CameraStage.tsx`, `docs/STATE.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: `npm run lint` passed; `npm test` 14/14 passed; `npm run build` passed; no-placeholder scan returned no matches; Vercel production deployment `dpl_EXh6hjLJVYUPRLKeZyxbLoFZBh6Q` Ready and aliased to `https://motionquest-app.vercel.app`; `npm run test:e2e` 7/7 passed against production.
+Локальный account context: без изменений
+Локальная карта секретов: без изменений
+Следующий шаг: deploy diagnostic landmark retention and rerun production e2e.

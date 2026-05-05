@@ -15,7 +15,7 @@ Contest-condition source checked: https://phystech-2026.devpost.com/
 | GitHub repository visibility | PUBLIC, default branch `master` |
 | Initial public package commit | `0aa645fd5a19eb96a08a6ed5a18ca2cbc4317265` |
 | Release-evidence push commit | `cb3b84bdbb09844525200bfff2e40735690cbe18` |
-| Latest production deployment recorded in state | `dpl_HxrY5sN9bamDrqULiJvripyVXiZP` |
+| Latest production deployment recorded in state | `dpl_EXh6hjLJVYUPRLKeZyxbLoFZBh6Q` |
 
 ## Fresh Verification Commands
 
@@ -82,6 +82,21 @@ Fix shipped:
 - Seated Adaptive copy now asks for one visible forearm instead of generic
   `Move into frame`.
 - E2E was rerun against production after deployment `dpl_HxrY5sN9bamDrqULiJvripyVXiZP`.
+
+## Partial Landmark Diagnostic Fix
+
+User screenshots on 2026-05-05 showed the person visibly seated in frame, but
+the UI still reported every joint group as missing because the app cleared all
+landmarks whenever the pose was not yet scoreable.
+
+Fix shipped:
+
+- Partial upper-body landmarks stay available for the overlay and right-side
+  diagnostic panel.
+- Timers and scoring still require the stricter usable pose gate.
+- Diagnostic visibility uses a lower threshold than scoring, so the UI can show
+  what the model is starting to see without treating it as a valid measurement.
+- E2E was rerun against production after deployment `dpl_EXh6hjLJVYUPRLKeZyxbLoFZBh6Q`.
 
 ## MediaPipe Production Asset Checks
 
