@@ -15,7 +15,7 @@ Contest-condition source checked: https://phystech-2026.devpost.com/
 | GitHub repository visibility | PUBLIC, default branch `master` |
 | Initial public package commit | `0aa645fd5a19eb96a08a6ed5a18ca2cbc4317265` |
 | Release-evidence push commit | `cb3b84bdbb09844525200bfff2e40735690cbe18` |
-| Latest production deployment recorded in state | `dpl_B1m73Bmz1xCwsR2A4CANH6DKKLFK` |
+| Latest production deployment recorded in state | `dpl_BcT6QQDRShkgSxosRLaS4CtE4W1o` |
 
 ## Fresh Verification Commands
 
@@ -37,6 +37,22 @@ User screenshot on 2026-05-05 showed a hand close to the camera being accepted a
 - Geometric shoulder/hip body-frame gating before high confidence, overlay drawing, readiness and Reach Stars scoring.
 - Reach Stars dwell scoring disabled while the body frame is unstable.
 - Corrected Reach Stars copy and HUD layout so timer and instructions do not overlap.
+
+## Real-Camera Closeout Instrumentation
+
+The production app now includes a `Copy live evidence` button on every camera
+stage. It copies:
+
+- timestamp and URL;
+- stage and mode;
+- camera/model status;
+- pose confidence;
+- body-frame usability verdict;
+- visible joint group status;
+- setup target.
+
+This is the required text evidence for T086-T089, T092-T093, T104 and T105
+alongside screenshots in `evidence/camera-smoke/`.
 
 ## MediaPipe Production Asset Checks
 

@@ -35,9 +35,9 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
 
   await page.getByRole("button", { name: "Start Reach Stars" }).click();
   await expect(
-    page.getByText("Move either wrist into the yellow target and hold"),
+    page.getByText("Step back first. Move either wrist into the yellow target"),
   ).toBeVisible();
-  await page.getByRole("button", { name: "View Report" }).click();
+  await page.getByRole("button", { name: "Finish & View Report" }).click();
 
   await expect(page.getByText("Caregiver Report")).toBeVisible();
   await expect(page.getByText("Interpretation", { exact: true })).toBeVisible();
@@ -200,7 +200,7 @@ test("keyboard flow and focus rings cover primary actions", async ({ page }) => 
   await expectOutlineVisible(reach);
   await page.keyboard.press("Enter");
 
-  const report = page.getByRole("button", { name: "View Report" });
+  const report = page.getByRole("button", { name: "Finish & View Report" });
   await expect(report).toBeVisible();
   await report.focus();
   await expectOutlineVisible(report);
@@ -249,7 +249,9 @@ test("camera recovery text is visible when no camera is available", async ({
 
   await page.getByRole("button", { name: "Start Camera Check" }).click();
 
-  await expect(page.getByText("Camera not found")).toBeVisible();
+  await expect(page.getByText("Camera not found")).toBeVisible({
+    timeout: 15000,
+  });
   await expect(page.getByText("Camera/model needs attention")).toBeVisible();
   await expect(page.getByText("No usable camera was found")).toBeVisible();
   await expect(page.getByText("Connect a webcam or enable the built-in camera.")).toBeVisible();

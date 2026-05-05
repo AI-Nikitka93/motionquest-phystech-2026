@@ -1,9 +1,11 @@
 "use client";
 
 import type { ReactNode } from "react";
+import { useMemo, useState } from "react";
 import { usePoseTracking } from "@/hooks/usePoseTracking";
 import {
   LANDMARK_VISIBILITY_THRESHOLD,
+  countVisibleLandmarks,
   hasUsablePose,
   isVisibleLandmark,
   type NormalizedLandmark,
@@ -48,6 +50,32 @@ export function CameraStage({
     isReady,
   };
   const poseUsable = hasUsablePose(landmarks, mode);
+  const [copyStatus, setCopyStatus] = useState("Copy live evidence");
+  const evidenceText = useMemo(
+    () =>
+      buildCameraEvidenceText({
+        mode,
+        title,
+        confidence,
+        status,
+        error,
+        isReady,
+        poseUsable,
+        landmarks,
+      }),
+    [confidence, error, isReady, landmarks, mode, poseUsable, status, title],
+  );
+
+  const copyEvidence = async () => {
+    try {
+      await navigator.clipboard.writeText(evidenceText);
+      setCopyStatus("Evidence copied");
+      window.setTimeout(() => setCopyStatus("Copy live evidence"), 1400);
+    } catch {
+      setCopyStatus("Copy unavailable");
+      window.setTimeout(() => setCopyStatus("Copy live evidence"), 1800);
+    }
+  };
 
   return (
     <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
@@ -124,6 +152,22 @@ export function CameraStage({
             Start Camera Check
           </button>
         ) : null}
+        <div className="mt-5 rounded-lg border-2 border-[#075E54] bg-[#F7F1DE] p-4">
+          <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+            Live smoke evidence
+          </p>
+          <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+            Copy this after each real camera stage. It records the camera
+            state, visible joints and body-frame verdict for T086-T104.
+          </p>
+          <button
+            type="button"
+            onClick={() => void copyEvidence()}
+            className="mt-4 min-h-14 w-full rounded-xl bg-[#10231F] px-7 text-lg font-bold text-white hover:bg-[#263B34] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
+          >
+            {copyStatus}
+          </button>
+        </div>
       </aside>
     </section>
   );
@@ -340,6 +384,53 @@ function JointVisibilityPanel({
       </div>
     </div>
   );
+}
+
+function buildCameraEvidenceText({
+  mode,
+  title,
+  confidence,
+  status,
+  error,
+  isReady,
+  poseUsable,
+  landmarks,
+}: {
+  mode: PoseMode;
+  title: string;
+  confidence: PoseConfidence;
+  status: string;
+  error: string | null;
+  isReady: boolean;
+  poseUsable: boolean;
+  landmarks: NormalizedLandmark[];
+}) {
+  const groups = JOINT_GROUPS[mode].map((group) => {
+    const visible = group.indexes.every((index) =>
+      isVisibleLandmark(landmarks[index], LANDMARK_VISIBILITY_THRESHOLD),
+    );
+    return `${group.label}: ${visible ? "visible" : "missing"}`;
+  });
+  const visibleKeypoints = countVisibleLandmarks(
+    landmarks,
+    JOINT_GROUPS[mode].flatMap((group) => group.indexes),
+  );
+
+  return [
+    "MotionQuest live camera evidence",
+    `timestamp: ${new Date().toISOString()}`,
+    `url: ${typeof window !== "undefined" ? window.location.href : "unknown"}`,
+    `stage: ${title}`,
+    `mode: ${mode}`,
+    `cameraActive: ${isReady ? "yes" : "no"}`,
+    `poseConfidence: ${confidence}`,
+    `bodyFrameUsable: ${poseUsable ? "yes" : "no"}`,
+    `status: ${status}`,
+    `error: ${error ?? "none"}`,
+    `visibleKeypoints: ${visibleKeypoints}`,
+    `jointGroups: ${groups.join("; ")}`,
+    "setupTarget: camera 1.8-2.4m away, waist/chest height, front light, shoulders/hips visible, hands away from lens",
+  ].join("\n");
 }
 
 function StageStatusItem({

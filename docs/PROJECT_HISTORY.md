@@ -332,3 +332,12 @@
 Локальный account context: без изменений
 Локальная карта секретов: без изменений
 Следующий шаг: user should retry live camera with full upper body visible and hands away from lens; if false positives remain, capture another screenshot from the same stage.
+
+Дата и время: 2026-05-05 03:58
+Роль: P-FRONTEND / P-SMOKE / Verification
+Сделано: добавлен реальный closeout-механизм для T086-T105: `Copy live evidence` on every camera stage, pass/fail evidence fields, updated camera smoke protocol, exact setup guidance and Phase 5 closeout package.
+Изменены файлы: `motionquest-app/src/components/CameraStage.tsx`, `motionquest-app/tests/e2e/motionquest-flow.spec.ts`, `docs/CAMERA_SMOKE_TEST_PROTOCOL.md`, `evidence/camera-smoke/README.md`, `docs/PHASE5_T086_T105_REAL_CAMERA_CLOSEOUT.md`, `docs/STATE.md`, `docs/PROJECT_MAP.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: `npm run lint` passed; `npm test` 12/12 passed; `npm run build` passed; `npm run test:e2e` 7/7 passed; Vercel production deployment `dpl_BcT6QQDRShkgSxosRLaS4CtE4W1o` Ready and aliased to `https://motionquest-app.vercel.app`.
+Локальный account context: без изменений
+Локальная карта секретов: без изменений
+Следующий шаг: run the real physical webcam flow and save copied evidence plus screenshots in `evidence/camera-smoke/`; then close T086-T089, T092-T093, T104 and T105.
