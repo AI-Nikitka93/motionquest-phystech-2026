@@ -10,5 +10,6 @@
 | Production deployment | DONE | Live at `https://motionquest-app.vercel.app`; Vercel status Ready. |
 | Conditions gap audit | DONE | `docs/CONDITIONS_GAP_AUDIT.md` created; current app judged not submission-ready. |
 | Master winning TODO | DONE | `docs/MASTER_TODO_WINNING_PROJECT.md` created with 160 ordinary tasks and recurring contest-condition anchors. |
-| Project reality upgrade | IN_PROGRESS | Phase 1 T001-T021 completed; Phase 2 T022-T042 completed; Phase 3 T043-T063 completed; Phase 4 T064-T084 closed; Phase 5 T085, T090-T091, T093A-T093D and T094-T103 completed; T086-T089, T092-T093 and T104 need physical webcam evidence. |
-| Demo rehearsal | BLOCKED | Needs real webcam threshold tuning for standing and seated-adaptive branches plus fallback script rehearsal; use `docs/CAMERA_SMOKE_TEST_PROTOCOL.md` and `evidence/camera-smoke/`. |
+| Project reality upgrade | IN_PROGRESS | Phases 1-6 closed where evidence exists; Phase 7 non-camera verification closed; Phase 8 preparation docs closed. Remaining open work requires physical webcam evidence, final Devpost/Discord timing, presenter rehearsal or post-contest outcomes. |
+| Public package | DONE | App, GitHub source package, README, Devpost copy, presentation script, Q&A bank, screenshots, demo video, final checklist, risk register and release evidence are ready. |
+| Demo rehearsal | BLOCKED | Needs real webcam threshold tuning for standing and seated-adaptive branches plus actual presenter rehearsal; use `docs/CAMERA_SMOKE_TEST_PROTOCOL.md`, `docs/FINAL_REHEARSAL_PLAN.md` and `evidence/camera-smoke/`. |

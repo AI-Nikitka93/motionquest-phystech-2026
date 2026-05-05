@@ -3,13 +3,13 @@
 ## Structured State
 
 current_goal: Win PhysTech 2026 with a focused MotionQuest MVP.
-current_task: Phase 5 adaptive seated movement engine and report outcome.
-status: T081-T085, T090-T091, T093A-T093D and T094-T103 completed and deployed; T086-T089, T092-T093 and T104 still need real webcam evidence.
+current_task: Public package verification and remaining TODO closure control.
+status: Phase 6 public package is complete; Phase 7 non-camera verification tasks are complete; Phase 8 preparation artifacts are complete where they do not require future Devpost, Discord, presenter rehearsal or post-contest evidence.
 active_step: Contest-winning product upgrade.
-next_step: User-side live webcam run for seated-adaptive and standing branches; capture evidence in `evidence/camera-smoke/`; then tune thresholds and close T086-T089, T092-T093 and T104.
-blockers: Physical webcam is not available in the current agent environment (`NotFoundError: Requested device not found`), so real live-camera smoke tests, post-live threshold tuning and end-to-end real camera run cannot be honestly closed here.
-artifacts: docs/mvp-plan.md, docs/visual-spec.md, docs/CONDITIONS_GAP_AUDIT.md, docs/CONDITIONS_GAP_ACTION_CHECKLIST.md, docs/JUDGING_CLAIMS_AND_LIMITS.md, docs/SUBMISSION_PACKAGE_PLAN.md, docs/MASTER_TODO_WINNING_PROJECT.md, docs/PHASE1_T001_T010_RESULTS.md, docs/PHASE1_T011_T020_RESULTS.md, docs/PHASE1_T021_REVIEW.md, docs/PHASE2_T022_T030_RESULTS.md, docs/PHASE2_T031_T040_RESULTS.md, docs/PHASE2_T042_REVIEW.md, docs/PHASE3_T043_T050_RESULTS.md, docs/PHASE3_T051_T060_RESULTS.md, docs/PHASE3_T061_T063_REVIEW.md, docs/PHASE4_T064_T070_VISUAL_QA.md, docs/PHASE4_T071_T080_ACCESSIBILITY_TRUST_QA.md, docs/PHASE4_T081_T084_FINAL_VISUAL_REVIEW.md, docs/PHASE5_T085_T090_CAMERA_READINESS.md, docs/PHASE5_T091_T100_RESULTS.md, docs/PHASE5_T101_T104_RESULTS.md, docs/CAMERA_SMOKE_TEST_PROTOCOL.md, docs/ADAPTIVE_SEATED_METRICS_RESEARCH_2026_05_05.md, docs/ADAPTIVE_SEATED_IMPLEMENTATION_2026_05_05.md, docs/RESEARCH_ARTIFACT_INDEX.md, docs/RESEARCH_LAYER_PUBLIC_COPY.md, docs/RESEARCH_EVIDENCE_TRACE_T022_T030.md, docs/EVIDENCE_PANEL_CONTENT.md, docs/CAREGIVER_INTERPRETATION_COPY.md, docs/RESEARCH_OVERCLAIM_AUDIT.md, output/devpost-screenshots/01-home-desktop.png, output/devpost-screenshots/02-home-mobile.png, output/devpost-screenshots/03-safe-demo-report-desktop.png, output/playwright/motionquest-home-desktop-t081-t090.png, output/playwright/motionquest-home-mobile-t081-t090.png, output/playwright/motionquest-safe-demo-report-desktop-t081-t090.png, output/playwright/motionquest-production-touch-home.png, output/playwright/motionquest-production-touch-report.png, output/playwright/motionquest-production-touch-camera-recovery.png, evidence/camera-smoke/README.md, research-synthesis-MotionQuest.md, motionquest-app/
-updated_at: 2026-05-05 03:05 Europe/Minsk
+next_step: Run real physical webcam smoke tests for seated-adaptive and standing branches, capture evidence in `evidence/camera-smoke/`, then tune thresholds and close T086-T089, T092-T093, T104, T131 and T134.
+blockers: Physical webcam is not available in the current agent environment (`NotFoundError: Requested device not found`), Edge/second browser is not available here, and Devpost submission / Discord registration / live rehearsals / post-contest updates are future human-time actions that cannot be honestly completed on 2026-05-05.
+artifacts: docs/mvp-plan.md, docs/visual-spec.md, docs/CONDITIONS_GAP_AUDIT.md, docs/CONDITIONS_GAP_ACTION_CHECKLIST.md, docs/JUDGING_CLAIMS_AND_LIMITS.md, docs/SUBMISSION_PACKAGE_PLAN.md, docs/MASTER_TODO_WINNING_PROJECT.md, docs/DEVPOST_SUBMISSION_COPY.md, docs/PRESENTATION_SCRIPT.md, docs/JUDGE_QA_ANSWER_BANK.md, docs/FINAL_SUBMISSION_CHECKLIST.md, docs/FINAL_REHEARSAL_PLAN.md, docs/RELEASE_RISK_REGISTER.md, docs/RELEASE_EVIDENCE_2026_05_05.md, docs/POST_CONTEST_CONTINUITY.md, docs/ADAPTIVE_SEATED_METRICS_RESEARCH_2026_05_05.md, docs/ADAPTIVE_SEATED_IMPLEMENTATION_2026_05_05.md, output/devpost-screenshots/01-home-desktop.png, output/devpost-screenshots/02-seated-adaptive-stage.png, output/devpost-screenshots/03-reach-stars-stage.png, output/devpost-screenshots/04-caregiver-report.png, output/devpost-screenshots/05-home-mobile.png, output/demo-video/motionquest-adaptive-demo.webm, evidence/camera-smoke/README.md, research-synthesis-MotionQuest.md, motionquest-app/, https://github.com/AI-Nikitka93/motionquest-phystech-2026
+updated_at: 2026-05-05 03:30 Europe/Minsk
 
 ## Notes
 
@@ -20,6 +20,10 @@ Visual direction is "warm kinetic trust": accessible, high-contrast, camera-firs
 Implementation status: `motionquest-app` builds with Next.js 16.2.4, React 19.2.4, Tailwind v4, and `@mediapipe/tasks-vision`. Verified commands: `npm test`, `npm run lint`, `npm run build`, `npm run test:e2e`. Local dev server verified on `http://localhost:3001`.
 
 Deployment status: Vercel production is ready at `https://motionquest-app.vercel.app`. Latest deployment id is `dpl_8sTZY7XCGYDaJTuYXfc12HDrUseg`. MediaPipe wasm/model URLs are CDN-hosted and returned HTTP 200 during deploy verification.
+
+Public source/package status: GitHub repository is public at `https://github.com/AI-Nikitka93/motionquest-phystech-2026`.
+
+Public package verification update: Phase 6 T106-T126 is complete. Phase 7 T127-T130, T133, T135-T142 and T145-T146 are complete with fresh evidence in `docs/RELEASE_EVIDENCE_2026_05_05.md`. T131-T132, T134, T143-T144 and T147 remain open because they require physical webcam, second-browser availability or final pre-submission timing.
 
 Conditions audit status: current MotionQuest is a working early functional movement lab prototype, but it still needs a visible Impact/Creativity/Presentation story and a public artifact suitable for Devpost and book/research framing.
 

@@ -3,6 +3,7 @@
 MotionQuest is an accessible browser-based functional movement lab for older adults and seated/standing users. It turns a normal webcam into two short evidence-aligned movement activities and a caregiver-readable report.
 
 - Live app: https://motionquest-app.vercel.app
+- Public source package: https://github.com/AI-Nikitka93/motionquest-phystech-2026
 - Hackathon: [PhysTech 2026: Physical Activity and Technology Hack Day](https://phystech-2026.devpost.com/)
 - Verification date for contest rules: 2026-05-05
 

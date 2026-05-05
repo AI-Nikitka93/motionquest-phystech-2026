@@ -314,3 +314,12 @@
 Локальный account context: без изменений
 Локальная карта секретов: без изменений
 Следующий шаг: run real webcam evidence for seated-adaptive and standing branch, then tune thresholds and close T086-T089, T092-T093 and T104.
+
+Дата и время: 2026-05-05 03:30
+Роль: P-MASTER-TODO / P-PACKAGE / Verification
+Сделано: закрыты оставшиеся реально закрываемые public-package, release-verification and continuity TODOs; создан public GitHub package, Devpost copy, presentation/Q&A assets, screenshots, demo video, release risk register and release evidence; физические, будущие and post-contest пункты оставлены открытыми без fake completion.
+Изменены файлы: `README.md`, `.gitignore`, `docs/DEVPOST_SUBMISSION_COPY.md`, `docs/PRESENTATION_SCRIPT.md`, `docs/JUDGE_QA_ANSWER_BANK.md`, `docs/FINAL_SUBMISSION_CHECKLIST.md`, `docs/FINAL_REHEARSAL_PLAN.md`, `docs/RELEASE_RISK_REGISTER.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/POST_CONTEST_CONTINUITY.md`, `docs/SUBMISSION_PACKAGE_PLAN.md`, `docs/MASTER_TODO_WINNING_PROJECT.md`, `docs/PROJECT_MAP.md`, `docs/STATE.md`, `docs/EXEC_PLAN.md`, `docs/DECISIONS.md`, `docs/PROJECT_HISTORY.md`, `output/devpost-screenshots/`, `output/demo-video/motionquest-adaptive-demo.webm`.
+Результат/доказательство: live Devpost checked on 2026-05-05; GitHub repo `https://github.com/AI-Nikitka93/motionquest-phystech-2026` is PUBLIC; app URL, repo URL, raw README and raw app source returned HTTP 200; `npm run lint`, `npm test` 11/11, `npm run build`, `npm run test:e2e` 7/7 passed; MediaPipe CDN/model assets returned HTTP 206/200; `npm audit --omit=dev` still reports 2 moderate Next/PostCSS vulnerabilities with force-fix requiring breaking downgrade.
+Локальный account context: обновлён в /docs/ACCOUNT_REGISTRY.local.md
+Локальная карта секретов: обновлена в /docs/SECRETS_INDEX.local.md
+Следующий шаг: run physical webcam evidence and final Devpost/Discord submission workflow at the required dates; do not close T086-T089, T092-T093, T104, T131-T134, T143-T155, T157-T159 or T165-T168 until evidence exists.

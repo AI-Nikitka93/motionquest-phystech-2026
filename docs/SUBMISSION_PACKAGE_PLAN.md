@@ -9,12 +9,12 @@ Working deadline: June 27, 2026, 12:00pm Eastern / 7:00pm GMT+3
 | Link | Status | Final target |
 |---|---|---|
 | App URL | Ready | `https://motionquest-app.vercel.app` |
-| Source / storage URL | To publish | Public GitHub repository or Google Drive folder with actual work. |
-| Research artifact | Local ready | Publish `research-synthesis-MotionQuest.md` or a concise public research summary. |
+| Source / storage URL | Ready | `https://github.com/AI-Nikitka93/motionquest-phystech-2026` |
+| Research artifact | Published in source package | `research-synthesis-MotionQuest.md` and `docs/ADAPTIVE_SEATED_METRICS_RESEARCH_2026_05_05.md`. |
 | Devpost URL | Created during submission | Devpost project page. |
 | Presentation registration form | Organizer-provided | Google Form shared in PhysTech Discord. |
-| Screenshots / demo media | To produce | Public images/GIF/video in package. |
-| Demo runbook | To produce | `docs/demo-runbook.md`. |
+| Screenshots / demo media | Ready | `output/devpost-screenshots/` and `output/demo-video/motionquest-adaptive-demo.webm`. |
+| Demo runbook | Ready | `docs/PRESENTATION_SCRIPT.md` and `docs/FINAL_REHEARSAL_PLAN.md`. |
 
 ## Minimum Package Contents
 

@@ -80,3 +80,15 @@ Rejected:
 - Inferring disability or wheelchair status automatically: unsafe and unsupported.
 - Keeping seated mode as a hidden fallback: weakens inclusion and makes the report less honest.
 - Adding a third activity: breaks the intentionally small MVP scope.
+
+## 2026-05-05 - TODO closure requires evidence, not checkbox completion
+
+Decision: Close only TODO items backed by source files, public links, tests, screenshots, demo media, deployment status or live contest-rule verification.
+
+Reason: The remaining open items depend on physical webcam behavior, final Devpost/Discord timing, presenter rehearsal, or post-contest outcomes. Marking those done on 2026-05-05 would create fake confidence and weaken the submission.
+
+Rejected:
+- Marking physical camera tasks as complete from Playwright fallback flow.
+- Treating safe demo data as real measured evidence.
+- Marking Devpost submission and presentation registration complete before those forms are actually submitted.
+- Closing post-contest tasks before presentation/results/book invitation exist.

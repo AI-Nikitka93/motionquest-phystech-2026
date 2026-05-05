@@ -22,7 +22,7 @@ Webcam-based adaptive movement practice with a caregiver-readable report.
 ## Public Links
 
 - Live app: https://motionquest-app.vercel.app
-- Source package: to be verified after GitHub publication.
+- Source package: https://github.com/AI-Nikitka93/motionquest-phystech-2026
 - Research basis: `docs/ADAPTIVE_SEATED_METRICS_RESEARCH_2026_05_05.md`
 - Implementation proof: `docs/ADAPTIVE_SEATED_IMPLEMENTATION_2026_05_05.md`
 

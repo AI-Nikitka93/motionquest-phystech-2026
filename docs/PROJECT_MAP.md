@@ -61,6 +61,7 @@ MotionQuest: a browser-based webcam exergame for older adults and seated/standin
 - Host: Vercel.
 - Production URL: `https://motionquest-app.vercel.app`.
 - Deployment id: `dpl_8sTZY7XCGYDaJTuYXfc12HDrUseg`.
+- Public source package: `https://github.com/AI-Nikitka93/motionquest-phystech-2026`.
 - Vercel local project metadata is in `motionquest-app/.vercel/` and ignored by `.gitignore`.
 
 ## Risks
@@ -69,5 +70,5 @@ MotionQuest: a browser-based webcam exergame for older adults and seated/standin
 - Webcam permission and lighting can break live demo.
 - Clinical claims must stay conservative.
 - Dev server uses port `3001` in this workspace because `3000` was already occupied during verification.
-- Public source/storage package and demo media still need to be created before Devpost submission.
+- Public source/storage package and demo media are created; real webcam evidence and final Devpost submission remain future blockers.
 - T086-T089 cannot be fully closed in this environment until a real physical webcam or real camera evidence is available; seated-adaptive mode is implemented and deployed but still needs user-side live-camera tuning evidence.

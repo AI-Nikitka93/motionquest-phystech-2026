@@ -204,27 +204,27 @@ MASTER TODO
 
 ## PHASE 6 — Public Artifact, Devpost Package And Presentation
 
-[ ] T106 [P0] Создать public-facing README with problem, solution, demo URL, setup, research basis, limitations and submission status.
-[ ] T107 [P0] Добавить README section explaining how judges can verify actual work.
-[ ] T108 [P0] Добавить README section explaining that no video leaves browser.
-[ ] T109 [P0] Добавить README section mapping project to PhysTech criteria: Impact, Creativity, Presentation.
-[ ] T110 [P0] Добавить README section mapping project to Research and Social Impact awards.
-[ ] T111 [P0] Подготовить Devpost project title.
-[ ] T112 [P0] Подготовить Devpost one-paragraph abstract.
-[ ] T113 [P0] Подготовить short project description for presentation registration.
-[ ] T114 [P0] Подготовить 10-minute presentation structure with 7-minute story and 3-minute Q&A buffer.
-[ ] T115 [P0] Подготовить 90-second live demo script inside the 10-minute presentation.
-[ ] T116 [P0] Подготовить backup demo script if webcam fails.
-[ ] T117 [P1] Подготовить slide outline: problem, insight, solution, demo, evidence, impact, limitations, next steps.
-[ ] T118 [P1] Подготовить judge Q&A answer bank for clinical claims, accuracy, privacy, accessibility, scalability and research.
-[ ] T119 [P1] Подготовить screenshot set showing mission, calibration, Adaptive Chair Movement, Reach Stars and report.
-[ ] T120 [P1] Подготовить short demo video or GIF if time allows.
-[ ] T121 [P1] Подготовить public repository or storage package and ensure the link references actual work.
-[ ] T122 [P1] Проверить that Vercel URL, repo/storage URL and research artifacts are all publicly accessible.
-[ ] T123 [P1] Подготовить final submission checklist for June 27 EDT deadlines.
-[ ] T124 [P1] Подготовить presentation registration checklist with name, contact, title, abstract and public link.
-[ ] T125 [P0] Сверить entire public package against Devpost requirement: actual outcome must be verifiable in afternoon of June 27.
-[ ] T126 [ANCHOR] 🏁 PHASE END REVIEW — итог фазы и проверка направления
+[x] T106 [P0] Создать public-facing README with problem, solution, demo URL, setup, research basis, limitations and submission status.
+[x] T107 [P0] Добавить README section explaining how judges can verify actual work.
+[x] T108 [P0] Добавить README section explaining that no video leaves browser.
+[x] T109 [P0] Добавить README section mapping project to PhysTech criteria: Impact, Creativity, Presentation.
+[x] T110 [P0] Добавить README section mapping project to Research and Social Impact awards.
+[x] T111 [P0] Подготовить Devpost project title.
+[x] T112 [P0] Подготовить Devpost one-paragraph abstract.
+[x] T113 [P0] Подготовить short project description for presentation registration.
+[x] T114 [P0] Подготовить 10-minute presentation structure with 7-minute story and 3-minute Q&A buffer.
+[x] T115 [P0] Подготовить 90-second live demo script inside the 10-minute presentation.
+[x] T116 [P0] Подготовить backup demo script if webcam fails.
+[x] T117 [P1] Подготовить slide outline: problem, insight, solution, demo, evidence, impact, limitations, next steps.
+[x] T118 [P1] Подготовить judge Q&A answer bank for clinical claims, accuracy, privacy, accessibility, scalability and research.
+[x] T119 [P1] Подготовить screenshot set showing mission, calibration, Adaptive Chair Movement, Reach Stars and report.
+[x] T120 [P1] Подготовить short demo video or GIF if time allows.
+[x] T121 [P1] Подготовить public repository or storage package and ensure the link references actual work.
+[x] T122 [P1] Проверить that Vercel URL, repo/storage URL and research artifacts are all publicly accessible.
+[x] T123 [P1] Подготовить final submission checklist for June 27 EDT deadlines.
+[x] T124 [P1] Подготовить presentation registration checklist with name, contact, title, abstract and public link.
+[x] T125 [P0] Сверить entire public package against Devpost requirement: actual outcome must be verifiable in afternoon of June 27.
+[x] T126 [ANCHOR] 🏁 PHASE END REVIEW — итог фазы и проверка направления
     Агент-исполнитель обязан перед переходом в следующую фазу:
     1. Перечитать IDEA ANCHOR and live PhysTech Devpost page.
     2. Проверить последние 20 задач: закрывают ли они public actual outcome, submission and presentation.
@@ -234,26 +234,26 @@ MASTER TODO
 
 ## PHASE 7 — Verification, Smoke Testing And Risk Control
 
-[ ] T127 [P0] Провести full local build after all product upgrades.
-[ ] T128 [P0] Провести lint and test verification after all product upgrades.
-[ ] T129 [P0] Провести production redeploy after all product upgrades.
-[ ] T130 [P0] Проверить production URL returns correct page and updated content.
+[x] T127 [P0] Провести full local build after all product upgrades.
+[x] T128 [P0] Провести lint and test verification after all product upgrades.
+[x] T129 [P0] Провести production redeploy after all product upgrades.
+[x] T130 [P0] Проверить production URL returns correct page and updated content.
 [ ] T131 [P0] Проверить production app on HTTPS with physical webcam.
 [ ] T132 [P0] Проверить camera permission flow in at least two browsers if available.
-[ ] T133 [P0] Проверить fallback demo flow without camera.
+[x] T133 [P0] Проверить fallback demo flow without camera.
 [ ] T134 [P0] Проверить report export/copy flow after real session.
-[ ] T135 [P0] Проверить that public README links are correct and not private/local.
-[ ] T136 [P0] Проверить that no local-only paths are required for judges to understand the project.
-[ ] T137 [P1] Проверить mobile layout for Home, Method, Camera and Report.
-[ ] T138 [P1] Проверить desktop layout for presentation sharing over Zoom.
-[ ] T139 [P1] Проверить loading, empty, camera denied, model failed and low-confidence states.
-[ ] T140 [P1] Проверить accessible focus order through the whole flow.
-[ ] T141 [P1] Проверить that all medical limitation text is visible where needed.
-[ ] T142 [P1] Проверить that report numbers are not misleading when confidence is low.
+[x] T135 [P0] Проверить that public README links are correct and not private/local.
+[x] T136 [P0] Проверить that no local-only paths are required for judges to understand the project.
+[x] T137 [P1] Проверить mobile layout for Home, Method, Camera and Report.
+[x] T138 [P1] Проверить desktop layout for presentation sharing over Zoom.
+[x] T139 [P1] Проверить loading, empty, camera denied, model failed and low-confidence states.
+[x] T140 [P1] Проверить accessible focus order through the whole flow.
+[x] T141 [P1] Проверить that all medical limitation text is visible where needed.
+[x] T142 [P1] Проверить that report numbers are not misleading when confidence is low.
 [ ] T143 [P1] Проверить Devpost abstract against current contest conditions one final time before submission.
 [ ] T144 [P1] Проверить research citations and claims one final time before submission.
-[ ] T145 [P1] Составить final release risk register with owner and mitigation for every live demo risk.
-[ ] T146 [P0] Зафиксировать release evidence: build logs, deploy URL, screenshots, smoke test notes and known limitations.
+[x] T145 [P1] Составить final release risk register with owner and mitigation for every live demo risk.
+[x] T146 [P0] Зафиксировать release evidence: build logs, deploy URL, screenshots, smoke test notes and known limitations.
 [ ] T147 [ANCHOR] 🏁 PHASE END REVIEW — итог фазы и проверка направления
     Агент-исполнитель обязан перед переходом в следующую фазу:
     1. Перечитать IDEA ANCHOR, contest conditions and release blockers.
@@ -269,18 +269,19 @@ MASTER TODO
 [ ] T150 [P0] За 48 часов до дедлайна выполнить full submission dry run without actually submitting if submission is not ready.
 [ ] T151 [P0] За 48 часов до дедлайна проверить all public links from a clean browser/session.
 [ ] T152 [P0] За 24 часа до дедлайна freeze product scope except critical fixes.
+[x] T152A [P0] Настроить автоматическое напоминание на 72h/48h/24h windows so AI team rereads contest conditions and checks submission readiness.
 [ ] T153 [P0] Submit project to Devpost before June 27, 2026, 12:00pm EDT.
 [ ] T154 [P0] Register project presentation before June 27, 2026, 12:00pm EDT.
 [ ] T155 [P0] Save proof of submission and registration.
-[ ] T156 [P0] Prepare final live demo setup: browser, webcam, lighting, chair, fallback data, tabs, internet check.
+[x] T156 [P0] Prepare final live demo setup: browser, webcam, lighting, chair, fallback data, tabs, internet check.
 [ ] T157 [P0] Rehearse the 10-minute presentation at least three times with stopwatch.
 [ ] T158 [P0] Rehearse the 90-second live demo until it works without improvisation.
 [ ] T159 [P0] Rehearse Q&A answers for research, clinical limitations, accessibility, privacy and impact.
-[ ] T160 [P1] Prepare a concise "what changed after hackathon" roadmap for book chapter and future work.
-[ ] T161 [P1] Prepare post-contest notes template to record judge feedback.
-[ ] T162 [P1] Prepare post-contest issue list for real-world validation, not fake success claims.
-[ ] T163 [P1] Prepare book chapter outline from problem, method, prototype, findings, limitations and future work.
-[ ] T164 [P1] Prepare continuation plan for small pilot with caregivers or community wellness users if invited.
+[x] T160 [P1] Prepare a concise "what changed after hackathon" roadmap for book chapter and future work.
+[x] T161 [P1] Prepare post-contest notes template to record judge feedback.
+[x] T162 [P1] Prepare post-contest issue list for real-world validation, not fake success claims.
+[x] T163 [P1] Prepare book chapter outline from problem, method, prototype, findings, limitations and future work.
+[x] T164 [P1] Prepare continuation plan for small pilot with caregivers or community wellness users if invited.
 [ ] T165 [P1] After presentation, record what worked, what failed and what judges asked.
 [ ] T166 [P1] After results, update public README with outcome honestly.
 [ ] T167 [P1] If invited for book chapter, convert research synthesis and project evidence into chapter draft plan.
