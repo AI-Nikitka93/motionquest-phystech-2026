@@ -53,14 +53,14 @@ const REQUIRED_LANDMARKS: Record<PoseMode, number[]> = {
   calibration: [11, 12, 23, 24, 25, 26, 27, 28],
   chair: [11, 12, 23, 24, 25, 26, 27, 28],
   seated: [11, 12, 13, 14, 15, 16, 23, 24],
-  reach: [11, 12, 13, 14, 15, 16, 23, 24],
+  reach: [11, 12, 13, 14, 15, 16],
 };
 
 const MIN_USABLE_LANDMARKS: Record<PoseMode, number[]> = {
   calibration: [11, 12, 23, 24, 25, 26],
   chair: [11, 12, 23, 24, 25, 26],
   seated: [11, 12, 13, 14, 15, 16],
-  reach: [11, 12, 15, 16],
+  reach: [11, 12],
 };
 
 export function isVisibleLandmark(
@@ -105,12 +105,19 @@ export function hasPlausibleBodyFrame(
 ) {
   const leftShoulder = landmarks[11];
   const rightShoulder = landmarks[12];
+  if (mode === "reach") {
+    if (!hasPlausibleShoulderFrame(leftShoulder, rightShoulder)) {
+      return false;
+    }
+    return hasPlausibleReachArm(landmarks, "left") ||
+      hasPlausibleReachArm(landmarks, "right");
+  }
+
   const leftHip = landmarks[23];
   const rightHip = landmarks[24];
 
   if (
-    !isVisibleLandmark(leftShoulder) ||
-    !isVisibleLandmark(rightShoulder) ||
+    !hasPlausibleShoulderFrame(leftShoulder, rightShoulder) ||
     !isVisibleLandmark(leftHip, 0.45) ||
     !isVisibleLandmark(rightHip, 0.45)
   ) {
@@ -261,6 +268,10 @@ export function detectReachHit(
   landmarks: NormalizedLandmark[],
   target: StarTarget,
 ): boolean {
+  if (!hasUsablePose(landmarks, "reach")) {
+    return false;
+  }
+
   const wrists = [landmarks[15], landmarks[16]].filter(
     (point) => isVisibleLandmark(point),
   );
@@ -357,6 +368,55 @@ function hasPlausibleArm(
     maxSegment <= Math.max(0.36, torsoDiagonal * 1.6) &&
     zDelta <= 0.75
   );
+}
+
+function hasPlausibleReachArm(
+  landmarks: NormalizedLandmark[],
+  side: "left" | "right",
+) {
+  const [shoulderIndex, elbowIndex, wristIndex] =
+    side === "left" ? [11, 13, 15] : [12, 14, 16];
+  const shoulder = landmarks[shoulderIndex];
+  const elbow = landmarks[elbowIndex];
+  const wrist = landmarks[wristIndex];
+
+  if (
+    !isVisibleLandmark(shoulder) ||
+    !isVisibleLandmark(elbow, 0.42) ||
+    !isVisibleLandmark(wrist, 0.42)
+  ) {
+    return false;
+  }
+
+  const upperArm = distance(shoulder, elbow);
+  const forearm = distance(elbow, wrist);
+  const wholeArm = distance(shoulder, wrist);
+  const zDelta =
+    Number.isFinite(wrist.z) && Number.isFinite(shoulder.z)
+      ? Math.abs((wrist.z ?? 0) - (shoulder.z ?? 0))
+      : 0;
+
+  return (
+    upperArm >= 0.025 &&
+    forearm >= 0.025 &&
+    wholeArm >= 0.045 &&
+    upperArm <= 0.48 &&
+    forearm <= 0.48 &&
+    zDelta <= 0.85
+  );
+}
+
+function hasPlausibleShoulderFrame(
+  leftShoulder: NormalizedLandmark | undefined,
+  rightShoulder: NormalizedLandmark | undefined,
+) {
+  if (!isVisibleLandmark(leftShoulder) || !isVisibleLandmark(rightShoulder)) {
+    return false;
+  }
+
+  const shoulderWidth = distance(leftShoulder, rightShoulder);
+  const shoulderTilt = Math.abs(leftShoulder.y - rightShoulder.y);
+  return shoulderWidth >= 0.1 && shoulderWidth <= 0.66 && shoulderTilt <= 0.22;
 }
 
 function distance(first: NormalizedLandmark, second: NormalizedLandmark) {

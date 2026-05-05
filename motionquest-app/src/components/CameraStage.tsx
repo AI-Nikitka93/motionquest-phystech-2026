@@ -117,7 +117,7 @@ export function CameraStage({
         <div className="mt-5 space-y-4 text-xl leading-relaxed">
           <StageStatusItem tone={poseUsable ? "success" : "warning"}>
             {mode === "seated" || mode === "reach"
-              ? "Shoulders, elbows and wrists are visible"
+              ? "Upper body and at least one reaching hand are visible"
               : "Shoulders, hips and knees are visible"}
           </StageStatusItem>
           <StageStatusItem tone={isReady ? "success" : "warning"}>
@@ -270,19 +270,14 @@ const JOINT_GROUPS: Record<
       help: "Shoulders anchor the reach frame.",
     },
     {
-      label: "Elbows",
-      indexes: [13, 14],
-      help: "Elbows help show arm extension.",
+      label: "Left arm",
+      indexes: [13, 15],
+      help: "Raise your left hand until elbow and wrist are visible.",
     },
     {
-      label: "Wrists",
-      indexes: [15, 16],
-      help: "Wrists must be visible to hit stars.",
-    },
-    {
-      label: "Hips",
-      indexes: [23, 24],
-      help: "Hips keep the body frame stable.",
+      label: "Right arm",
+      indexes: [14, 16],
+      help: "Raise your right hand until elbow and wrist are visible.",
     },
   ],
   seated: [
@@ -318,13 +313,12 @@ function JointVisibilityPanel({
 }) {
   const requiredGroups = JOINT_GROUPS[mode];
   const allVisible =
-    requiredGroups.length > 0 &&
-    requiredGroups.every((group) =>
-      group.indexes.every((index) => {
-        const point = landmarks[index];
-        return isVisibleLandmark(point, LANDMARK_VISIBILITY_THRESHOLD);
-      }),
-    );
+    mode === "reach"
+      ? isGroupVisible(requiredGroups[0], landmarks) &&
+        (isGroupVisible(requiredGroups[1], landmarks) ||
+          isGroupVisible(requiredGroups[2], landmarks))
+      : requiredGroups.length > 0 &&
+        requiredGroups.every((group) => isGroupVisible(group, landmarks));
   const poseUsable = hasUsablePose(landmarks, mode);
 
   return (
@@ -344,16 +338,15 @@ function JointVisibilityPanel({
           {allVisible && poseUsable
             ? "Required joints are visible enough for this activity."
             : allVisible
-              ? "Joints are detected, but the body frame is not stable. Move hands away from the lens and show your upper body."
-            : "Show every required joint before treating the session as usable."}
+              ? "Joints are detected, but the body frame is not stable. Move hands away from the lens and keep shoulders visible."
+              : mode === "reach"
+                ? "Show shoulders and raise at least one hand until elbow and wrist are visible."
+                : "Show every required joint before treating the session as usable."}
         </p>
       </div>
       <div className="mt-3 grid gap-3">
         {requiredGroups.map((group) => {
-          const visible = group.indexes.every((index) => {
-            const point = landmarks[index];
-            return isVisibleLandmark(point, LANDMARK_VISIBILITY_THRESHOLD);
-          });
+          const visible = isGroupVisible(group, landmarks);
           return (
             <div
               key={group.label}
@@ -384,6 +377,16 @@ function JointVisibilityPanel({
       </div>
     </div>
   );
+}
+
+function isGroupVisible(
+  group: { indexes: number[] },
+  landmarks: NormalizedLandmark[],
+) {
+  return group.indexes.every((index) => {
+    const point = landmarks[index];
+    return isVisibleLandmark(point, LANDMARK_VISIBILITY_THRESHOLD);
+  });
 }
 
 function buildCameraEvidenceText({

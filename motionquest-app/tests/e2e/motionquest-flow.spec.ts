@@ -35,7 +35,7 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
 
   await page.getByRole("button", { name: "Start Reach Stars" }).click();
   await expect(
-    page.getByText("Step back first. Move either wrist into the yellow target"),
+    page.getByText("First show shoulders and one raised hand."),
   ).toBeVisible();
   await page.getByRole("button", { name: "Finish & View Report" }).click();
 

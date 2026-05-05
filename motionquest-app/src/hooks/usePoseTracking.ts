@@ -341,11 +341,13 @@ function framingHint(mode: PoseMode, landmarks: NormalizedLandmark[]) {
     11, 12, 13, 14, 15, 16, 23, 24,
   ]);
   if (upperBodyCandidate >= 5) {
-    return "Body frame unstable. Move hands away from the lens and show your shoulders and hips";
+    return mode === "reach"
+      ? "Reach tracking unstable. Keep shoulders visible and raise one hand away from the lens"
+      : "Body frame unstable. Move hands away from the lens and show your shoulders and hips";
   }
 
   if (mode === "reach") {
-    return "Step back and show shoulders, hips, elbows, and both wrists";
+    return "Show shoulders, then raise one hand until elbow and wrist are visible";
   }
   if (mode === "seated") {
     return "Stay seated, move hands away from the lens, and show shoulders, elbows, and wrists";

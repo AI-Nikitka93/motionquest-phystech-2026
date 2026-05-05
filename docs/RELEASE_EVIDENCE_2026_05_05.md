@@ -15,7 +15,7 @@ Contest-condition source checked: https://phystech-2026.devpost.com/
 | GitHub repository visibility | PUBLIC, default branch `master` |
 | Initial public package commit | `0aa645fd5a19eb96a08a6ed5a18ca2cbc4317265` |
 | Release-evidence push commit | `cb3b84bdbb09844525200bfff2e40735690cbe18` |
-| Latest production deployment recorded in state | `dpl_BcT6QQDRShkgSxosRLaS4CtE4W1o` |
+| Latest production deployment recorded in state | `dpl_2ywFSKkkehRRx55NevPWNGbjxfVh` |
 
 ## Fresh Verification Commands
 
@@ -53,6 +53,21 @@ stage. It copies:
 
 This is the required text evidence for T086-T089, T092-T093, T104 and T105
 alongside screenshots in `evidence/camera-smoke/`.
+
+## Reach Stars Seated Webcam Fix
+
+User screenshot on 2026-05-05 showed a realistic seated webcam frame where
+shoulders were visible but hips/wrists were not yet visible, causing Reach Stars
+to remain stuck while the timer continued.
+
+Fix shipped:
+
+- Reach Stars no longer requires hips.
+- Reach Stars accepts shoulders plus one visible elbow/wrist pair.
+- Timer pauses until usable reach pose exists.
+- Target is hidden until the reach pose is usable.
+- Target positions stay in upper reachable camera zones.
+- E2E was rerun against production after deployment.
 
 ## MediaPipe Production Asset Checks
 

@@ -3,13 +3,13 @@
 ## Structured State
 
 current_goal: Win PhysTech 2026 with a focused MotionQuest MVP.
-current_task: Prepare Phase 5 real-camera closeout evidence path.
-status: Engineering support for T086-T105 is implemented and deployed: live camera stages now produce copyable evidence, false-positive hand geometry is rejected, and camera protocol has pass/fail criteria.
+current_task: Fix Reach Stars for real seated webcam framing.
+status: Reach Stars now works as an upper-body seated reach task: shoulders plus one visible arm are enough, hips are no longer required, timer waits for usable reach pose, and targets stay in the upper reachable camera area.
 active_step: Contest-winning product upgrade.
 next_step: On the user's physical webcam, run the production flow and save `home-calibration.png`, `chair-stand-tracking.png`, `reach-stars-tracking.png`, `caregiver-report.png` and `live-evidence.txt` in `evidence/camera-smoke/`; then close T086-T089, T092-T093, T104 and T105.
 blockers: Physical webcam is not available in the current agent environment (`NotFoundError: Requested device not found`), Edge/second browser is not available here, and Devpost submission / Discord registration / live rehearsals / post-contest updates are future human-time actions that cannot be honestly completed on 2026-05-05.
 artifacts: docs/mvp-plan.md, docs/visual-spec.md, docs/CONDITIONS_GAP_AUDIT.md, docs/CONDITIONS_GAP_ACTION_CHECKLIST.md, docs/JUDGING_CLAIMS_AND_LIMITS.md, docs/SUBMISSION_PACKAGE_PLAN.md, docs/MASTER_TODO_WINNING_PROJECT.md, docs/DEVPOST_SUBMISSION_COPY.md, docs/PRESENTATION_SCRIPT.md, docs/JUDGE_QA_ANSWER_BANK.md, docs/FINAL_SUBMISSION_CHECKLIST.md, docs/FINAL_REHEARSAL_PLAN.md, docs/RELEASE_RISK_REGISTER.md, docs/RELEASE_EVIDENCE_2026_05_05.md, docs/PHASE5_T086_T105_REAL_CAMERA_CLOSEOUT.md, docs/POST_CONTEST_CONTINUITY.md, docs/ADAPTIVE_SEATED_METRICS_RESEARCH_2026_05_05.md, docs/ADAPTIVE_SEATED_IMPLEMENTATION_2026_05_05.md, output/devpost-screenshots/01-home-desktop.png, output/devpost-screenshots/02-seated-adaptive-stage.png, output/devpost-screenshots/03-reach-stars-stage.png, output/devpost-screenshots/04-caregiver-report.png, output/devpost-screenshots/05-home-mobile.png, output/demo-video/motionquest-adaptive-demo.webm, output/playwright/reach-stars-layout-after-tracking-gate-fix.png, evidence/camera-smoke/README.md, research-synthesis-MotionQuest.md, motionquest-app/, https://github.com/AI-Nikitka93/motionquest-phystech-2026
-updated_at: 2026-05-05 03:58 Europe/Minsk
+updated_at: 2026-05-05 04:13 Europe/Minsk
 
 ## Notes
 
@@ -90,3 +90,5 @@ Adaptive seated implementation update: deployed `Adaptive Chair Movement` with s
 Tracking false-positive fix update: after user screenshot showed a hand close to the camera being accepted as `Tracking: High`, the pose gate now requires plausible shoulder/hip body geometry and plausible arm geometry before drawing overlay, reporting high confidence, or counting Reach Stars. Reach Stars now blocks dwell scoring when the body frame is unstable, moves the `What counts` chip away from the timer, and shows `Finish & View Report` for manual early finish. Production deployment `dpl_B1m73Bmz1xCwsR2A4CANH6DKKLFK` is aliased to `https://motionquest-app.vercel.app`.
 
 Real-camera closeout preparation update: `Copy live evidence` is now available on camera stages; `docs/PHASE5_T086_T105_REAL_CAMERA_CLOSEOUT.md`, `docs/CAMERA_SMOKE_TEST_PROTOCOL.md` and `evidence/camera-smoke/README.md` define the exact evidence needed to close T086-T089, T092-T093, T104 and T105. Production deployment `dpl_BcT6QQDRShkgSxosRLaS4CtE4W1o` is aliased to `https://motionquest-app.vercel.app`.
+
+Reach Stars real-camera fix update: after user screenshot showed a seated upper body visible but Reach Stars still stuck on missing joints, Reach Stars was relaxed to an upper-body task. It no longer requires hips, accepts shoulders plus one visible elbow/wrist, pauses the timer until usable reach pose exists, hides targets until tracking is usable, and places targets in upper reachable zones. Production deployment `dpl_2ywFSKkkehRRx55NevPWNGbjxfVh` is aliased to `https://motionquest-app.vercel.app`.

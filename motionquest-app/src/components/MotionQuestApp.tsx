@@ -49,10 +49,10 @@ const createInitialDraft = (sessionMode: SessionMode): SessionDraft => ({
 const INITIAL_DRAFT = createInitialDraft("seated-adaptive");
 
 const TARGETS: Omit<StarTarget, "id" | "shownAt">[] = [
-  { label: "Left reach", x: 12, y: 42, size: 16 },
-  { label: "Right reach", x: 72, y: 42, size: 16 },
-  { label: "High reach", x: 42, y: 16, size: 16 },
-  { label: "Center reach", x: 42, y: 48, size: 16 },
+  { label: "Left shoulder reach", x: 10, y: 24, size: 15 },
+  { label: "Right shoulder reach", x: 74, y: 24, size: 15 },
+  { label: "High center reach", x: 43, y: 14, size: 15 },
+  { label: "Midline reach", x: 43, y: 34, size: 15 },
 ];
 
 const FLOW_STEPS: { id: Screen; label: string; outcome: string }[] = [
@@ -637,9 +637,9 @@ function ReachStarsScreen({
         <ReadinessConfirmation
           title="Ready for Reach Stars"
           checks={[
-            "Stand or sit far enough back to show shoulders and wrists.",
+            "Sit or stand far enough back to show shoulders.",
+            "Raise one hand until elbow and wrist are visible.",
             "Reach only within a comfortable range.",
-            "Keep both hands visible when possible.",
           ]}
           action="Start Reach Stars"
           onConfirm={() => setConfirmed(true)}
@@ -689,7 +689,7 @@ function ReachStarsHud({
   const hasUsableReachPose = hasUsablePose(tracking.landmarks, "reach");
   const displayFeedback = hasUsableReachPose
     ? feedback
-    : "Step back. Show shoulders, hips, elbows, and wrists.";
+    : "Show shoulders, then raise one hand until elbow and wrist are visible.";
 
   const finish = useCallback(
     (confidence: PoseConfidence) => {
@@ -709,10 +709,12 @@ function ReachStarsHud({
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setSecondsLeft((value) => Math.max(0, value - 1));
+      if (hasUsableReachPose) {
+        setSecondsLeft((value) => Math.max(0, value - 1));
+      }
     }, 1000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [hasUsableReachPose]);
 
   useEffect(() => {
     if (!hasUsableReachPose) {
@@ -769,26 +771,28 @@ function ReachStarsHud({
         <span className="block text-base">Timer</span>
         <span className="text-6xl font-black tabular-nums">{secondsLeft}</span>
       </HudChip>
-      <div
-        className="absolute flex items-center justify-center rounded-full border-4 border-[#10231F] bg-[#F6C85F] text-5xl font-black text-[#10231F] shadow-camera"
-        style={{
-          left: `${target.x}%`,
-          top: `${target.y}%`,
-          width: `${target.size}%`,
-          aspectRatio: "1",
-        }}
-        aria-label={target.label}
-      >
-        ★
-      </div>
+      {hasUsableReachPose ? (
+        <div
+          className="absolute flex items-center justify-center rounded-full border-4 border-[#10231F] bg-[#F6C85F] text-5xl font-black text-[#10231F] shadow-camera"
+          style={{
+            left: `${target.x}%`,
+            top: `${target.y}%`,
+            width: `${target.size}%`,
+            aspectRatio: "1",
+          }}
+          aria-label={target.label}
+        >
+          ★
+        </div>
+      ) : null}
       <div className="absolute bottom-28 left-4 rounded-xl bg-[#D8F3DC] p-4 text-xl font-bold text-[#10231F] shadow-camera">
         {displayFeedback}
       </div>
       <HudChip className="left-4 right-4 top-44 md:left-auto md:right-4 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
-          Step back first. Move either wrist into the yellow target and hold
-          for half a second.
+          First show shoulders and one raised hand. Then hold your wrist inside
+          the yellow target for half a second.
         </span>
       </HudChip>
       <button

@@ -58,6 +58,9 @@ test("detectReachHit returns true when either wrist enters the star target box",
   };
 
   const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.9));
+  landmarks[11] = landmark(0.42, 0.28, 0.95);
+  landmarks[12] = landmark(0.58, 0.29, 0.95);
+  landmarks[13] = landmark(0.34, 0.38, 0.95);
   landmarks[15] = landmark(0.22, 0.48, 0.96);
 
   assert.equal(detectReachHit(landmarks, target), true);
@@ -97,6 +100,28 @@ test("hasUsablePose rejects hand-close false body geometry even when required la
   assert.equal(hasPlausibleBodyFrame(landmarks, "reach"), false);
   assert.equal(hasUsablePose(landmarks, "reach"), false);
   assert.equal(getPoseConfidence(landmarks, "reach"), "low");
+});
+
+test("Reach Stars accepts a seated upper-body frame with one visible arm and no hips", () => {
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
+  landmarks[11] = landmark(0.42, 0.28, 0.9);
+  landmarks[12] = landmark(0.58, 0.29, 0.9);
+  landmarks[13] = landmark(0.35, 0.37, 0.88);
+  landmarks[15] = landmark(0.24, 0.32, 0.88);
+  landmarks[23] = landmark(0.44, 0.8, 0.03);
+  landmarks[24] = landmark(0.56, 0.8, 0.03);
+
+  assert.equal(hasPlausibleBodyFrame(landmarks, "reach"), true);
+  assert.equal(hasUsablePose(landmarks, "reach"), true);
+});
+
+test("Reach Stars rejects shoulders only until at least one elbow and wrist are visible", () => {
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
+  landmarks[11] = landmark(0.42, 0.28, 0.9);
+  landmarks[12] = landmark(0.58, 0.29, 0.9);
+
+  assert.equal(hasPlausibleBodyFrame(landmarks, "reach"), false);
+  assert.equal(hasUsablePose(landmarks, "reach"), false);
 });
 
 test("hasUsablePose rejects a single noisy limb so the overlay does not pretend tracking is valid", () => {
@@ -202,6 +227,9 @@ test("detectReachDwellHit requires the wrist to stay inside the target for 500ms
     shownAt: 1000,
   };
   const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.9));
+  landmarks[11] = landmark(0.42, 0.28, 0.95);
+  landmarks[12] = landmark(0.58, 0.29, 0.95);
+  landmarks[13] = landmark(0.34, 0.38, 0.95);
   landmarks[15] = landmark(0.22, 0.48, 0.96);
 
   const first = detectReachDwellHit({

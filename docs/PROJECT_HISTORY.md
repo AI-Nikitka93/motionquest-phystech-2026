@@ -341,3 +341,12 @@
 Локальный account context: без изменений
 Локальная карта секретов: без изменений
 Следующий шаг: run the real physical webcam flow and save copied evidence plus screenshots in `evidence/camera-smoke/`; then close T086-T089, T092-T093, T104 and T105.
+
+Дата и время: 2026-05-05 04:13
+Роль: P-FRONTEND / P-DEBUG / Verification
+Сделано: исправлен Reach Stars под реальный сидячий webcam-сценарий из пользовательского скрина: убрано обязательное требование hips, достаточно shoulders + one visible elbow/wrist pair; таймер не тикает без usable reach pose; цель скрывается до валидного трекинга и размещается только в верхней reachable-zone.
+Изменены файлы: `motionquest-app/src/lib/gameLogic.ts`, `motionquest-app/src/lib/gameLogic.test.ts`, `motionquest-app/src/hooks/usePoseTracking.ts`, `motionquest-app/src/components/CameraStage.tsx`, `motionquest-app/src/components/MotionQuestApp.tsx`, `motionquest-app/tests/e2e/motionquest-flow.spec.ts`, `docs/STATE.md`, `docs/PROJECT_MAP.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`, `output/playwright/reach-stars-production-upper-body-fix.png`.
+Результат/доказательство: `npm run lint` passed; `npm test` 14/14 passed; `npm run build` passed; `npm run test:e2e` 7/7 passed against production; Vercel production deployment `dpl_2ywFSKkkehRRx55NevPWNGbjxfVh` Ready and aliased to `https://motionquest-app.vercel.app`; production screenshot `output/playwright/reach-stars-production-upper-body-fix.png` confirms new copy and no target before tracking.
+Локальный account context: без изменений
+Локальная карта секретов: без изменений
+Следующий шаг: user should hard-refresh production URL, open Reach Stars, raise one hand into frame and capture another screenshot if tracking still does not become usable.
