@@ -1,0 +1,12 @@
+MotionQuest session report
+Created: 05.05.2026, 02:09:16
+Source: safe demo fallback
+Chair Stand: 8 reps in 30s
+Reach Stars: 10/12 targets
+Average reach reaction: 946 ms
+Tracking confidence: high
+Tracking validity: valid
+Next session suggestion: same
+Interpretation: 8 chair-stand reps were recorded, 10 of 12 reach targets were hit, and tracking confidence was high. reach interaction looked consistent. Use this as session feedback, not diagnosis.
+Limitations: Results depend on camera angle, lighting, body visibility, and safe chair setup.
+Limit: practice feedback only; not a medical assessment.

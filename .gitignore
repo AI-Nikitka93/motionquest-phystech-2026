@@ -1,0 +1,32 @@
+# Dependencies and builds
+node_modules/
+motionquest-app/node_modules/
+motionquest-app/.next/
+motionquest-app/out/
+motionquest-app/playwright-report/
+motionquest-app/test-results/
+
+# Local hosting and account state
+.vercel/
+motionquest-app/.vercel/
+*.local
+*.local.*
+docs/*.local.md
+
+# Logs
+*.log
+.devserver*.log
+motionquest-app/dev-server*.log
+motionquest-app/dev-server*.err.log
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+.playwright-mcp/
+
+# Secrets
+.env
+.env.*
+!.env.example

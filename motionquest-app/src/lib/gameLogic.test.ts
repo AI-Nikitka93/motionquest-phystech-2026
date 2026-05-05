@@ -1,0 +1,211 @@
+import assert from "node:assert/strict";
+import test from "node:test";
+import {
+  classifyPoseReadiness,
+  detectChairStandTransition,
+  detectReachDwellHit,
+  detectReachHit,
+  detectSeatedArmTransition,
+  getPoseConfidence,
+  hasUsablePose,
+  type ChairStandPhase,
+  type NormalizedLandmark,
+  type SeatedArmPhase,
+  type StarTarget,
+} from "./gameLogic";
+import { buildDemoSession, buildSession } from "./sessionStorage";
+
+const landmark = (
+  x: number,
+  y: number,
+  visibility = 0.95,
+): NormalizedLandmark => ({ x, y, z: 0, visibility });
+
+test("detectChairStandTransition counts one full seated to standing to seated cycle", () => {
+  let phase: ChairStandPhase = "seated";
+  let reps = 0;
+  const frames = [
+    { hipsY: 0.72, kneesY: 0.64 },
+    { hipsY: 0.56, kneesY: 0.64 },
+    { hipsY: 0.50, kneesY: 0.64 },
+    { hipsY: 0.70, kneesY: 0.64 },
+  ];
+
+  for (const frame of frames) {
+    const result = detectChairStandTransition({
+      previousPhase: phase,
+      reps,
+      hipY: frame.hipsY,
+      kneeY: frame.kneesY,
+    });
+    phase = result.phase;
+    reps = result.reps;
+  }
+
+  assert.equal(reps, 1);
+  assert.equal(phase, "seated");
+});
+
+test("detectReachHit returns true when either wrist enters the star target box", () => {
+  const target: StarTarget = {
+    id: "left",
+    label: "Left",
+    x: 18,
+    y: 42,
+    size: 16,
+    shownAt: 0,
+  };
+
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.9));
+  landmarks[15] = landmark(0.22, 0.48, 0.96);
+
+  assert.equal(detectReachHit(landmarks, target), true);
+});
+
+test("getPoseConfidence returns low when required landmarks are missing", () => {
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.9));
+  landmarks[25] = landmark(0.5, 0.5, 0.05);
+
+  assert.equal(getPoseConfidence(landmarks, "chair"), "low");
+});
+
+test("getPoseConfidence returns medium for usable but incomplete full-body pose", () => {
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.05));
+  for (const index of [11, 12, 23, 24, 25, 26]) {
+    landmarks[index] = landmark(0.5, 0.5, 0.9);
+  }
+
+  assert.equal(hasUsablePose(landmarks, "chair"), true);
+  assert.equal(getPoseConfidence(landmarks, "chair"), "medium");
+});
+
+test("hasUsablePose rejects a single noisy limb so the overlay does not pretend tracking is valid", () => {
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
+  landmarks[25] = landmark(0.44, 0.65, 0.95);
+  landmarks[27] = landmark(0.45, 0.82, 0.95);
+
+  assert.equal(hasUsablePose(landmarks, "chair"), false);
+  assert.equal(getPoseConfidence(landmarks, "chair"), "low");
+});
+
+test("buildSession marks sessions without landmarks as not valid enough", () => {
+  const session = buildSession({
+    sessionMode: "standing",
+    chairReps: 0,
+    seatedArmReps: 0,
+    primaryMovement: "chair-stand",
+    chairDurationSec: 1,
+    reachTargetsShown: 0,
+    reachTargetsHit: 0,
+    reachReactionTimes: [],
+    poseConfidence: "low",
+    bodyLandmarksDetected: false,
+  });
+
+  assert.equal(session.trackingQuality.validity, "not-valid-enough");
+  assert.match(session.report.interpretation, /No usable body tracking/);
+});
+
+test("buildSession labels seated adaptive movement without pretending chair stand was required", () => {
+  const session = buildSession({
+    sessionMode: "seated-adaptive",
+    primaryMovement: "seated-arm-movement",
+    chairReps: 0,
+    seatedArmReps: 7,
+    chairDurationSec: 30,
+    reachTargetsShown: 4,
+    reachTargetsHit: 3,
+    reachReactionTimes: [720, 760, 810],
+    poseConfidence: "medium",
+    bodyLandmarksDetected: true,
+  });
+
+  assert.equal(session.sessionMode, "seated-adaptive");
+  assert.equal(session.primaryMovement, "seated-arm-movement");
+  assert.equal(session.adaptiveMovement.reps, 7);
+  assert.match(session.report.interpretation, /7 seated arm movement reps/);
+  assert.doesNotMatch(session.report.interpretation, /chair-stand reps/);
+});
+
+test("buildDemoSession labels fallback data explicitly", () => {
+  const session = buildDemoSession();
+
+  assert.equal(session.source, "safe-demo");
+  assert.equal(session.trackingQuality.validity, "valid");
+  assert.match(session.report.disclaimer, /Safe demo data only/);
+});
+
+test("classifyPoseReadiness accepts seated upper-body tracking without visible knees", () => {
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
+  for (const index of [11, 12, 13, 14, 15, 16, 23, 24]) {
+    landmarks[index] = landmark(0.5, 0.5, 0.9);
+  }
+  landmarks[25] = landmark(0.5, 0.9, 0.04);
+  landmarks[26] = landmark(0.5, 0.9, 0.04);
+
+  assert.equal(classifyPoseReadiness(landmarks), "seated-ready");
+  assert.equal(hasUsablePose(landmarks, "seated"), true);
+  assert.equal(hasUsablePose(landmarks, "chair"), false);
+});
+
+test("detectSeatedArmTransition counts one full extended flexed extended cycle", () => {
+  let phase: SeatedArmPhase = "extended";
+  let reps = 0;
+  const frames = [162, 118, 62, 88, 151];
+
+  for (const elbowAngle of frames) {
+    const result = detectSeatedArmTransition({
+      previousPhase: phase,
+      reps,
+      elbowAngle,
+    });
+    phase = result.phase;
+    reps = result.reps;
+  }
+
+  assert.equal(reps, 1);
+  assert.equal(phase, "extended");
+});
+
+test("detectReachDwellHit requires the wrist to stay inside the target for 500ms", () => {
+  const target: StarTarget = {
+    id: "safe-left",
+    label: "Left",
+    x: 18,
+    y: 42,
+    size: 16,
+    shownAt: 1000,
+  };
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.9));
+  landmarks[15] = landmark(0.22, 0.48, 0.96);
+
+  const first = detectReachDwellHit({
+    landmarks,
+    target,
+    nowMs: 1200,
+    dwellStartedAtMs: null,
+  });
+
+  assert.equal(first.hit, false);
+  assert.equal(first.dwellStartedAtMs, 1200);
+
+  const second = detectReachDwellHit({
+    landmarks,
+    target,
+    nowMs: 1699,
+    dwellStartedAtMs: first.dwellStartedAtMs,
+  });
+
+  assert.equal(second.hit, false);
+  assert.equal(second.dwellStartedAtMs, 1200);
+
+  const third = detectReachDwellHit({
+    landmarks,
+    target,
+    nowMs: 1700,
+    dwellStartedAtMs: first.dwellStartedAtMs,
+  });
+
+  assert.equal(third.hit, true);
+  assert.equal(third.dwellStartedAtMs, 1200);
+});

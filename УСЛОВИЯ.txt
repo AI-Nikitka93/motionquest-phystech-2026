@@ -1,0 +1,224 @@
+https://phystech-2026.devpost.com/
+
+
+
+PhysTech 2026: Physical Activity and Technology Hack Day
+Move, Inspire and Innovate! Demonstrate your talent and showcase your hack for physical activity.
+Start project
+Find teammates
+Import from portfolio
+Who can participate
+Above legal age of majority in country of residence
+All countries/territories, excluding standard exceptions 
+View full rules
+54 more days to deadline
+View schedule
+
+Deadline
+
+27 июн. 2026 г. @ 7:00pm GMT+3 
+Online
+Public
+10 non-cash prizes	200 participants
+Binnovative
+Education Health IoT
+We are back! Following the great success of PhysTech 2025, we are excited to invite you to this year's edition: PhysTech 2026.
+
+Website: https://binnovative-boston.github.io/phystech/2026.html
+
+Discord: https://discord.gg/mt4RVtcA7h
+
+Instagram: https://www.instagram.com/phys.tech26/
+
+Email: phystech@yahoo.com
+
+LinkedIn: https://www.linkedin.com/groups/17528013/
+
+Book publication: Your project will be featured in a book in the Binnovative Innovation Book Series.
+
+
+ 
+About the challenge
+PhysTech is an online international hackathon led by students for anyone who does, watches, analyzes and promotes physical activities - including sports, workouts, fitness exercises, casual hobbies/pastimes, and recreational adventures.
+
+PhysTech welcomes any type of physical activity. Sports and physical training are in. Yoga, pilates, ballet? Of course. Swimming, kayaking, cycling, dancing, skateboarding, rock/mountain climbing, hiking, horseback riding? Sure. Fishing, bowling, paddleboarding, scuba diving, rafting, cheerleading, outdoor bird watching, gardening, kite flying, disc golf (frisbee), or cornhole? Why not!
+
+Not only athletes and recreational players, but also fans, coaches, referees/judges, and analysts are welcome.
+
+PhysTech offers you a platform to address various needs, wants, and challenges in physical activities and produce creative solutions (hacks) with technology.
+
+PhysTech welcomes anyone of all ages and all technical skills, from limited experience to advanced.
+
+Entry is free.
+
+Expected project topics include, but are not limited to:
+
+Monitoring and enhancing performance
+
+Logging and tracking practice, training, and exercise
+
+Recording, analyzing, and communicating activity data
+
+Applying data analytics to physical activity
+
+Enhancing fan experience
+
+Increasing participation/engagement in physical activity
+
+Promoting health and wellness through physical activity
+
+Preventing and helping heal from injuries
+
+Improving dietary and nutritional assistance
+
+Protecting and improving the environment for physical activity
+
+ 
+
+Solutions can take many different forms, such as apps, games, social platforms, websites/services, devices, sensors, robots, audio/video, data collection/storage, data analysis/forecasts, data visualization, information retrieval, and 3-dimensional modeling/printing. PhysTech is hosted by Binnovative, a nonprofit organization in Massachusetts.
+
+
+Book chapter publication: We will publish a book that features the projects presented at PhysTech 2026. Selected participants will be invited to extend their project descriptions and publish them as a book. We are planning to publish this book as a part of the Binnovative Innovation Book Series. 
+
+ 
+
+InnovArt is hosted by Binnovative, a nonprofit organization in Massachusetts.
+
+Organizers:
+
+Konomi Karube (Co-chair)
+
+Naomi McCreary
+
+Rei Nagata (Co-chair)
+
+Hanna Suzuki (Co-chair)
+
+Alyssa Yasuhara (Co-chair)
+
+Rimi Yoshikawa
+
+Requirements
+ Each participant/team is required to complete ALL of the following 3 retirements:
+
+Submit your project to Devpost by 12 pm on June 27 (Sat), EST.
+
+Register your project presentation by 12 pm on June 27 (Sat), EST.
+
+Give a project presentation online on June 28 (Sun), EST. 
+
+Note that the deadlines are firm. No extensions will be given. Failure to meet the above requirements will disqualify you (and your team) from award judging.
+
+A link for presentation registration will be shared in the PhysTech 2026 channel in Discord. To register your presentation, you will be asked to submit:
+
+Your name and contact info
+
+Your project presentation title
+
+An abstract (short one-paragraph description) of your project
+
+A publicly accessible link to your project is placed on an online code repository (e.g., GitHub) or online storage (e.g., Google Drive). We will verify the actual outcome of your work with this link in the afternoon of June 27. Please note that we will not schedule your presentation if we cannot verify your actual work. You can submit a link to your project on Devpost; however, please make sure that the link references the actual outcome of your work.
+
+We will announce the schedule of project presentations (i.e., what time each presentation starts) by early morning of June 28 (Sun), EST. A Zoom link will be made available in the PhysTech 2026 channel in Discord. 
+
+ 
+
+Project Presentation: We tentatively plan to start project presentations at 10 am on June 28 (Sun), EST, but we might slightly adjust it based on the locations (time zones) where participants reside. We will announce the full presentation schedule by early morning of June 28 (Sun), EST. A Zoom link will be made available in the PhysTech 2026 channel of Discord.
+
+You will have 10 minutes in total for your presentation, including approx. 3 minutes for QAs with judges and other participants.
+
+
+Prizes
+10 non-cash prizes
+Grand Prix
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+2nd Place
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+3rd Place
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+Honorable Mention
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+Excellence in Creativity Award
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+Excellence in Research Award
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+Excellence in Entrepreneurship Award
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+Excellence in Social Impact Award
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+Emerging Talent Award
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+Key Contributor Award
+1 winner
+-Certificate of achievement
+-Will be invited to publish a book chapter about the project (priceless achievement!).
+
+Devpost Achievements
+Submitting to this hackathon could earn you:
+
+
+First online hackathon
+
+X Hackathons
+ level 1
+
+Hackathon Winner
+ level 1
+
+Generalist
+Judges
+Sarasa Ouchi
+Sarasa Ouchi
+
+Shun Nagata
+Shun Nagata
+
+PhysTech Advisory Board
+PhysTech Advisory Board
+
+Judging Criteria
+Impact
+How much impact (quality and quantity) can this project have? Does it solve a big problem or a small problem? Will it inspire or help many or a few?
+Creativity
+How creative/innovative is this project? Is it something that hasn't been attempted before, or is it an incremental improvement on something that already exists?
+Presentation
+How well did the team/individual communicate this project? Was the presentation effective in telling the story of the project: why it is important, what challenge it addresses, and how it delivers a solution?
+
+
+Dates: June 28 (Sun), 10 AM (EST). Each participant/team will deliver a project presentation (1-10 minutes) online. 
+
+Eligibility: Anyone of all ages and all technical skills, from limited experience to advanced. 
+
+Project and Submission Requirements: Each participant/team is required to submit a project presentation title and contact information by 12 pm on June 27 (Sat), EST. 
+
+Prizes: Grand Prix (1st Place), 2nd Place, 3rd Place, Honorable Mention, Excellence in Creativity Award, Excellence in Research Award, Excellence in Entrepreneurship Award, Excellence in Social Impact Award, Emerging Talent Award, and Key Contributor Award
+
+
+Judging Criteria and Winner Selection: A panel of judges will select award winners at the end of presentation event on online.
