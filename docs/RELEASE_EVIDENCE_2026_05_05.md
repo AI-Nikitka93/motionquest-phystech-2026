@@ -13,7 +13,8 @@ Contest-condition source checked: https://phystech-2026.devpost.com/
 | Raw README | https://raw.githubusercontent.com/AI-Nikitka93/motionquest-phystech-2026/master/README.md returned HTTP 200 |
 | Raw app source | https://raw.githubusercontent.com/AI-Nikitka93/motionquest-phystech-2026/master/motionquest-app/src/components/MotionQuestApp.tsx returned HTTP 200 |
 | GitHub repository visibility | PUBLIC, default branch `master` |
-| Current published package commit before final evidence update | `0aa645fd5a19eb96a08a6ed5a18ca2cbc4317265` |
+| Initial public package commit | `0aa645fd5a19eb96a08a6ed5a18ca2cbc4317265` |
+| Release-evidence push commit | `cb3b84bdbb09844525200bfff2e40735690cbe18` |
 | Latest production deployment recorded in state | `dpl_8sTZY7XCGYDaJTuYXfc12HDrUseg` |
 
 ## Fresh Verification Commands
