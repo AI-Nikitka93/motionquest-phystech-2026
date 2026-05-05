@@ -350,3 +350,12 @@
 Локальный account context: без изменений
 Локальная карта секретов: без изменений
 Следующий шаг: user should hard-refresh production URL, open Reach Stars, raise one hand into frame and capture another screenshot if tracking still does not become usable.
+
+Дата и время: 2026-05-05 04:58
+Роль: P-FRONTEND / P-DEBUG / Verification
+Сделано: исправлен Seated Adaptive под реальный сидячий webcam-сценарий из пользовательского скрина: seated branch больше не требует hips, принимает shoulders + one visible elbow/wrist pair, таймер не тикает без usable seated arm pose, а HUD просит поднять один forearm вместо generic `Move into frame`.
+Изменены файлы: `motionquest-app/src/lib/gameLogic.ts`, `motionquest-app/src/lib/gameLogic.test.ts`, `motionquest-app/src/hooks/usePoseTracking.ts`, `motionquest-app/src/components/CameraStage.tsx`, `motionquest-app/src/components/MotionQuestApp.tsx`, `motionquest-app/tests/e2e/motionquest-flow.spec.ts`, `docs/STATE.md`, `docs/PROJECT_MAP.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: `npm test` 14/14 passed; `npm run lint` passed; `npm run build` passed; Vercel production deployment `dpl_HxrY5sN9bamDrqULiJvripyVXiZP` Ready and aliased to `https://motionquest-app.vercel.app`; `npm run test:e2e` 7/7 passed against production.
+Локальный account context: без изменений
+Локальная карта секретов: без изменений
+Следующий шаг: user should hard-refresh production URL, run Seated Adaptive with shoulders visible and one forearm raised into frame, then use `Copy live evidence` if tracking still does not become usable.

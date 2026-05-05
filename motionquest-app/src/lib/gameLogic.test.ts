@@ -185,11 +185,11 @@ test("classifyPoseReadiness accepts seated upper-body tracking without visible k
   landmarks[11] = landmark(0.42, 0.26, 0.9);
   landmarks[12] = landmark(0.58, 0.26, 0.9);
   landmarks[13] = landmark(0.36, 0.4, 0.9);
-  landmarks[14] = landmark(0.64, 0.4, 0.9);
   landmarks[15] = landmark(0.34, 0.54, 0.9);
-  landmarks[16] = landmark(0.66, 0.54, 0.9);
-  landmarks[23] = landmark(0.44, 0.58, 0.9);
-  landmarks[24] = landmark(0.56, 0.58, 0.9);
+  landmarks[14] = landmark(0.64, 0.4, 0.04);
+  landmarks[16] = landmark(0.66, 0.54, 0.04);
+  landmarks[23] = landmark(0.44, 0.58, 0.04);
+  landmarks[24] = landmark(0.56, 0.58, 0.04);
   landmarks[25] = landmark(0.5, 0.9, 0.04);
   landmarks[26] = landmark(0.5, 0.9, 0.04);
 

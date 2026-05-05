@@ -15,7 +15,7 @@ Contest-condition source checked: https://phystech-2026.devpost.com/
 | GitHub repository visibility | PUBLIC, default branch `master` |
 | Initial public package commit | `0aa645fd5a19eb96a08a6ed5a18ca2cbc4317265` |
 | Release-evidence push commit | `cb3b84bdbb09844525200bfff2e40735690cbe18` |
-| Latest production deployment recorded in state | `dpl_2ywFSKkkehRRx55NevPWNGbjxfVh` |
+| Latest production deployment recorded in state | `dpl_HxrY5sN9bamDrqULiJvripyVXiZP` |
 
 ## Fresh Verification Commands
 
@@ -24,7 +24,7 @@ Run from `motionquest-app/` on 2026-05-05:
 | Command | Result |
 |---|---|
 | `npm run lint` | Passed, exit 0 |
-| `npm test` | Passed, 11/11 tests |
+| `npm test` | Passed, 14/14 tests |
 | `npm run build` | Passed, Next.js production build exit 0 |
 | `npm run test:e2e` | Passed, 7/7 Chromium Playwright tests |
 | `rg -n "TODO\|placeholder\|insert code" src tests` | No matches, exit 1 because no matches were found |
@@ -68,6 +68,20 @@ Fix shipped:
 - Target is hidden until the reach pose is usable.
 - Target positions stay in upper reachable camera zones.
 - E2E was rerun against production after deployment.
+
+## Seated Adaptive Webcam Fix
+
+User screenshot on 2026-05-05 showed a seated upper body visible while Seated
+Adaptive still stayed in warning state and the 30-second timer continued to run.
+
+Fix shipped:
+
+- Seated Adaptive no longer requires hips.
+- Seated Adaptive accepts shoulders plus one visible elbow/wrist pair.
+- Seated Adaptive timer pauses until usable seated arm pose exists.
+- Seated Adaptive copy now asks for one visible forearm instead of generic
+  `Move into frame`.
+- E2E was rerun against production after deployment `dpl_HxrY5sN9bamDrqULiJvripyVXiZP`.
 
 ## MediaPipe Production Asset Checks
 

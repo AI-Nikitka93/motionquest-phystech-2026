@@ -93,7 +93,7 @@ export function CameraStage({
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(rgba(124,247,212,0.10)_1px,transparent_1px),linear-gradient(90deg,rgba(124,247,212,0.10)_1px,transparent_1px)] bg-[size:64px_64px]" />
         <div className="absolute left-4 top-4 rounded-full bg-[#071B17]/90 px-5 py-3 text-base font-bold text-white shadow-camera">
           <span className="text-[#F6C85F]">Measurement stage</span> ·{" "}
-          {confidenceLabel(confidence)}
+          {confidenceLabel(confidence, mode, status)}
         </div>
         <div className="absolute right-4 top-4 hidden rounded-full bg-[#D8F3DC] px-5 py-3 text-base font-black text-[#10231F] shadow-camera sm:block">
           {modeLabel(mode)}
@@ -116,9 +116,11 @@ export function CameraStage({
         </p>
         <div className="mt-5 space-y-4 text-xl leading-relaxed">
           <StageStatusItem tone={poseUsable ? "success" : "warning"}>
-            {mode === "seated" || mode === "reach"
-              ? "Upper body and at least one reaching hand are visible"
-              : "Shoulders, hips and knees are visible"}
+            {mode === "seated"
+              ? "Seated upper body and one moving arm are visible"
+              : mode === "reach"
+                ? "Upper body and at least one reaching hand are visible"
+                : "Shoulders, hips and knees are visible"}
           </StageStatusItem>
           <StageStatusItem tone={isReady ? "success" : "warning"}>
             {isReady ? "Camera is active" : "Camera not started"}
@@ -287,19 +289,14 @@ const JOINT_GROUPS: Record<
       help: "Keep upper body centered while seated.",
     },
     {
-      label: "Elbows",
-      indexes: [13, 14],
-      help: "Keep elbows in frame for arm movement counting.",
+      label: "Left arm",
+      indexes: [13, 15],
+      help: "Raise your left forearm until elbow and wrist are visible.",
     },
     {
-      label: "Wrists",
-      indexes: [15, 16],
-      help: "Wrists must be visible for seated movement and reach.",
-    },
-    {
-      label: "Hips",
-      indexes: [23, 24],
-      help: "Hips help confirm a stable seated frame when visible.",
+      label: "Right arm",
+      indexes: [14, 16],
+      help: "Raise your right forearm until elbow and wrist are visible.",
     },
   ],
 };
@@ -313,7 +310,7 @@ function JointVisibilityPanel({
 }) {
   const requiredGroups = JOINT_GROUPS[mode];
   const allVisible =
-    mode === "reach"
+    mode === "reach" || mode === "seated"
       ? isGroupVisible(requiredGroups[0], landmarks) &&
         (isGroupVisible(requiredGroups[1], landmarks) ||
           isGroupVisible(requiredGroups[2], landmarks))
@@ -339,8 +336,8 @@ function JointVisibilityPanel({
             ? "Required joints are visible enough for this activity."
             : allVisible
               ? "Joints are detected, but the body frame is not stable. Move hands away from the lens and keep shoulders visible."
-              : mode === "reach"
-                ? "Show shoulders and raise at least one hand until elbow and wrist are visible."
+              : mode === "reach" || mode === "seated"
+                ? "Show shoulders and raise at least one forearm until elbow and wrist are visible."
                 : "Show every required joint before treating the session as usable."}
         </p>
       </div>
@@ -473,9 +470,14 @@ function StageStatusItem({
   );
 }
 
-function confidenceLabel(confidence: PoseConfidence) {
+function confidenceLabel(
+  confidence: PoseConfidence,
+  mode: PoseMode,
+  status: string,
+) {
   if (confidence === "high") return "Tracking: High";
   if (confidence === "medium") return "Tracking: Medium";
+  if (mode === "seated" || mode === "reach") return status;
   return "Move into frame";
 }
 

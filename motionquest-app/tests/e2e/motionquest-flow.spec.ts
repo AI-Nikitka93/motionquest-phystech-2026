@@ -26,7 +26,7 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
 
   await page.getByRole("button", { name: "Start seated mode" }).click();
   await expect(
-    page.getByText("Stay seated. Bend one visible arm"),
+    page.getByText("First show shoulders and one forearm."),
   ).toBeVisible();
   await page.getByRole("button", { name: "Finish early" }).click();
 

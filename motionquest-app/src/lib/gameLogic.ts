@@ -52,14 +52,14 @@ export const REACH_TARGET_DWELL_MS = 500;
 const REQUIRED_LANDMARKS: Record<PoseMode, number[]> = {
   calibration: [11, 12, 23, 24, 25, 26, 27, 28],
   chair: [11, 12, 23, 24, 25, 26, 27, 28],
-  seated: [11, 12, 13, 14, 15, 16, 23, 24],
+  seated: [11, 12, 13, 14, 15, 16],
   reach: [11, 12, 13, 14, 15, 16],
 };
 
 const MIN_USABLE_LANDMARKS: Record<PoseMode, number[]> = {
   calibration: [11, 12, 23, 24, 25, 26],
   chair: [11, 12, 23, 24, 25, 26],
-  seated: [11, 12, 13, 14, 15, 16],
+  seated: [11, 12],
   reach: [11, 12],
 };
 
@@ -105,7 +105,7 @@ export function hasPlausibleBodyFrame(
 ) {
   const leftShoulder = landmarks[11];
   const rightShoulder = landmarks[12];
-  if (mode === "reach") {
+  if (mode === "reach" || mode === "seated") {
     if (!hasPlausibleShoulderFrame(leftShoulder, rightShoulder)) {
       return false;
     }
@@ -214,8 +214,12 @@ export function getPoseConfidence(
       : visiblePoints.reduce((sum, point) => sum + (point.visibility ?? 1), 0) /
         visiblePoints.length;
 
+  const usable = hasUsablePose(landmarks, mode);
   if (ratio >= 0.95 && averageVisibility >= 0.72) return "high";
-  if (ratio >= 0.7 && hasUsablePose(landmarks, mode)) return "medium";
+  if (mode === "seated" || mode === "reach") {
+    if (usable && ratio >= 0.5 && averageVisibility >= 0.55) return "medium";
+  }
+  if (ratio >= 0.7 && usable) return "medium";
   return "low";
 }
 
