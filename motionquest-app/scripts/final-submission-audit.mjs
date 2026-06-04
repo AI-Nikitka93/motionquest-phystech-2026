@@ -155,6 +155,7 @@ const stateText = readProjectFile("docs/STATE.md");
 const rootReadmeText = readProjectFile("README.md");
 const appReadmeText = readAppFile("README.md");
 const devpostCopyText = readProjectFile("docs/DEVPOST_SUBMISSION_COPY.md");
+const finalChecklistText = readProjectFile("docs/FINAL_SUBMISSION_CHECKLIST.md");
 const judgeQaText = readProjectFile("docs/JUDGE_QA_ANSWER_BANK.md");
 const releaseEvidenceText = readProjectFile("docs/RELEASE_EVIDENCE_2026_05_05.md");
 const visualSpecText = readProjectFile("docs/visual-spec.md");
@@ -252,6 +253,24 @@ check(
 check("local_package", "Devpost copy contains production app link", devpostCopyText.includes("https://motionquest-app.vercel.app"));
 check("local_package", "Devpost copy contains public source link", devpostCopyText.includes("https://github.com/AI-Nikitka93/motionquest-phystech-2026"));
 check("local_package", "Devpost copy keeps three-award story", ["Research", "Social Impact", "Entrepreneurship"].every((term) => devpostCopyText.includes(term)));
+check(
+  "local_package",
+  "official rule sources include Devpost and Binnovative",
+  ["https://phystech-2026.devpost.com/", "https://binnovative-boston.github.io/phystech/2026.html"].every((url) => finalChecklistText.includes(url)),
+);
+check(
+  "local_package",
+  "final checklist includes Europe/Minsk deadline conversions",
+  [
+    "June 27, 2026, 19:00 Europe/Minsk",
+    "June 28, 2026, 17:00 Europe/Minsk",
+  ].every((term) => finalChecklistText.includes(term)),
+);
+check(
+  "local_package",
+  "final checklist records prize wording source mismatch",
+  finalChecklistText.includes("Prize wording differs") && finalChecklistText.includes("Do not depend on exact award names"),
+);
 check("local_package", "release evidence records preliminary clean-browser smoke", releaseEvidenceText.includes("Preliminary clean-browser public-link smoke"));
 check("boundary", "state records local changes newer than latest recorded deployment or final public proof exists", stateText.includes("local dependency, UX-fix and artifact refresh is newer than that recorded deployment") || proof.finalPublicLink);
 

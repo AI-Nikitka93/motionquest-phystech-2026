@@ -627,6 +627,30 @@ Verification:
 | `npm run project:readiness` | Passed; readiness now checks 11 app files including the capture helper. |
 | `npm run project:final-audit -- --public-smoke` | Passed audit execution; final submission remains `NO-GO` until push/deploy, content match, proof files and public actions are real. |
 
+## Official Source And Deadline Guard
+
+2026-06-04 13:52 update:
+
+- Strengthened `docs/FINAL_SUBMISSION_CHECKLIST.md` with a two-source official ledger: Devpost for deadline/submission/criteria and Binnovative for Google Forms registration details, country/time-zone field, actual-outcome link wording, presentation start plan and book-publication context.
+- Added presenter-timezone conversions: June 27, 2026 12:00pm EDT equals June 27, 2026 19:00 Europe/Minsk; June 28, 2026 10:00am EDT equals June 28, 2026 17:00 Europe/Minsk.
+- Recorded the current prize-wording mismatch: Devpost and Binnovative are not word-for-word identical, so final public claims must anchor to the judging criteria Impact, Creativity and Presentation, while Research, Social Impact and Entrepreneurship stay story angles where supported.
+- Added a TDD-covered `local_package` guard in `motionquest-app/scripts/final-submission-audit.mjs` so future edits cannot remove the two-source ledger, Europe/Minsk deadline conversions or prize-wording mismatch warning without failing the audit-output test.
+
+Verification:
+
+| Command/check | Result |
+|---|---|
+| TDD red | `npm test` failed before implementation because the audit did not print the official-source/deadline guard checks. |
+| `npm test` | Passed, 37/37 after implementation. |
+| `git diff --check` | Passed with CRLF warnings only. |
+| `npm run project:readiness` | Passed. |
+| `npm run project:final-audit -- --public-smoke` | Passed audit execution; new official-source/deadline guard checks are `OK`, while public publication remains `NO-GO` until push/deploy and real proof. |
+| `npm run lint` | Passed. |
+| `npm run build` | Passed with Next.js 16.2.7. |
+| `npm audit --audit-level=moderate` | Passed, 0 vulnerabilities. |
+| `npm run project:capture-public-proof -- --dry-run` | Passed; confirms no submit/register/push/deploy side effects. |
+| `E2E_APP_URL=http://localhost:3013 npm run test:e2e` | Passed, 11/11 Chromium tests; server stopped, temporary logs removed and port 3013 confirmed free. |
+
 ## Honest Open Blockers
 
 These tasks are not closed because they need physical, public-action or future evidence:

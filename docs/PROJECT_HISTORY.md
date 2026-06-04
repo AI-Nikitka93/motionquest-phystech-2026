@@ -827,3 +827,12 @@
 Локальный account context: без изменений.
 Локальная карта секретов: без изменений.
 Следующий шаг: run full verification, commit the helper locally, then use it only after explicit push/deploy approval.
+
+Дата и время: 2026-06-04 13:52
+Роль: Final Submission Audit Gate / Official Source And Deadline Guard
+Сделано: hardened the final checklist and audit against stale or ambiguous contest-source details. `docs/FINAL_SUBMISSION_CHECKLIST.md` now cites both official sources, Devpost and Binnovative, records Europe/Minsk deadline conversions, and warns that current prize wording differs between official surfaces, so final claims should anchor to Impact, Creativity and Presentation rather than fragile exact award labels. `motionquest-app/scripts/final-submission-audit.mjs` now checks that this source/time/prize guard stays present, and the audit-output test covers it.
+Изменены файлы: `docs/FINAL_SUBMISSION_CHECKLIST.md`, `motionquest-app/scripts/final-submission-audit.mjs`, `motionquest-app/src/lib/finalSubmissionAuditOutput.test.ts`, `docs/STATE.md`, `docs/EXEC_PLAN.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: RED was confirmed first: `npm test` failed because the audit did not yet print `official rule sources include Devpost and Binnovative`, `final checklist includes Europe/Minsk deadline conversions` and `final checklist records prize wording source mismatch`. After implementation, verification passed: `git diff --check` with CRLF warnings only, `npm run project:readiness`, `npm run project:final-audit -- --public-smoke`, `npm test` 37/37, `npm run lint`, `npm run build`, `npm audit --audit-level=moderate`, `npm run project:capture-public-proof -- --dry-run`, and `E2E_APP_URL=http://localhost:3013 npm run test:e2e` 11/11. The e2e production server was stopped, temporary logs were removed and port 3013 was confirmed free.
+Локальный account context: без изменений.
+Локальная карта секретов: без изменений.
+Следующий шаг: rerun readiness/final-audit/build/lint/audit/e2e checks; public publication still requires explicit push/deploy approval and real proof capture.

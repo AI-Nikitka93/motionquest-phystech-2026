@@ -1,7 +1,23 @@
 # Final Submission Checklist
 
 Verification date for contest conditions: 2026-06-04
-Primary contest source: https://phystech-2026.devpost.com/
+
+## Official Source Ledger
+
+Primary contest sources checked on 2026-06-04:
+
+- Devpost: https://phystech-2026.devpost.com/ - deadline, Devpost submission requirement, public project requirement, presentation outline, judges and criteria.
+- Binnovative: https://binnovative-boston.github.io/phystech/2026.html - Google Forms presentation-registration process, country/time-zone field, public actual-outcome link wording, presentation start plan and book-publication context.
+
+Deadline conversions for the presenter timezone:
+
+| Official item | Official time | Europe/Minsk action time |
+|---|---:|---:|
+| Devpost submission deadline | June 27, 2026, 12:00pm EDT | June 27, 2026, 19:00 Europe/Minsk |
+| Presentation registration deadline | June 27, 2026, 12:00pm EDT | June 27, 2026, 19:00 Europe/Minsk |
+| Tentative presentation kickoff | June 28, 2026, 10:00am EDT | June 28, 2026, 17:00 Europe/Minsk |
+
+Prize wording differs between current official surfaces: Devpost lists 10 non-cash prizes, while the Binnovative page also includes Innovation and Team Work wording. Do not depend on exact award names in final claims. Anchor the pitch to the official judging criteria, Impact, Creativity and Presentation, and use Research, Social Impact and Entrepreneurship as story angles only where the current submission surface supports them.
 
 ## T123 — Deadline Checklist
 
