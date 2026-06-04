@@ -818,3 +818,12 @@
 Локальный account context: без изменений.
 Локальная карта секретов: без изменений.
 Следующий шаг: verify and commit this content-smoke hardening locally; final public publication still requires explicit push/deploy and proof capture.
+
+Дата и время: 2026-06-04 13:00
+Роль: Public Proof Capture / Final Public-Link Evidence Prep
+Сделано: added a safe clean-browser proof capture helper for the final post-push/deploy verification step. The helper verifies production app, public source and raw README content before writing `evidence/submission-proof/public-link-clean-browser.png`, and its dry-run documents paths and requirements without browser side effects. It explicitly does not submit, register, push or deploy.
+Изменены файлы: `motionquest-app/scripts/capture-public-proof.mjs`, `motionquest-app/package.json`, `motionquest-app/scripts/project-readiness.mjs`, `motionquest-app/scripts/final-submission-audit.mjs`, `motionquest-app/src/lib/publicProofCaptureOutput.test.ts`, `motionquest-app/src/lib/finalSubmissionAuditOutput.test.ts`, `motionquest-app/README.md`, `docs/FINAL_SUBMISSION_CHECKLIST.md`, `docs/STATE.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: RED was confirmed first: `npm test` failed because the helper file, package script and final-audit helper checks were missing. After implementation, `npm test` passed 37/37; `npm run project:capture-public-proof -- --dry-run` passed; `npm run project:readiness` passed and now checks 11 app files; `npm run project:final-audit -- --public-smoke` passed audit execution while correctly keeping publication/final submission `NO-GO` until real public proof exists.
+Локальный account context: без изменений.
+Локальная карта секретов: без изменений.
+Следующий шаг: run full verification, commit the helper locally, then use it only after explicit push/deploy approval.

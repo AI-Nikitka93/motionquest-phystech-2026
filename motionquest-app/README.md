@@ -34,6 +34,7 @@ npm audit --audit-level=moderate
 E2E_APP_URL=http://localhost:3013 npm run test:e2e
 npm run project:final-audit
 npm run project:final-audit -- --public-smoke
+npm run project:capture-public-proof -- --dry-run
 ```
 
 ## Implementation Notes

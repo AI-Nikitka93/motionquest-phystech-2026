@@ -26,6 +26,8 @@ test("final submission audit reports public framing guardrails", () => {
     result.stdout,
     /public framing describes seated hand movement and caregiver report/,
   );
+  assert.match(result.stdout, /public proof capture helper exists/);
+  assert.match(result.stdout, /package exposes project:capture-public-proof/);
 });
 
 test("final submission audit exposes content-aware public smoke requirements", () => {

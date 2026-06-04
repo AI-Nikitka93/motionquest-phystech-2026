@@ -46,6 +46,7 @@ const requiredAppFiles = [
   "src/lib/visualSystem.ts",
   "tests/e2e/motionquest-flow.spec.ts",
   "scripts/final-submission-audit.mjs",
+  "scripts/capture-public-proof.mjs",
 ];
 
 const requiredInstructionContracts = [
@@ -70,7 +71,7 @@ const forbiddenBackendPaths = [
   "server",
 ];
 
-const requiredScripts = ["build", "lint", "test", "test:e2e", "project:readiness", "project:final-audit"];
+const requiredScripts = ["build", "lint", "test", "test:e2e", "project:readiness", "project:final-audit", "project:capture-public-proof"];
 const allowedDependencies = new Set([
   "@mediapipe/tasks-vision",
   "next",

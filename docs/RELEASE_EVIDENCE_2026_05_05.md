@@ -608,6 +608,25 @@ Current public-smoke content expectations:
 | Devpost | `Physical Activity and Technology Hack Day` |
 | Binnovative | `PhysTech 2026` |
 
+## Public Proof Capture Helper
+
+2026-06-04 13:00 update:
+
+- Added `npm run project:capture-public-proof` for the final post-push/deploy clean-browser public proof step.
+- The helper does not submit, register, push or deploy. It only verifies public app/source/raw README content and writes `evidence/submission-proof/public-link-clean-browser.png` after the content checks pass.
+- Added `npm run project:capture-public-proof -- --dry-run` so future agents can inspect output paths and content requirements without browser/network side effects.
+- `npm run project:readiness` and `npm run project:final-audit` now check that the helper exists and that `package.json` exposes it.
+
+Verification:
+
+| Command/check | Result |
+|---|---|
+| TDD red | `npm test` failed before implementation because the helper and script were missing. |
+| `npm test` | Passed, 37/37 tests after implementation. |
+| `npm run project:capture-public-proof -- --dry-run` | Passed; prints the proof path, URLs and content requirements, and states that it does not submit/register/push/deploy. |
+| `npm run project:readiness` | Passed; readiness now checks 11 app files including the capture helper. |
+| `npm run project:final-audit -- --public-smoke` | Passed audit execution; final submission remains `NO-GO` until push/deploy, content match, proof files and public actions are real. |
+
 ## Honest Open Blockers
 
 These tasks are not closed because they need physical, public-action or future evidence:

@@ -231,6 +231,8 @@ checkBoundaryTask("T211", "Phase 11 anchor is not closed without submission and 
 
 check("local_package", "package exposes project:readiness", Boolean(packageJson.scripts?.["project:readiness"]));
 check("local_package", "package exposes project:final-audit", Boolean(packageJson.scripts?.["project:final-audit"]));
+check("local_package", "package exposes project:capture-public-proof", Boolean(packageJson.scripts?.["project:capture-public-proof"]));
+check("local_package", "public proof capture helper exists", isNonEmpty(join(appRoot, "scripts/capture-public-proof.mjs")));
 check("local_package", "public metadata uses Adaptive Home Movement Lab title", appMetadataText.includes("MotionQuest: Adaptive Home Movement Lab"));
 check(
   "local_package",

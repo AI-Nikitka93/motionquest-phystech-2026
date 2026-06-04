@@ -57,7 +57,7 @@ Prepared on 2026-06-04:
 | Check Discord / official channel | 72h before deadline | Confirm registration link and Zoom info. |
 | Submission dry run | 48h before deadline | Fill Devpost fields without final submission until all links pass. |
 | Final audit dry run | 48h before deadline | Run `npm run project:final-audit -- --public-smoke` from `motionquest-app/`; do not submit while public/submission/final decisions are `NO-GO`. |
-| Clean-browser public link check | 48h before deadline | Open app and repository links in private/incognito browser. |
+| Clean-browser public link check | 48h before deadline | After final push/deploy, run `npm run project:capture-public-proof` from `motionquest-app/` and keep the generated screenshot. |
 | Scope freeze | 24h before deadline | Only critical fixes after this point. |
 | Submit Devpost | Before June 27 12:00pm EDT | Save screenshot/proof. |
 | Register presentation | Before June 27 12:00pm EDT | Save confirmation/proof. |
@@ -71,6 +71,7 @@ Run this twice: 24 hours before the Devpost deadline and again before the presen
 - Confirm Devpost deadline, presentation registration deadline, presentation date/time, Q&A timebox and public-link requirement.
 - Check Discord for the current Google Forms registration link, Zoom link and any schedule update.
 - Verify the public app and source/package links from a clean browser/session after final deploy/push.
+- Run `npm run project:capture-public-proof -- --dry-run` first; after final deploy/push, run `npm run project:capture-public-proof` to generate `evidence/submission-proof/public-link-clean-browser.png`.
 - Run `npm run project:final-audit -- --public-smoke` from `motionquest-app/` and confirm any remaining `NO-GO` decision is understood and backed by a real blocker.
 - Save any submission/registration confirmation screenshots under `evidence/submission-proof/`.
 
