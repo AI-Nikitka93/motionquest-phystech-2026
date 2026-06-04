@@ -44,6 +44,18 @@ test("final submission audit reports public framing guardrails", () => {
     result.stdout,
     /final public-link proof manifest is plausible/,
   );
+  assert.match(
+    result.stdout,
+    /presentation script preserves 7-minute story and 3-minute Q&A buffer/,
+  );
+  assert.match(
+    result.stdout,
+    /live demo runbook preserves 90-second path to report/,
+  );
+  assert.match(
+    result.stdout,
+    /rehearsal plan records timing and Q&A practice loop/,
+  );
 });
 
 test("final submission audit exposes content-aware public smoke requirements", () => {

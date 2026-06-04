@@ -845,3 +845,12 @@
 Локальный account context: без изменений.
 Локальная карта секретов: без изменений.
 Следующий шаг: commit this local guard; then public publication still requires explicit push/deploy approval, real proof capture and final Devpost/registration evidence.
+
+Дата и время: 2026-06-04 14:26
+Роль: Final Submission Audit Gate / Presentation Timebox Guard
+Сделано: rechecked the current official Devpost and Binnovative pages for the presentation rule and hardened the local audit against overlong or Q&A-starving presentation edits. `npm run project:final-audit` now checks that the presentation script keeps the 7-minute story plus 3-minute Q&A buffer, the 90-second demo path reaches the report, and the rehearsal plan records timing plus Q&A practice.
+Изменены файлы: `motionquest-app/scripts/final-submission-audit.mjs`, `motionquest-app/src/lib/finalSubmissionAuditOutput.test.ts`, `docs/STATE.md`, `docs/EXEC_PLAN.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: RED was confirmed first: `npm test` failed because the audit did not print `presentation script preserves 7-minute story and 3-minute Q&A buffer`, `live demo runbook preserves 90-second path to report` or `rehearsal plan records timing and Q&A practice loop`. After implementation, verification passed: `git diff --check` with CRLF warnings only, `npm run project:readiness`, `npm run project:final-audit -- --public-smoke`, `npm test` 37/37, `npm run lint`, `npm run build`, `npm audit --audit-level=moderate`, `npm run project:capture-public-proof -- --dry-run`, and `E2E_APP_URL=http://localhost:3013 npm run test:e2e` 11/11. The audit correctly keeps public/final decisions at `NO-GO` until real public-action and camera proof exists. Local production server was stopped and port 3013 was confirmed free.
+Локальный account context: без изменений.
+Локальная карта секретов: без изменений.
+Следующий шаг: run full verification, commit locally, then continue only with more local hardening or explicit public-action approval.

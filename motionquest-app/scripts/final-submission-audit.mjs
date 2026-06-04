@@ -157,6 +157,8 @@ const rootReadmeText = readProjectFile("README.md");
 const appReadmeText = readAppFile("README.md");
 const devpostCopyText = readProjectFile("docs/DEVPOST_SUBMISSION_COPY.md");
 const finalChecklistText = readProjectFile("docs/FINAL_SUBMISSION_CHECKLIST.md");
+const presentationScriptText = readProjectFile("docs/PRESENTATION_SCRIPT.md");
+const finalRehearsalText = readProjectFile("docs/FINAL_REHEARSAL_PLAN.md");
 const judgeQaText = readProjectFile("docs/JUDGE_QA_ANSWER_BANK.md");
 const releaseEvidenceText = readProjectFile("docs/RELEASE_EVIDENCE_2026_05_05.md");
 const visualSpecText = readProjectFile("docs/visual-spec.md");
@@ -277,6 +279,21 @@ check(
   "final checklist records prize wording source mismatch",
   finalChecklistText.includes("Prize wording differs") && finalChecklistText.includes("Do not depend on exact award names"),
 );
+check(
+  "local_package",
+  "presentation script preserves 7-minute story and 3-minute Q&A buffer",
+  hasPresentationTimebox(presentationScriptText, devpostCopyText),
+);
+check(
+  "local_package",
+  "live demo runbook preserves 90-second path to report",
+  hasNinetySecondDemoRunbook(presentationScriptText),
+);
+check(
+  "local_package",
+  "rehearsal plan records timing and Q&A practice loop",
+  hasRehearsalTimingLoop(finalRehearsalText),
+);
 check("local_package", "release evidence records preliminary clean-browser smoke", releaseEvidenceText.includes("Preliminary clean-browser public-link smoke"));
 check("boundary", "state records local changes newer than latest recorded deployment or final public proof exists", stateText.includes("local dependency, UX-fix and artifact refresh is newer than that recorded deployment") || proof.finalPublicLink);
 
@@ -385,6 +402,48 @@ function hasSubmissionProofNotes(relativePath) {
     "Clean-browser proof file:",
   ];
   return requiredFields.every((field) => text.includes(field)) && !/template|pending|todo|tbd|placeholder/i.test(text);
+}
+
+function hasPresentationTimebox(scriptText, submissionText) {
+  const requiredScriptSnippets = [
+    "Time limit: 10 minutes total, including about 3 minutes Q&A",
+    "Recommended structure: 7-minute story + 3-minute Q&A buffer",
+    "| 0:00-0:45 | Hook |",
+    "| 6:20-7:00 | Limits and next step |",
+    "| 7:00-10:00 | Q&A |",
+  ];
+  const requiredSubmissionSnippets = [
+    "10 minute presentation including Q&A",
+    "7-minute story plus 3-minute Q&A buffer",
+  ];
+  return requiredScriptSnippets.every((snippet) => scriptText.includes(snippet))
+    && requiredSubmissionSnippets.every((snippet) => submissionText.includes(snippet));
+}
+
+function hasNinetySecondDemoRunbook(scriptText) {
+  const requiredSnippets = [
+    "## T156 — 90-Second Live Demo Runbook",
+    "| 0-10s | Open Home |",
+    "| 20-30s | Click `Seated adaptive` |",
+    "| 45-60s | Finish early, start Reach Stars |",
+    "| 60-75s | Click `Finish & View Report` |",
+    "| 75-90s | Show report/export/limitations |",
+    "The report includes confidence and limits, so we do not overclaim.",
+  ];
+  return requiredSnippets.every((snippet) => scriptText.includes(snippet));
+}
+
+function hasRehearsalTimingLoop(rehearsalText) {
+  const requiredSnippets = [
+    "Run three rehearsals:",
+    "Full 7-minute story without interruption.",
+    "Full 90-second demo inside the story.",
+    "Full Q&A practice with hard questions",
+    "total time;",
+    "Presentation timebox recovery:",
+    "Preserve Q&A time",
+  ];
+  return requiredSnippets.every((snippet) => rehearsalText.includes(snippet));
 }
 
 function hasPublicLinkProofManifest(relativePath) {

@@ -675,6 +675,29 @@ Verification:
 | `npm run project:capture-public-proof -- --dry-run` | Passed; dry-run prints both PNG and JSON manifest output paths and confirms no submit/register/push/deploy side effects. |
 | `E2E_APP_URL=http://localhost:3013 npm run test:e2e` | Passed, 11/11 Chromium tests; local production server was stopped and port 3013 confirmed free. |
 
+## Presentation Timebox Audit Guard
+
+2026-06-04 14:26 update:
+
+- Rechecked the current official Devpost and Binnovative pages. Both still require a 10-minute total presentation window, including about 3 minutes for Q&A, with presentation timing planned for June 28, 2026.
+- Strengthened `npm run project:final-audit` so the local package now checks that `docs/PRESENTATION_SCRIPT.md` keeps the 7-minute story plus 3-minute Q&A buffer, the 90-second live demo path to report, and that `docs/FINAL_REHEARSAL_PLAN.md` records timing plus Q&A practice.
+- This is a local presentation-score guard only. It does not close live rehearsal, Devpost, registration, public-proof or real-camera tasks.
+
+Verification:
+
+| Command/check | Result |
+|---|---|
+| TDD red | `npm test` failed before implementation because the audit did not print the presentation-timebox guard labels. |
+| `git diff --check` | Passed with CRLF warnings only. |
+| `npm run project:readiness` | Passed. |
+| `npm run project:final-audit -- --public-smoke` | Passed audit execution; the new timebox checks are `OK`, local package and boundary are `GO`, and public/final decisions remain `NO-GO` until real public-action and camera proof exists. |
+| `npm test` | Passed, 37/37 after implementation. |
+| `npm run lint` | Passed. |
+| `npm run build` | Passed with Next.js 16.2.7. |
+| `npm audit --audit-level=moderate` | Passed, 0 vulnerabilities. |
+| `npm run project:capture-public-proof -- --dry-run` | Passed. |
+| `E2E_APP_URL=http://localhost:3013 npm run test:e2e` | Passed, 11/11 Chromium tests; local production server was stopped and port 3013 confirmed free. |
+
 ## Honest Open Blockers
 
 These tasks are not closed because they need physical, public-action or future evidence:
