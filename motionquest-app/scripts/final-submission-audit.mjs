@@ -99,6 +99,7 @@ const submissionProofFiles = [
   "evidence/submission-proof/devpost-submission-confirmation.png",
   "evidence/submission-proof/presentation-registration-confirmation.png",
   "evidence/submission-proof/public-link-clean-browser.png",
+  "evidence/submission-proof/public-link-clean-browser.json",
   "evidence/submission-proof/discord-schedule-or-zoom-note.png",
   "evidence/submission-proof/submission-proof-notes.md",
 ];
@@ -182,10 +183,15 @@ const stalePublicFramingPatterns = [
   /browser pose landmarks/i,
 ];
 
+const finalPublicLinkScreenshot = hasPlausibleImageProof("evidence/submission-proof/public-link-clean-browser.png");
+const finalPublicLinkManifest = hasPublicLinkProofManifest("evidence/submission-proof/public-link-clean-browser.json");
+
 const proof = {
   devpostSubmission: hasPlausibleImageProof("evidence/submission-proof/devpost-submission-confirmation.png"),
   presentationRegistration: hasPlausibleImageProof("evidence/submission-proof/presentation-registration-confirmation.png"),
-  finalPublicLink: hasPlausibleImageProof("evidence/submission-proof/public-link-clean-browser.png"),
+  finalPublicLinkScreenshot,
+  finalPublicLinkManifest,
+  finalPublicLink: finalPublicLinkScreenshot && finalPublicLinkManifest,
   scheduleOrZoom: hasPlausibleImageProof("evidence/submission-proof/discord-schedule-or-zoom-note.png"),
   submissionNotes: hasSubmissionProofNotes("evidence/submission-proof/submission-proof-notes.md"),
   realCamera: hasRealCameraProof(),
@@ -276,7 +282,8 @@ check("boundary", "state records local changes newer than latest recorded deploy
 
 check("public_publication", "T147 judge-openable public proof is closed", hasTaskStatus(todoText, "T147", "x"));
 check("public_publication", "T158 final clean-browser public-link check is closed", hasTaskStatus(todoText, "T158", "x"));
-check("public_publication", "final public-link clean-browser screenshot proof is plausible", proof.finalPublicLink);
+check("public_publication", "final public-link clean-browser screenshot proof is plausible", proof.finalPublicLinkScreenshot);
+check("public_publication", "final public-link proof manifest is plausible", proof.finalPublicLinkManifest);
 check("public_publication", "public package paths have no unpublished local changes", gitPublication.cleanPublicPackage);
 check("public_publication", "public smoke checked remote branch freshness", gitPublication.remoteChecked);
 check("public_publication", "remote branch matches local HEAD", gitPublication.remoteMatchesHead);
@@ -284,6 +291,8 @@ check("public_publication", "remote branch matches local HEAD", gitPublication.r
 for (const file of submissionProofFiles) {
   if (file.endsWith(".png")) {
     check("external_submission", `final public-action screenshot proof is plausible: ${file}`, hasPlausibleImageProof(file));
+  } else if (file.endsWith(".json")) {
+    check("external_submission", `final public-action manifest proof is plausible: ${file}`, hasPublicLinkProofManifest(file));
   } else {
     check("external_submission", `final public-action notes contain real proof fields: ${file}`, hasSubmissionProofNotes(file));
   }
@@ -376,6 +385,68 @@ function hasSubmissionProofNotes(relativePath) {
     "Clean-browser proof file:",
   ];
   return requiredFields.every((field) => text.includes(field)) && !/template|pending|todo|tbd|placeholder/i.test(text);
+}
+
+function hasPublicLinkProofManifest(relativePath) {
+  const text = readProjectFile(relativePath);
+  if (!text || /template|pending|todo|tbd|placeholder/i.test(text)) {
+    return false;
+  }
+
+  let manifest;
+  try {
+    manifest = JSON.parse(text);
+  } catch {
+    return false;
+  }
+
+  const requiredChecks = [
+    {
+      name: "production app",
+      url: "https://motionquest-app.vercel.app",
+      expected: ["MotionQuest", "Adaptive Home Movement Lab", "Safe demo"],
+    },
+    {
+      name: "public source",
+      url: "https://github.com/AI-Nikitka93/motionquest-phystech-2026",
+      expected: ["motionquest-phystech-2026"],
+    },
+    {
+      name: "raw README",
+      url: "https://raw.githubusercontent.com/AI-Nikitka93/motionquest-phystech-2026/master/README.md",
+      expected: ["MotionQuest", "Adaptive Home Movement Lab", "caregiver-readable"],
+    },
+  ];
+  const capturedAtStart = Date.parse(manifest.capturedAtStart ?? "");
+  const capturedAtEnd = Date.parse(manifest.capturedAtEnd ?? "");
+
+  return manifest.PROOF_STATUS === "REAL"
+    && manifest.generatedBy === "npm run project:capture-public-proof"
+    && manifest.sideEffects === "does not submit, register, push or deploy"
+    && manifest.screenshot === "evidence/submission-proof/public-link-clean-browser.png"
+    && manifest.appUrl === requiredChecks[0].url
+    && manifest.sourceUrl === requiredChecks[1].url
+    && manifest.rawReadmeUrl === requiredChecks[2].url
+    && Number.isFinite(capturedAtStart)
+    && Number.isFinite(capturedAtEnd)
+    && capturedAtEnd >= capturedAtStart
+    && Array.isArray(manifest.checks)
+    && requiredChecks.every((requiredCheck) => {
+      const actualCheck = manifest.checks.find((checkItem) => checkItem.name === requiredCheck.name);
+      return actualCheck
+        && actualCheck.url === requiredCheck.url
+        && Number.isInteger(actualCheck.status)
+        && actualCheck.status >= 200
+        && actualCheck.status < 400
+        && Array.isArray(actualCheck.expected)
+        && requiredCheck.expected.every((snippet) => actualCheck.expected.includes(snippet))
+        && actualCheck.contentOk === true
+        && Array.isArray(actualCheck.missing)
+        && actualCheck.missing.length === 0
+        && (requiredCheck.name === "production app"
+          ? actualCheck.screenshot === "evidence/submission-proof/public-link-clean-browser.png"
+          : actualCheck.screenshot === null);
+    });
 }
 
 function hasLiveCameraEvidence(relativePath) {

@@ -651,6 +651,30 @@ Verification:
 | `npm run project:capture-public-proof -- --dry-run` | Passed; confirms no submit/register/push/deploy side effects. |
 | `E2E_APP_URL=http://localhost:3013 npm run test:e2e` | Passed, 11/11 Chromium tests; server stopped, temporary logs removed and port 3013 confirmed free. |
 
+## Public Proof Manifest Guard
+
+2026-06-04 14:16 update:
+
+- Strengthened `npm run project:capture-public-proof` so the final post-push/deploy proof writes a machine-readable companion manifest at `evidence/submission-proof/public-link-clean-browser.json`.
+- The helper now rejects non-success HTTP statuses before writing proof and stores `PROOF_STATUS: REAL`, final public URLs, HTTP statuses, expected snippets, empty missing arrays, screenshot path and capture timestamps in the manifest.
+- Strengthened `npm run project:final-audit` so final public-link proof is plausible only when both `public-link-clean-browser.png` and `public-link-clean-browser.json` exist and the manifest matches the expected final production app, public source and raw README checks.
+- Current audit status is intentionally still `NO-GO`: no real post-push/deploy public proof has been captured, so the screenshot and manifest checks both remain `MISSING`.
+
+Verification:
+
+| Command/check | Result |
+|---|---|
+| TDD red | `npm test` failed before implementation because the audit did not print `final public-link proof manifest is plausible` and the capture helper dry-run did not advertise the manifest output. |
+| `git diff --check` | Passed with CRLF warnings only. |
+| `npm run project:readiness` | Passed. |
+| `npm run project:final-audit -- --public-smoke` | Passed audit execution; `local_package` and `boundary` are `GO`, while public proof manifest, public publication, external submission, real-camera evidence and final submission remain `NO-GO` until real proof exists. |
+| `npm test` | Passed, 37/37 after implementation. |
+| `npm run lint` | Passed. |
+| `npm run build` | Passed with Next.js 16.2.7. |
+| `npm audit --audit-level=moderate` | Passed, 0 vulnerabilities. |
+| `npm run project:capture-public-proof -- --dry-run` | Passed; dry-run prints both PNG and JSON manifest output paths and confirms no submit/register/push/deploy side effects. |
+| `E2E_APP_URL=http://localhost:3013 npm run test:e2e` | Passed, 11/11 Chromium tests; local production server was stopped and port 3013 confirmed free. |
+
 ## Honest Open Blockers
 
 These tasks are not closed because they need physical, public-action or future evidence:

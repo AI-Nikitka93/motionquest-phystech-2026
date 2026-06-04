@@ -22,6 +22,10 @@ test("public proof capture helper exposes safe dry-run contract", () => {
   );
   assert.match(
     result.stdout,
+    /writes manifest: ..\\evidence\\submission-proof\\public-link-clean-browser\.json/,
+  );
+  assert.match(
+    result.stdout,
     /requires production app content: MotionQuest; Adaptive Home Movement Lab; Safe demo/,
   );
   assert.match(result.stdout, /does not submit, register, push or deploy/);

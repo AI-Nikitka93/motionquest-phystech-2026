@@ -40,6 +40,10 @@ test("final submission audit reports public framing guardrails", () => {
     result.stdout,
     /final checklist records prize wording source mismatch/,
   );
+  assert.match(
+    result.stdout,
+    /final public-link proof manifest is plausible/,
+  );
 });
 
 test("final submission audit exposes content-aware public smoke requirements", () => {

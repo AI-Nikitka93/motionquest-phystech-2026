@@ -836,3 +836,12 @@
 Локальный account context: без изменений.
 Локальная карта секретов: без изменений.
 Следующий шаг: rerun readiness/final-audit/build/lint/audit/e2e checks; public publication still requires explicit push/deploy approval and real proof capture.
+
+Дата и время: 2026-06-04 14:16
+Роль: Final Submission Audit Gate / Public Proof Manifest Guard
+Сделано: tightened the final public-link proof route so a clean-browser screenshot alone is no longer enough. `npm run project:capture-public-proof` now rejects non-success HTTP responses and, after content checks pass, writes `evidence/submission-proof/public-link-clean-browser.json` with `PROOF_STATUS: REAL`, final public URLs, HTTP statuses, expected snippets, empty missing arrays, screenshot path and capture timestamps. `npm run project:final-audit` now accepts final public-link proof only when both the PNG and JSON manifest are present and plausible.
+Изменены файлы: `motionquest-app/scripts/capture-public-proof.mjs`, `motionquest-app/scripts/final-submission-audit.mjs`, `motionquest-app/src/lib/finalSubmissionAuditOutput.test.ts`, `motionquest-app/src/lib/publicProofCaptureOutput.test.ts`, `evidence/submission-proof/README.md`, `docs/STATE.md`, `docs/EXEC_PLAN.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: RED was confirmed first: `npm test` failed because the audit did not print `final public-link proof manifest is plausible` and the capture helper dry-run did not advertise the manifest output. After implementation, verification passed: `git diff --check` with CRLF warnings only, `npm run project:readiness`, `npm run project:final-audit -- --public-smoke`, `npm test` 37/37, `npm run lint`, `npm run build`, `npm audit --audit-level=moderate`, `npm run project:capture-public-proof -- --dry-run`, and `E2E_APP_URL=http://localhost:3013 npm run test:e2e` 11/11. The audit correctly keeps `public_publication`, `external_submission`, `real_camera_evidence` and `final_submission` at `NO-GO` because no real post-push/deploy proof, public-action proof or presenter-side camera proof exists. Local production server was stopped and port 3013 was confirmed free.
+Локальный account context: без изменений.
+Локальная карта секретов: без изменений.
+Следующий шаг: commit this local guard; then public publication still requires explicit push/deploy approval, real proof capture and final Devpost/registration evidence.
