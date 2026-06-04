@@ -1,28 +1,29 @@
 import { expect, test, type Locator } from "@playwright/test";
 
-const appUrl = "https://motionquest-app.vercel.app";
+const appUrl = process.env.E2E_APP_URL ?? "https://motionquest-app.vercel.app";
 
 test("judge walkthrough reaches the caregiver report without camera hardware", async ({
   page,
 }) => {
   await page.goto(appUrl);
 
-  await expect(page.getByText("Judge Proof")).toBeVisible();
-  await expect(page.getByText("Use Safe Demo Data")).toBeVisible();
+  await expect(page.getByText("Start", { exact: true })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Safe demo" })).toBeVisible();
   await expect(page.getByRole("button", { name: "I can stand safely" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "I will stay seated" })).toBeVisible();
-  await expect(page.getByText("Review Method")).toBeVisible();
-  await expect(page.getByText("Lower-friction movement practice")).toBeVisible();
-  await expect(
-    page.getByText("How to verify the actual outcome in under two minutes."),
-  ).toBeVisible();
+  await expect(page.getByRole("button", { name: "Seated adaptive" })).toBeVisible();
+  await expect(page.getByText("No account. No wearable. Camera only during the session.")).toBeVisible();
+  await expect(page.getByText("Research, safety and judge evidence")).toBeVisible();
   await expect(page.getByText("Required joints")).toBeVisible();
+  await expect(page.getByText("Human setup guidance")).toBeVisible();
   await expect(page.getByText("Adjust camera").first()).toBeVisible();
   await expect(page.getByText("Shoulders").first()).toBeVisible();
 
-  await page.getByRole("button", { name: "Start Seated Judge Walkthrough" }).click();
-  await expect(page.getByText("Activity 1")).toBeVisible();
+  await page.getByRole("button", { name: "Seated adaptive" }).click();
+  await expect(page.getByText("Activity 1", { exact: true })).toBeVisible();
   await expect(page.getByText("Ready for seated adaptive movement")).toBeVisible();
+  await expect(
+    page.getByText("Adaptive movement is complete. Continue into Reach Stars."),
+  ).not.toBeVisible();
 
   await page.getByRole("button", { name: "Start seated mode" }).click();
   await expect(
@@ -31,28 +32,33 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
   await page.getByRole("button", { name: "Finish early" }).click();
 
   await expect(page.getByText("Activity 2")).toBeVisible();
+  await expect(
+    page.getByText("Adaptive movement is complete. Continue into Reach Stars."),
+  ).toBeVisible();
   await expect(page.getByText("Ready for Reach Stars")).toBeVisible();
 
   await page.getByRole("button", { name: "Start Reach Stars" }).click();
   await expect(
-    page.getByText("Raise one visible hand."),
+    page.getByText("Cover the yellow target with one visible hand"),
   ).toBeVisible();
   await page.getByRole("button", { name: "Finish & View Report" }).click();
 
   await expect(page.getByText("Caregiver Report")).toBeVisible();
   await expect(page.getByText("Interpretation", { exact: true })).toBeVisible();
+  await expect(page.getByText("Observed activity", { exact: true })).toBeVisible();
+  await expect(page.getByText("Confidence", { exact: true })).toBeVisible();
+  await expect(page.getByText("Limitations", { exact: true })).toBeVisible();
+  await expect(page.getByText("Next session suggestion", { exact: true })).toBeVisible();
+  await expect(page.getByText("Export", { exact: true })).toBeVisible();
   await expect(page.getByText("Session not valid enough")).toBeVisible();
   await expect(
     page.getByText(
-      "No usable body tracking was detected. Repeat the setup with full-body visibility before using the numbers.",
-      { exact: true },
-    ),
+      "The camera did not capture enough movement signal. Try a calmer setup before using the numbers",
+      { exact: false },
+    ).first(),
   ).toBeVisible();
-  await expect(
-    page.getByText("Next session suggestion", { exact: true }),
-  ).toBeVisible();
-  await expect(page.getByText("Export", { exact: true })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Copy report" })).toBeVisible();
+  await expect(page.getByText("Session complete")).toBeVisible();
+  await expect(page.getByRole("button", { name: "Copy practice note" })).toBeVisible();
 });
 
 test("visible interactive controls and text respect visual accessibility floor", async ({
@@ -65,6 +71,9 @@ test("visible interactive controls and text respect visual accessibility floor",
       .filter((item) => {
         const rect = item.getBoundingClientRect();
         const style = window.getComputedStyle(item);
+        if (item.getAttribute("data-nextjs-dev-tools-button") === "true") {
+          return false;
+        }
         return (
           rect.width > 0 &&
           rect.height > 0 &&
@@ -112,11 +121,11 @@ test("key visual sections keep accessible contrast", async ({ page }) => {
 
   const samples = [
     page.getByRole("heading", { name: "MotionQuest" }),
-    page.getByText("Judge Proof").first(),
-    page.getByRole("button", { name: "Start Seated Judge Walkthrough" }),
-    page.getByText("Lower-friction movement practice"),
-    page.getByRole("button", { name: "Verify Seated Camera Flow" }),
-    page.getByText("Video stays in the browser").first(),
+    page.getByText("Start", { exact: true }),
+    page.getByRole("button", { name: "Seated adaptive" }),
+    page.getByText("No account. No wearable. Camera only during the session."),
+    page.getByText("Research, safety and judge evidence"),
+    page.getByText("Human setup guidance").first(),
   ];
 
   for (const locator of samples) {
@@ -171,12 +180,73 @@ test("key visual sections keep accessible contrast", async ({ page }) => {
   }
 });
 
+test("Phase 4 visual trust surfaces are visible and production-readable", async ({
+  page,
+}) => {
+  await page.goto(appUrl);
+  await page.getByText("Research, safety and judge evidence").click();
+
+  await expect(page.getByText("Dignity & Privacy Promise")).toBeVisible();
+  await expect(page.getByText("Before camera use", { exact: true })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Camera only during the session" }),
+  ).toBeVisible();
+  await expect(page.getByText("Video is not saved")).toBeVisible();
+  await expect(page.getByText("Participant controls the data")).toBeVisible();
+  await expect(page.getByText("Visual production system")).toBeVisible();
+  await expect(page.getByText("One asset at a time")).toBeVisible();
+  await expect(page.getByText("Reject fake medical cues")).toBeVisible();
+  await expect(page.getByText("Keep provenance visible")).toBeVisible();
+  await expect(page.getByText("Prototype risk")).toBeVisible();
+  await expect(page.getByText("Inclusive movement lab")).toBeVisible();
+  await expect(page.getByText("Phase 4 acceptance")).toBeVisible();
+  await expect(page.getByText("Phase 5 acceptance")).toBeVisible();
+  await expect(
+    page.getByText("Every core screen has normal, degraded and fallback states."),
+  ).toBeVisible();
+  await expect(page.getByText("Home calibration")).toBeVisible();
+  await expect(page.getByText("Phase 6 trust contract").first()).toBeVisible();
+  await expect(page.getByText("Safety first")).toBeVisible();
+  await expect(page.getByText("Camera control")).toBeVisible();
+  await expect(page.getByText("Dignity by design")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Independence" })).toBeVisible();
+  await expect(page.getByText("Caregiver interpretation rules")).toBeVisible();
+  await expect(page.getByText("High confidence")).toBeVisible();
+  await expect(page.getByText("Medium confidence")).toBeVisible();
+  await expect(page.getByText("Low confidence")).toBeVisible();
+  await expect(page.getByText("Camera limitation rules")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Close camera" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Hand near lens" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Partial view" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Poor lighting" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Seated hand" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Standing body" })).toBeVisible();
+  await expect(page.getByText("Trust checklist by screen")).toBeVisible();
+  await expect(page.getByText("Manual review protocol")).toBeVisible();
+  await expect(page.getByText("User-side smoke protocol")).toBeVisible();
+  await expect(page.getByText("Claim escalation rule").first()).toBeVisible();
+
+  await page.getByRole("button", { name: "Verify Safe Demo Report" }).click();
+  await expect(page.getByText("Session complete")).toBeVisible();
+  await expect(page.getByText("Caregiver artifact")).toBeVisible();
+  await expect(page.getByLabel("Sample data warning")).toBeVisible();
+  await expect(page.getByText("Evidence surface")).toBeVisible();
+  await expect(page.getByText("Why this report is useful, and where it stops.")).toBeVisible();
+  await expect(page.getByText("Mini-bibliography")).toBeVisible();
+  await expect(page.getByText("Confidence by mode")).toBeVisible();
+  await expect(page.getByText("Functional movement", { exact: true })).toBeVisible();
+  await expect(page.getByText("Browser pose limits", { exact: true })).toBeVisible();
+  await expect(page.getByText("Dignity and privacy", { exact: true })).toBeVisible();
+  await expect(page.getByText("Confidence explanation:").first()).toBeVisible();
+  await expect(page.getByText("Caregiver interpretation rules")).toBeVisible();
+  await expect(page.getByText("Camera limitation rules")).toBeVisible();
+  await expect(page.getByText("Claim escalation rule")).toBeVisible();
+});
+
 test("keyboard flow and focus rings cover primary actions", async ({ page }) => {
   await page.goto(appUrl);
 
-  const firstAction = page.getByRole("button", {
-    name: "Start Seated Judge Walkthrough",
-  });
+  const firstAction = page.getByRole("button", { name: "Seated adaptive" });
   await firstAction.focus();
   await expect(firstAction).toBeFocused();
   await expectOutlineVisible(firstAction);
@@ -206,7 +276,7 @@ test("keyboard flow and focus rings cover primary actions", async ({ page }) => 
   await expectOutlineVisible(report);
   await page.keyboard.press("Enter");
 
-  const copy = page.getByRole("button", { name: "Copy report" });
+  const copy = page.getByRole("button", { name: "Copy practice note" });
   await expect(copy).toBeVisible();
   await copy.focus();
   await expectOutlineVisible(copy);
@@ -222,6 +292,12 @@ test("reduced motion keeps navigation usable without animated emphasis", async (
     .locator("button, a, [class*='transition']")
     .evaluateAll((items) =>
       items.map((item) => {
+        if (item.getAttribute("data-nextjs-dev-tools-button") === "true") {
+          return {
+            transitionDuration: "0s",
+            animationDuration: "0s",
+          };
+        }
         const style = window.getComputedStyle(item);
         return {
           transitionDuration: style.transitionDuration,
@@ -238,39 +314,128 @@ test("reduced motion keeps navigation usable without animated emphasis", async (
 
   expect(longMotion).toEqual([]);
 
-  await page.getByRole("button", { name: "Open Labeled Safe Demo Report" }).click();
-  await expect(page.getByText("Caregiver Report")).toBeVisible();
+  await page.getByRole("button", { name: "Safe demo" }).click();
+  await expect(page.getByText("Caregiver Report", { exact: true })).toBeVisible();
 });
 
-test("camera recovery text is visible when no camera is available", async ({
+test("camera recovery text is visible when live camera cannot start", async ({
   page,
 }) => {
   await page.goto(appUrl);
 
   await page.getByRole("button", { name: "Start Camera Check" }).click();
 
-  await expect(page.getByText("Camera not found")).toBeVisible({
-    timeout: 15000,
-  });
   await expect(page.getByText("Camera/model needs attention")).toBeVisible();
-  await expect(page.getByText("No usable camera was found")).toBeVisible();
-  await expect(page.getByText("Connect a webcam or enable the built-in camera.")).toBeVisible();
+  await expect(
+    page.getByText(
+      /Camera not found|Camera runtime not supported|Camera detected but no frames arrived/,
+    ),
+  ).toBeVisible({ timeout: 15000 });
+  await expect(
+    page.getByText(/Camera diagnostics|No camera is not a dead end/).first(),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/safe demo|regular Chrome or Edge|another browser/).first(),
+  ).toBeVisible();
+});
+
+test("camera stage instruction hierarchy avoids overlay collisions", async ({
+  page,
+}) => {
+  await page.goto(appUrl);
+
+  await page.getByRole("button", { name: "Seated adaptive" }).click();
+  await page.getByRole("button", { name: "Start seated mode" }).click();
+
+  const whatCounts = page
+    .locator("div.absolute")
+    .filter({ hasText: "What counts" })
+    .first();
+  const modePill = page
+    .locator("div.absolute")
+    .filter({ hasText: /^Seated Adaptive$/ })
+    .first();
+
+  await expect(whatCounts).toBeVisible();
+  await expect(modePill).toBeVisible();
+
+  const [whatCountsBox, modePillBox] = await Promise.all([
+    whatCounts.boundingBox(),
+    modePill.boundingBox(),
+  ]);
+
+  expect(whatCountsBox).not.toBeNull();
+  expect(modePillBox).not.toBeNull();
+  expect(
+    overlapArea(whatCountsBox!, modePillBox!),
+    "What counts guidance must not cover the stage label",
+  ).toBe(0);
+});
+
+test("camera stage does not stretch below the live video frame", async ({
+  page,
+}) => {
+  await page.goto(appUrl);
+
+  const cameraStage = page.locator("video").first().locator("xpath=ancestor::div[contains(@class,'relative')][1]");
+  const [stageBox, videoBox] = await Promise.all([
+    cameraStage.boundingBox(),
+    page.locator("video").first().boundingBox(),
+  ]);
+
+  expect(stageBox).not.toBeNull();
+  expect(videoBox).not.toBeNull();
+  expect(
+    Math.abs(stageBox!.height - videoBox!.height),
+    "Camera stage should not stretch to match the taller diagnostics panel",
+  ).toBeLessThanOrEqual(12);
+});
+
+test("standing branch pauses measurement until full-body tracking is usable", async ({
+  page,
+}) => {
+  await page.goto(appUrl);
+
+  await page.getByRole("button", { name: "I can stand safely" }).click();
+  await page.getByRole("button", { name: "I am in position" }).click();
+
+  await expect(
+    page.getByText(
+      "Timer is paused. Keep shoulders, hips and knees visible before the standing branch can count.",
+    ),
+  ).toBeVisible({ timeout: 15000 });
+  await page.getByRole("button", { name: "Finish early" }).click();
+  await page.getByRole("button", { name: "Start Reach Stars" }).click();
+  await page.getByRole("button", { name: "Finish & View Report" }).click();
+  await expect(page.getByText("Session not valid enough")).toBeVisible();
+  await expect(
+    page.getByText("not an official medical record", { exact: false }).first(),
+  ).toBeVisible();
 });
 
 test("safe demo report is visibly labeled as fallback data", async ({ page }) => {
   await page.goto(appUrl);
 
-  await page.getByRole("button", { name: "Open Labeled Safe Demo Report" }).click();
+  await page.getByRole("button", { name: "Safe demo" }).click();
 
-  await expect(page.getByText("Caregiver Report")).toBeVisible();
+  await expect(page.getByText("Caregiver Report", { exact: true })).toBeVisible();
   await expect(page.getByText("Demo fallback").first()).toBeVisible();
-  await expect(page.getByText("Safe demo data only")).toBeVisible();
+  await expect(page.getByLabel("Sample data warning")).toBeVisible();
+  await expect(page.getByText("Sample session - not live camera data.").first()).toBeVisible();
+  await expect(page.getByText("Not an official medical record.").first()).toBeVisible();
   await expect(page.getByText("Source: safe demo fallback")).toBeVisible();
   await expect(page.getByText("Session mode: seated-adaptive")).toBeVisible();
   await expect(page.getByText("Primary movement: seated-arm-movement")).toBeVisible();
+  await expect(page.getByText("Observed activity", { exact: true })).toBeVisible();
+  await expect(page.getByText("Confidence", { exact: true })).toBeVisible();
+  await expect(page.getByText("Next session suggestion", { exact: true })).toBeVisible();
   await expect(page.getByText("Tracking validity: valid")).toBeVisible();
+  await expect(page.getByText("Confidence explanation:").first()).toBeVisible();
+  await expect(
+    page.getByText("Seated mode uses visible hand movement only").first(),
+  ).toBeVisible();
   const download = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Download report" }).click();
+  await page.getByRole("button", { name: "Download practice note" }).click();
   const artifact = await download;
   expect(artifact.suggestedFilename()).toMatch(/^motionquest-.*\.txt$/);
 });
@@ -317,4 +482,19 @@ function durationListToMs(value: string) {
       return 0;
     }),
   );
+}
+
+function overlapArea(
+  a: { x: number; y: number; width: number; height: number },
+  b: { x: number; y: number; width: number; height: number },
+) {
+  const xOverlap = Math.max(
+    0,
+    Math.min(a.x + a.width, b.x + b.width) - Math.max(a.x, b.x),
+  );
+  const yOverlap = Math.max(
+    0,
+    Math.min(a.y + a.height, b.y + b.height) - Math.max(a.y, b.y),
+  );
+  return Math.round(xOverlap * yOverlap);
 }

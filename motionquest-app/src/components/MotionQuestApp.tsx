@@ -27,6 +27,27 @@ import {
   type MotionQuestSession,
   type SessionDraft,
 } from "@/lib/sessionStorage";
+import {
+  beforeAfterSlide,
+  cameraLimitationRules,
+  caregiverInterpretationRules,
+  claimEscalationRule,
+  confidenceByMode,
+  dignityPrivacyItems,
+  evidenceCards,
+  homeProofPathItems,
+  manualReviewProtocol,
+  miniBibliography,
+  phaseSixAcceptanceNote,
+  phaseFourAcceptanceItems,
+  phaseFiveStateMatrix,
+  phaseSixSafetyPrivacyItems,
+  phaseSixScreenTrustChecklist,
+  phaseSixTrustContracts,
+  userSmokeProtocol,
+  visualAssetStandards,
+  type MotionQuestIcon,
+} from "@/lib/visualSystem";
 
 type Screen = "home" | "chair" | "reach" | "report";
 
@@ -49,10 +70,10 @@ const createInitialDraft = (sessionMode: SessionMode): SessionDraft => ({
 const INITIAL_DRAFT = createInitialDraft("seated-adaptive");
 
 const TARGETS: Omit<StarTarget, "id" | "shownAt">[] = [
-  { label: "Left shoulder reach", x: 10, y: 24, size: 15 },
-  { label: "Right shoulder reach", x: 74, y: 24, size: 15 },
-  { label: "High center reach", x: 43, y: 14, size: 15 },
-  { label: "Midline reach", x: 43, y: 34, size: 15 },
+  { label: "Left shoulder reach", x: 11, y: 27, size: 18 },
+  { label: "Right shoulder reach", x: 71, y: 27, size: 18 },
+  { label: "High center reach", x: 41, y: 18, size: 18 },
+  { label: "Midline reach", x: 41, y: 40, size: 18 },
 ];
 
 const FLOW_STEPS: { id: Screen; label: string; outcome: string }[] = [
@@ -107,55 +128,51 @@ export function MotionQuestApp() {
 
   return (
     <main className="min-h-screen bg-[#FFF8E7] px-4 py-6 text-[#10231F] sm:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-6">
-        <header className="flex flex-col gap-5 rounded-lg bg-white p-6 shadow-camera">
-          <div className="flex flex-col gap-5 md:flex-row md:items-start">
-            <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl border-4 border-[#075E54] bg-[#FFF8E7] text-3xl font-black text-[#075E54] shadow-camera">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-5">
+        <header className="rounded-lg bg-white p-5 shadow-camera">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border-4 border-[#075E54] bg-[#FFF8E7] text-2xl font-black text-[#075E54] shadow-camera">
               MQ
             </div>
             <div>
               <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
                 PhysTech 2026 · Evidence-aligned exergame session
               </p>
-              <h1 className="mt-2 text-4xl font-black leading-tight md:text-5xl">
+              <h1 className="mt-1 text-3xl font-black leading-tight md:text-4xl">
                 MotionQuest
               </h1>
-              <p className="mt-3 max-w-3xl text-xl leading-relaxed text-[#394B45]">
-                A browser webcam becomes a functional movement session for older
-                adults: calibrate, move through two evidence-inspired
-                activities, then read a caregiver-friendly report.
+              <p className="mt-1 max-w-3xl text-lg font-bold leading-relaxed text-[#394B45]">
+                Webcam movement practice with a clear report.
               </p>
             </div>
           </div>
-          <div
-            className="grid gap-3 text-base font-bold md:grid-cols-4"
-            aria-label="MotionQuest session flow"
-          >
-            {FLOW_STEPS.map((step, index) => {
-              const state = getFlowState(screen, step.id);
-              return (
-                <div
-                  key={step.id}
-                  className={`rounded-xl border-2 p-4 ${
-                    state === "current"
-                      ? "border-[#075E54] bg-[#075E54] text-white"
-                      : state === "complete"
-                        ? "border-[#075E54] bg-[#D8F3DC] text-[#10231F]"
-                        : "border-[#D8F3DC] bg-[#FFF8E7] text-[#394B45]"
-                  }`}
-                >
-                  <span className="block text-lg font-black">{step.label}</span>
-                  <span className="mt-1 block text-base leading-snug">
-                    {state === "complete" ? "Done: " : ""}
-                    {step.outcome}
-                  </span>
-                  <span className="sr-only">
-                    {index + 1} of {FLOW_STEPS.length}, {state}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+          {screen !== "home" ? (
+            <div
+              className="mt-4 grid gap-3 text-base font-bold md:grid-cols-4"
+              aria-label="MotionQuest session flow"
+            >
+              {FLOW_STEPS.map((step, index) => {
+                const state = getFlowState(screen, step.id);
+                return (
+                  <div
+                    key={step.id}
+                    className={`rounded-xl border-2 p-3 ${
+                      state === "current"
+                        ? "border-[#075E54] bg-[#075E54] text-white"
+                        : state === "complete"
+                          ? "border-[#075E54] bg-[#D8F3DC] text-[#10231F]"
+                          : "border-[#D8F3DC] bg-[#FFF8E7] text-[#394B45]"
+                    }`}
+                  >
+                    <span className="block text-lg font-black">{step.label}</span>
+                    <span className="sr-only">
+                      {index + 1} of {FLOW_STEPS.length}, {state}. {step.outcome}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
         </header>
 
         {screen === "home" ? (
@@ -197,110 +214,65 @@ function HomeScreen({
   onDemo: () => void;
 }) {
   return (
-    <section className="space-y-6">
-      <section className="grid gap-5 lg:grid-cols-[1.3fr_0.7fr]">
-        <article className="rounded-lg bg-white p-6 shadow-camera md:p-8">
-          <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-            Problem
-          </p>
-          <h2 className="mt-2 text-4xl font-black leading-tight">
-            Older adults need movement practice that is easy to start and easy
-            to explain.
-          </h2>
-          <p className="mt-4 text-xl leading-relaxed text-[#394B45]">
-            Many tools require wearables, accounts, or clinical context.
-            MotionQuest keeps the first step simple: a browser, a webcam, two
-            short movement activities, and a report that a caregiver or judge can
-            understand.
-          </p>
-        </article>
-        <article className="rounded-lg bg-[#D8F3DC] p-6 shadow-camera md:p-8">
-          <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-            What MotionQuest does
-          </p>
-          <p className="mt-3 text-2xl font-black leading-tight">
-            Webcam-guided Adaptive Chair Movement + Reach Stars + session
-            report.
-          </p>
-          <p className="mt-4 text-xl leading-relaxed text-[#394B45]">
-            MotionQuest estimates reps, target hits, timing, and tracking
-            quality. It is research-aligned practice, not a medical test.
-          </p>
-        </article>
-      </section>
-
-      <JudgeDemoEntry onStart={onStart} onDemo={onDemo} />
-      <ImpactMethodOutcomeStrip />
-      <InfoGrid />
-      <MethodAndTrust id="research-basis" />
-      <JudgeVerificationSection onStart={onStart} onDemo={onDemo} />
-      <CameraStage
-        mode="calibration"
-        title="Camera setup"
-        instruction="Choose standing only if it is safe. Seated mode uses one visible open hand."
-      />
-      <div className="flex flex-col gap-4 rounded-lg bg-white p-6 shadow-camera md:flex-row">
-        <div className="flex-1">
-          <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-            Standing path
-          </p>
+    <section className="space-y-5">
+      <section className="rounded-lg bg-white p-5 shadow-camera">
+        <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+          Start
+        </p>
+        <p className="mt-2 text-2xl font-black leading-tight">
+          Choose a live path or open the labeled demo.
+        </p>
+        <div className="mt-4 flex flex-col gap-3 md:flex-row">
           <button
             type="button"
             onClick={() => onStart("standing")}
-            className="mt-3 min-h-16 w-full rounded-xl bg-[#075E54] px-7 text-xl font-bold text-white hover:bg-[#064C45] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
+            className="min-h-14 flex-1 rounded-xl bg-[#075E54] px-6 text-lg font-bold text-white hover:bg-[#064C45] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
           >
             I can stand safely
           </button>
-          <p className="mt-3 text-base font-bold leading-relaxed text-[#394B45]">
-            Uses the 30-second sit-to-stand branch when shoulders, hips and
-            knees are visible.
-          </p>
-        </div>
-        <div className="flex-1">
-          <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-            Seated adaptive path
-          </p>
           <button
             type="button"
             onClick={() => onStart("seated-adaptive")}
-            className="mt-3 min-h-16 w-full rounded-xl bg-[#F6C85F] px-7 text-xl font-black text-[#10231F] hover:bg-[#E4B94E] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#075E54]"
+            className="min-h-14 flex-1 rounded-xl bg-[#F6C85F] px-6 text-lg font-black text-[#10231F] hover:bg-[#E4B94E] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#075E54]"
           >
-            I will stay seated
+            Seated adaptive
           </button>
-          <p className="mt-3 text-base font-bold leading-relaxed text-[#394B45]">
-            Uses hand tracking for seated upper-body movement. It is not a
-            fallback failure state.
-          </p>
-        </div>
-        <div className="flex-1">
-          <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-            Safe fallback
-          </p>
           <button
             type="button"
             onClick={onDemo}
-            className="mt-3 min-h-14 w-full rounded-xl border-2 border-[#075E54] bg-[#FFF8E7] px-7 text-xl font-bold text-[#10231F] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
+            className="min-h-14 flex-1 rounded-xl border-2 border-[#075E54] bg-[#FFF8E7] px-6 text-lg font-bold text-[#10231F] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
           >
-            Use Safe Demo Data
+            Safe demo
           </button>
-          <p className="mt-3 text-base font-bold leading-relaxed text-[#394B45]">
-            Clearly labeled fallback for no camera, no room, or stage lighting.
-            It demonstrates the report format without pretending to be a live
-            measurement.
-          </p>
         </div>
-        <div className="flex-1">
-          <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-            Research basis
-          </p>
-          <a
-            href="#research-basis"
-            className="mt-3 flex min-h-14 w-full items-center justify-center rounded-xl border-2 border-[#10231F] bg-white px-7 text-center text-xl font-bold text-[#10231F] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
-          >
-            Review Method
-          </a>
+        <p className="mt-3 text-base font-black text-[#394B45]">
+          No account. No wearable. Camera only during the session.
+        </p>
+      </section>
+      <CameraStage
+        mode="calibration"
+        title="Camera setup"
+        instruction="Choose the movement path first, then let the camera check whether the chosen setup is observable."
+      />
+      <details
+        id="research-basis"
+        className="rounded-lg border-2 border-[#075E54] bg-white p-5 shadow-camera"
+      >
+        <summary className="cursor-pointer text-xl font-black leading-tight text-[#10231F] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]">
+          Research, safety and judge evidence
+        </summary>
+        <div className="mt-5 space-y-6">
+          <BeforeCameraUse />
+          <DignityPrivacyCard />
+          <ImpactMethodOutcomeStrip />
+          <InfoGrid />
+          <MethodAndTrust id="method-detail" />
+          <VisualSystemSection />
+          <PhaseFiveAcceptanceMatrix />
+          <PhaseSixTrustContract />
+          <JudgeVerificationSection onStart={onStart} onDemo={onDemo} />
         </div>
-      </div>
+      </details>
     </section>
   );
 }
@@ -339,8 +311,8 @@ function ChairStandScreen({
         }
         whatCounts={
           isSeated
-            ? "One seated rep counts after one visible hand raises and lowers."
-            : "One standing rep counts after a full stand and return to seated position."
+            ? "One seated rep counts after one visible open hand raises and lowers in view. No lower-body ability is inferred."
+            : "One standing rep counts after a full stand and return to seated position while full-body tracking is usable."
         }
       />
       {!confirmed ? (
@@ -349,14 +321,15 @@ function ChairStandScreen({
           checks={
             isSeated
               ? [
-                  "Stay seated in a stable chair.",
-                  "Raise and lower one open hand where the camera can see it.",
-                  "Move only in a comfortable range.",
-                ]
-              : [
-                  "Use a stable chair and keep the camera in front of the body.",
-                  "Keep shoulders, hips, knees, and ankles visible.",
-                  "Stop immediately if the movement feels unsafe.",
+                "Stay seated in a stable chair.",
+                "Raise and lower one open hand where the camera can see it.",
+                "Move only in a comfortable range.",
+                "Stop if the movement feels uncomfortable.",
+              ]
+            : [
+                "Use a stable chair and keep the camera in front of the body.",
+                "Keep shoulders, hips, knees, and ankles visible.",
+                "Stop immediately if the movement feels unsafe.",
                 ]
           }
           action={isSeated ? "Start seated mode" : "I am in position"}
@@ -434,10 +407,12 @@ function ChairStandHud({
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setSecondsLeft((value) => Math.max(0, value - 1));
+      if (hasUsableChairPose) {
+        setSecondsLeft((value) => Math.max(0, value - 1));
+      }
     }, 1000);
     return () => window.clearInterval(timer);
-  }, []);
+  }, [hasUsableChairPose]);
 
   useEffect(() => {
     if (secondsLeft === 0) {
@@ -446,6 +421,8 @@ function ChairStandHud({
   }, [finish, secondsLeft]);
 
   useEffect(() => {
+    if (!hasUsableChairPose) return;
+
     const hipY = averageY(tracking.landmarks, [23, 24]);
     const kneeY = averageY(tracking.landmarks, [25, 26]);
 
@@ -465,7 +442,7 @@ function ChairStandHud({
       window.setTimeout(() => setPulse(false), 280);
     }
     phaseRef.current = result.phase;
-  }, [tracking.landmarks]);
+  }, [hasUsableChairPose, tracking.landmarks]);
 
   return (
     <>
@@ -483,12 +460,18 @@ function ChairStandHud({
           {reps}
         </span>
       </HudChip>
-      <HudChip className="left-4 right-4 top-4 md:left-auto md:right-4 md:max-w-sm">
+      <HudChip className="left-4 right-4 top-44 md:left-auto md:right-4 md:top-24 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
           Stand tall, then return to seated. The seated return completes the rep.
         </span>
       </HudChip>
+      {!hasUsableChairPose ? (
+        <div className="absolute bottom-28 left-4 max-w-xl rounded-xl bg-[#D8F3DC] p-4 text-xl font-bold text-[#10231F] shadow-camera">
+          Timer is paused. Keep shoulders, hips and knees visible before the
+          standing branch can count.
+        </div>
+      ) : null}
       {pulse ? (
         <div className="pointer-events-none absolute inset-0 border-[12px] border-[#D8F3DC]" />
       ) : null}
@@ -591,7 +574,7 @@ function SeatedArmHud({
           {reps}
         </span>
       </HudChip>
-      <HudChip className="left-4 right-4 top-4 md:left-auto md:right-4 md:max-w-sm">
+      <HudChip className="left-4 right-4 top-44 md:left-auto md:right-4 md:top-24 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
           Seated mode is already selected. Raise and lower the same visible hand
@@ -628,19 +611,24 @@ function ReachStarsScreen({
 
   return (
     <section className="space-y-6">
+      <CompletionBridge
+        label="Activity 1 saved"
+        title="Adaptive movement is complete. Continue into Reach Stars."
+        body="The next step keeps the flow natural: one movement branch is saved first, then the reach activity adds target interaction and timing before the report."
+      />
       <JudgeFacingSummary
         title="Reach Stars connects play to visible reach practice."
-        body="The target game records wrist-to-target hits and timing. It is an engagement and reach-practice proxy, not a medical range-of-motion assessment."
+        body="The target game records visible hand-to-target hits and timing. It is an engagement and reach-practice proxy, not a medical range-of-motion assessment."
       />
       <ActivityIntroCard
         label="Activity 2"
         title="Reach Stars"
         measures={[
-          "Wrist-to-target hits",
+          "Hand-to-target hits",
           "Average reaction timing",
           "Pose tracking confidence",
         ]}
-        whatCounts="A hit counts when either visible wrist enters the yellow star target."
+        whatCounts="A hit counts when the yellow target overlaps the visible hand area for half a second."
       />
       {!confirmed ? (
         <ReadinessConfirmation
@@ -648,7 +636,7 @@ function ReachStarsScreen({
           checks={[
             "Sit or stand in a comfortable position.",
             "Raise one open hand where the camera can see it.",
-            "Reach only within a comfortable range.",
+            "Reach only within a comfortable range; large targets are enough.",
           ]}
           action="Start Reach Stars"
           onConfirm={() => setConfirmed(true)}
@@ -800,8 +788,8 @@ function ReachStarsHud({
       <HudChip className="left-4 right-4 top-44 md:left-auto md:right-4 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
-          Raise one visible hand. Then hold it inside the yellow target for half
-          a second.
+          Cover the yellow target with one visible hand and hold for half a
+          second.
         </span>
       </HudChip>
       <button
@@ -825,7 +813,7 @@ function ReportScreen({
   onDemo: () => void;
 }) {
   const fallback = report ?? buildDemoSession();
-  const [copyStatus, setCopyStatus] = useState("Copy report");
+  const [copyStatus, setCopyStatus] = useState("Copy practice note");
   const reportText = buildReportText(fallback);
   const isSafeDemo = fallback.source === "safe-demo";
   const isInvalid = fallback.trackingQuality.validity === "not-valid-enough";
@@ -839,25 +827,44 @@ function ReportScreen({
     try {
       await navigator.clipboard.writeText(reportText);
       setCopyStatus("Copied");
-      window.setTimeout(() => setCopyStatus("Copy report"), 1400);
+      window.setTimeout(() => setCopyStatus("Copy practice note"), 1400);
     } catch {
       setCopyStatus("Copy unavailable");
-      window.setTimeout(() => setCopyStatus("Copy report"), 1800);
+      window.setTimeout(() => setCopyStatus("Copy practice note"), 1800);
     }
   };
 
   return (
     <section className="space-y-6 text-[#10231F]">
+      <CompletionBridge
+        label="Session complete"
+        title="Movement is finished. Review the caregiver-readable practice note."
+        body="The report is the handoff: it states what was observed, what was limited, and what should happen next without implying an official medical record."
+      />
       <article className="rounded-lg bg-white p-6 shadow-camera md:p-8">
-        <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-          Caregiver Report
-        </p>
-        <h2 className="mt-2 text-4xl font-black leading-tight">
-          Today&apos;s Movement Summary
-        </h2>
-        <p className="mt-4 max-w-4xl text-xl leading-relaxed text-[#394B45]">
-          {fallback.report.summary}
-        </p>
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
+              Caregiver Report
+            </p>
+            <h2 className="mt-2 text-4xl font-black leading-tight">
+              Today&apos;s Movement Summary
+            </h2>
+            <p className="mt-4 max-w-4xl text-xl leading-relaxed text-[#394B45]">
+              {fallback.report.summary}
+            </p>
+          </div>
+          <div className="rounded-2xl border-2 border-[#075E54] bg-[#D8F3DC] p-5 text-[#10231F] lg:max-w-sm">
+            <IconMark icon="report" />
+            <p className="mt-3 text-base font-black uppercase tracking-wide text-[#394B45]">
+              Caregiver artifact
+            </p>
+            <p className="mt-2 text-xl font-black leading-snug">
+              Plain-language session note with counts, confidence, limits and
+              next safe step.
+            </p>
+          </div>
+        </div>
         {isSafeDemo ? (
           <p className="mt-4 rounded-lg bg-[#FFE8A3] p-4 text-lg font-black leading-relaxed text-[#10231F]">
             This is labeled safe demo data for presentation fallback. It is not
@@ -868,7 +875,13 @@ function ReportScreen({
 
       <section className="rounded-lg bg-white p-6 shadow-camera md:p-8">
         <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-          Metrics
+          Observed activity
+        </p>
+        <p className="mt-3 text-lg font-bold leading-relaxed text-[#394B45]">
+          {fallback.source === "safe-demo"
+            ? "Sample session - not live camera data."
+            : "Live camera session."}{" "}
+          The numbers below describe this single practice session only.
         </p>
         <div className="mt-5 grid gap-5 md:grid-cols-3">
           <MetricCard
@@ -876,21 +889,26 @@ function ReportScreen({
             value={`${fallback.adaptiveMovement.reps}`}
             note={`30-sec ${fallback.sessionMode === "seated-adaptive" ? "seated adaptive" : "standing"} branch, avg ${fallback.adaptiveMovement.avgRepSec ?? "n/a"} sec per rep`}
             badge={metricBadge}
+            confidenceNote={movementConfidenceNote(fallback)}
           />
           <MetricCard
             label="Reach Stars"
             value={`${fallback.reachStars.targetsHit}/${fallback.reachStars.targetsShown}`}
             note={`Avg reaction ${fallback.reachStars.avgReactionMs ?? "n/a"} ms`}
             badge={metricBadge}
+            confidenceNote={reachConfidenceNote(fallback)}
           />
           <MetricCard
             label="Tracking"
             value={fallback.poseConfidence}
             note="Browser webcam pose confidence"
             badge={metricBadge}
+            confidenceNote={trackingConfidenceNote(fallback)}
           />
         </div>
       </section>
+
+      {isSafeDemo ? <SampleDataBanner /> : null}
 
       <section className="grid gap-5 lg:grid-cols-[1fr_1fr]">
         <article
@@ -920,7 +938,10 @@ function ReportScreen({
 
       <section className="grid gap-5 md:grid-cols-2">
         <article className="rounded-lg border-2 border-[#D8F3DC] bg-white p-5 text-lg leading-relaxed">
-          <h3 className="text-2xl font-black">Method used</h3>
+          <div className="flex items-center gap-3">
+            <IconMark icon="evidence" />
+            <h3 className="text-2xl font-black">Method used</h3>
+          </div>
           <p className="mt-2 text-[#394B45]">
             Browser webcam pose tracking estimated the selected adaptive
             movement branch, reach-target hits, reaction timing, and tracking
@@ -928,7 +949,10 @@ function ReportScreen({
           </p>
         </article>
         <article className="rounded-lg border-2 border-[#FFE8A3] bg-[#FFF8E7] p-5 text-lg leading-relaxed">
-          <h3 className="text-2xl font-black">Limitations</h3>
+          <div className="flex items-center gap-3">
+            <IconMark icon="warning" />
+            <h3 className="text-2xl font-black">Limitations</h3>
+          </div>
           <ul className="mt-2 space-y-2 text-[#394B45]">
             {fallback.trackingQuality.limitations.map((item) => (
               <li key={item}>{item}</li>
@@ -945,7 +969,7 @@ function ReportScreen({
         }`}
       >
         <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
-          Tracking quality
+          Confidence
         </p>
         <h3 className="mt-2 text-3xl font-black leading-tight">
           {trackingQualityTitle(fallback.trackingQuality.validity)}
@@ -955,12 +979,64 @@ function ReportScreen({
         </p>
       </section>
 
+      <PhaseSixTrustContract compact />
+
+      <section className="rounded-lg bg-white p-6 shadow-camera md:p-8">
+        <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
+          Evidence surface
+        </p>
+        <h3 className="mt-2 text-3xl font-black leading-tight">
+          Why this report is useful, and where it stops.
+        </h3>
+        <div className="mt-5 grid gap-4 lg:grid-cols-3">
+          {evidenceCards.map((card) => (
+            <EvidenceReferenceCard key={card.title} {...card} />
+          ))}
+        </div>
+        <div className="mt-5 grid gap-4 lg:grid-cols-[0.8fr_1.2fr]">
+          <article className="rounded-lg bg-[#FFF8E7] p-5">
+            <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+              Mini-bibliography
+            </p>
+            <ul className="mt-3 space-y-3">
+              {miniBibliography.map((item) => (
+                <li key={item.label} className="rounded-lg bg-white p-4">
+                  <p className="text-xl font-black">{item.label}</p>
+                  <p className="mt-1 text-lg font-bold leading-relaxed text-[#394B45]">
+                    {item.note}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </article>
+          <article className="rounded-lg bg-[#D8F3DC] p-5">
+            <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+              Confidence by mode
+            </p>
+            <div className="mt-3 grid gap-3">
+              {confidenceByMode.map((item) => (
+                <div key={item.mode} className="rounded-lg bg-white p-4">
+                  <p className="text-xl font-black">{item.mode}</p>
+                  <p className="mt-1 text-lg font-bold leading-relaxed text-[#394B45]">
+                    Observes: {item.observes}
+                  </p>
+                  <p className="mt-1 text-lg font-bold leading-relaxed text-[#394B45]">
+                    Boundary: {item.boundary}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </article>
+        </div>
+      </section>
+
       <section className="rounded-lg bg-white p-6 shadow-camera">
         <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
           Export
         </p>
         <p className="mt-3 rounded-lg bg-[#FFE8A3] p-4 text-base font-bold leading-relaxed">
-          {fallback.report.disclaimer}
+          {fallback.report.disclaimer} This export is a personal practice note,
+          not an official medical record.
         </p>
         <pre className="mt-5 whitespace-pre-wrap rounded-lg border-2 border-[#D8F3DC] bg-[#FFF8E7] p-5 text-base font-bold leading-relaxed text-[#10231F]">
           {reportText}
@@ -987,7 +1063,7 @@ function ReportScreen({
           onClick={() => downloadReport(reportText, fallback)}
           className="min-h-14 flex-1 rounded-xl border-2 border-[#075E54] bg-white px-7 text-xl font-bold text-[#10231F] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
         >
-          Download report
+          Download practice note
         </button>
         <button
           type="button"
@@ -996,6 +1072,51 @@ function ReportScreen({
         >
           Load safe demo data
         </button>
+      </div>
+    </section>
+  );
+}
+
+function CompletionBridge({
+  label,
+  title,
+  body,
+}: {
+  label: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <section className="rounded-lg border-2 border-[#075E54] bg-[#D8F3DC] p-5 shadow-camera">
+      <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+        {label}
+      </p>
+      <h2 className="mt-2 text-3xl font-black leading-tight">{title}</h2>
+      <p className="mt-3 text-lg font-bold leading-relaxed text-[#394B45]">
+        {body}
+      </p>
+    </section>
+  );
+}
+
+function BeforeCameraUse() {
+  return (
+    <section className="rounded-lg border-2 border-[#075E54] bg-white p-6 shadow-camera md:p-8">
+      <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+        Before camera use
+      </p>
+      <h2 className="mt-2 text-3xl font-black leading-tight">
+        The participant sees the purpose, safe choice and proof path first.
+      </h2>
+      <div className="mt-5 grid gap-4 lg:grid-cols-3">
+        {homeProofPathItems.map((item) => (
+          <article key={item.title} className="rounded-lg bg-[#FFF8E7] p-5">
+            <h3 className="text-2xl font-black">{item.title}</h3>
+            <p className="mt-2 text-lg font-bold leading-relaxed text-[#394B45]">
+              {item.body}
+            </p>
+          </article>
+        ))}
       </div>
     </section>
   );
@@ -1019,10 +1140,427 @@ function ImpactMethodOutcomeStrip() {
       />
       <OutcomeProofCard
         label="Outcome"
-        title="A readable session artifact"
-        body="The report turns reps, target hits, timing, confidence, method, limits, and next-session guidance into one copyable note."
+        title="The report is the product outcome"
+        body="The activity exists to produce a caregiver-readable artifact: observed movement, confidence, limitations, interpretation, and next safe step in one copyable note."
       />
     </section>
+  );
+}
+
+function DignityPrivacyCard() {
+  return (
+    <section className="rounded-lg border-2 border-[#075E54] bg-white p-6 shadow-camera md:p-8">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
+            Dignity & Privacy Promise
+          </p>
+          <h2 className="mt-2 text-3xl font-black leading-tight">
+            Camera movement practice without hidden data capture.
+          </h2>
+          <p className="mt-3 max-w-4xl text-xl leading-relaxed text-[#394B45]">
+            MotionQuest makes trust visible before the participant starts. The
+            app uses the camera for the session, stores report data locally, and
+            avoids raw video retention. Privacy promises are written to match
+            what the browser app actually does.
+          </p>
+        </div>
+        <div className="rounded-2xl bg-[#D8F3DC] p-5 text-xl font-black leading-tight text-[#10231F] lg:max-w-xs">
+          Participant dignity is part of the product, not fine print.
+        </div>
+      </div>
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        {dignityPrivacyItems.map((item) => (
+          <TrustPromiseItem key={item.title} {...item} />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function PhaseSixTrustContract({ compact = false }: { compact?: boolean }) {
+  return (
+    <section className="space-y-5 rounded-lg border-2 border-[#075E54] bg-white p-6 shadow-camera md:p-8">
+      <div>
+        <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+          Phase 6 trust contract
+        </p>
+        <h2 className="mt-2 text-3xl font-black leading-tight">
+          Confidence, safety, privacy and dignity are explicit product behavior.
+        </h2>
+        <p className="mt-3 max-w-5xl text-xl font-bold leading-relaxed text-[#394B45]">
+          MotionQuest weakens claims when observation is weak. It never turns a
+          seated adaptation, camera problem or sample session into fake success.
+        </p>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {phaseSixSafetyPrivacyItems.map((item) => (
+          <article key={item.title} className="rounded-lg bg-[#D8F3DC] p-4">
+            <h3 className="text-2xl font-black">{item.title}</h3>
+            <p className="mt-2 text-lg font-bold leading-relaxed text-[#394B45]">
+              {item.body}
+            </p>
+          </article>
+        ))}
+      </div>
+      <section className="rounded-lg border-2 border-[#D8F3DC] bg-[#FFF8E7] p-5">
+        <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+          Caregiver interpretation rules
+        </p>
+        <div className="mt-3 grid gap-3 lg:grid-cols-3">
+          {caregiverInterpretationRules.map((item) => (
+            <article key={item.state} className="rounded-lg bg-white p-4">
+              <h3 className="text-xl font-black">{item.state}</h3>
+              <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+                {item.reportLanguage}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <section className="rounded-lg border-2 border-[#FFE8A3] bg-white p-5">
+        <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+          Camera limitation rules
+        </p>
+        <div className="mt-3 grid gap-3 lg:grid-cols-4">
+          {cameraLimitationRules.map((item) => (
+            <article key={item.condition} className="rounded-lg bg-[#FFE8A3] p-4">
+              <h3 className="text-xl font-black">{item.condition}</h3>
+              <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+                {item.reportLanguage}
+              </p>
+            </article>
+          ))}
+        </div>
+      </section>
+      {!compact ? (
+        <>
+          <div className="grid gap-4 lg:grid-cols-5">
+            {phaseSixTrustContracts.map((item) => (
+              <article key={item.mode} className="rounded-lg bg-[#FFF8E7] p-4">
+                <h3 className="text-xl font-black">{item.mode}</h3>
+                <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+                  <strong className="text-[#10231F]">Confidence:</strong>{" "}
+                  {item.confidence}
+                </p>
+                <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+                  <strong className="text-[#10231F]">Counts:</strong>{" "}
+                  {item.counts}
+                </p>
+                <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+                  <strong className="text-[#10231F]">Boundary:</strong>{" "}
+                  {item.boundary}
+                </p>
+              </article>
+            ))}
+          </div>
+          <section className="rounded-lg bg-[#10231F] p-5 text-white">
+            <p className="text-base font-black uppercase tracking-wide text-[#F6C85F]">
+              Trust checklist by screen
+            </p>
+            <div className="mt-3 grid gap-3 lg:grid-cols-4">
+              {phaseSixScreenTrustChecklist.map((item) => (
+                <article key={item.screen} className="rounded-lg bg-white/10 p-4">
+                  <h3 className="text-xl font-black">{item.screen}</h3>
+                  <p className="mt-2 text-base font-bold leading-relaxed">
+                    Visible: {item.visible}
+                  </p>
+                  <p className="mt-2 text-base font-bold leading-relaxed">
+                    Counted: {item.counted}
+                  </p>
+                  <p className="mt-2 text-base font-bold leading-relaxed">
+                    Limited: {item.limited}
+                  </p>
+                  <p className="mt-2 text-base font-bold leading-relaxed">
+                    User controls: {item.control}
+                  </p>
+                </article>
+              ))}
+            </div>
+          </section>
+          <section className="grid gap-4 lg:grid-cols-2">
+            <ProtocolCard
+              title="Manual review protocol"
+              items={manualReviewProtocol}
+            />
+            <ProtocolCard
+              title="User-side smoke protocol"
+              items={userSmokeProtocol}
+            />
+          </section>
+        </>
+      ) : null}
+      <section className="rounded-lg border-2 border-[#075E54] bg-[#D8F3DC] p-5">
+        <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+          Claim escalation rule
+        </p>
+        <p className="mt-2 text-xl font-black leading-relaxed">
+          {claimEscalationRule}
+        </p>
+        <p className="mt-3 rounded-lg bg-white p-4 text-lg font-bold leading-relaxed text-[#394B45]">
+          Acceptance note: {phaseSixAcceptanceNote}
+        </p>
+      </section>
+    </section>
+  );
+}
+
+function ProtocolCard({ title, items }: { title: string; items: string[] }) {
+  return (
+    <article className="rounded-lg border-2 border-[#D8F3DC] bg-white p-5">
+      <h3 className="text-2xl font-black leading-tight">{title}</h3>
+      <ul className="mt-3 space-y-3">
+        {items.map((item) => (
+          <li
+            key={item}
+            className="rounded-lg bg-[#FFF8E7] p-4 text-base font-bold leading-relaxed text-[#394B45]"
+          >
+            {item}
+          </li>
+        ))}
+      </ul>
+    </article>
+  );
+}
+
+function SampleDataBanner() {
+  return (
+    <section
+      className="sticky top-3 z-10 rounded-lg border-2 border-[#10231F] bg-[#FFE8A3] p-4 text-lg font-black leading-relaxed text-[#10231F] shadow-camera"
+      aria-label="Sample data warning"
+    >
+      This is a sample session - not live camera data. It stays visible so the
+      report cannot be confused with a real webcam session.
+    </section>
+  );
+}
+
+function TrustPromiseItem({
+  icon,
+  title,
+  body,
+}: {
+  icon: MotionQuestIcon;
+  title: string;
+  body: string;
+}) {
+  return (
+    <article className="rounded-lg bg-[#FFF8E7] p-5">
+      <IconMark icon={icon} />
+      <h3 className="mt-3 text-2xl font-black leading-tight">{title}</h3>
+      <p className="mt-2 text-lg font-bold leading-relaxed text-[#394B45]">
+        {body}
+      </p>
+    </article>
+  );
+}
+
+function EvidenceReferenceCard({
+  icon,
+  label,
+  title,
+  body,
+  source,
+  href,
+}: (typeof evidenceCards)[number]) {
+  return (
+    <article className="rounded-lg border-2 border-[#D8F3DC] bg-[#FFF8E7] p-5">
+      <div className="flex items-center gap-3">
+        <IconMark icon={icon} />
+        <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+          {label}
+        </p>
+      </div>
+      <h3 className="mt-3 text-2xl font-black leading-tight">{title}</h3>
+      <p className="mt-2 text-lg font-bold leading-relaxed text-[#394B45]">
+        {body}
+      </p>
+      <a
+        href={href}
+        target="_blank"
+        rel="noreferrer"
+        className="mt-4 inline-flex min-h-14 items-center rounded-xl border-2 border-[#075E54] bg-white px-5 text-lg font-black text-[#10231F] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
+      >
+        Source: {source}
+      </a>
+    </article>
+  );
+}
+
+function VisualSystemSection() {
+  return (
+    <section className="space-y-5 rounded-lg bg-white p-6 shadow-camera md:p-8">
+      <div>
+        <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
+          Visual production system
+        </p>
+        <h2 className="mt-2 text-3xl font-black leading-tight">
+          Assets must reinforce dignity, clarity and trust.
+        </h2>
+        <p className="mt-3 max-w-5xl text-xl leading-relaxed text-[#394B45]">
+          MotionQuest now treats icons, references and generated visuals as a
+          controlled product surface. Anything that looks fake, medicalized,
+          distorted or unreadable is rejected before it reaches the app.
+        </p>
+      </div>
+      <div className="grid gap-4 lg:grid-cols-3">
+        {visualAssetStandards.map((item) => (
+          <TrustPromiseItem key={item.title} {...item} />
+        ))}
+      </div>
+      <section className="grid gap-4 rounded-lg bg-[#10231F] p-5 text-white lg:grid-cols-2">
+        <BeforeAfterPanel
+          label="Before"
+          title={beforeAfterSlide.leftTitle}
+          body={beforeAfterSlide.leftBody}
+        />
+        <BeforeAfterPanel
+          label="After"
+          title={beforeAfterSlide.rightTitle}
+          body={beforeAfterSlide.rightBody}
+        />
+      </section>
+      <section className="rounded-lg border-2 border-[#075E54] bg-[#D8F3DC] p-5">
+        <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+          Phase 4 acceptance
+        </p>
+        <ul className="mt-3 grid gap-3 text-lg font-black leading-relaxed lg:grid-cols-2">
+          {phaseFourAcceptanceItems.map((item) => (
+            <li key={item} className="rounded-lg bg-white p-4">
+              {item}
+            </li>
+          ))}
+        </ul>
+      </section>
+    </section>
+  );
+}
+
+function PhaseFiveAcceptanceMatrix() {
+  return (
+    <section className="rounded-lg border-2 border-[#075E54] bg-white p-6 shadow-camera md:p-8">
+      <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+        Phase 5 acceptance
+      </p>
+      <h2 className="mt-2 text-3xl font-black leading-tight">
+        Every core screen has normal, degraded and fallback states.
+      </h2>
+      <div className="mt-5 grid gap-4 lg:grid-cols-2">
+        {phaseFiveStateMatrix.map((item) => (
+          <article key={item.screen} className="rounded-lg bg-[#FFF8E7] p-5">
+            <h3 className="text-2xl font-black">{item.screen}</h3>
+            <dl className="mt-3 grid gap-3 text-base font-bold leading-relaxed text-[#394B45]">
+              <div className="rounded-lg bg-white p-3">
+                <dt className="font-black text-[#10231F]">Normal</dt>
+                <dd>{item.normal}</dd>
+              </div>
+              <div className="rounded-lg bg-[#FFE8A3] p-3">
+                <dt className="font-black text-[#10231F]">Degraded</dt>
+                <dd>{item.degraded}</dd>
+              </div>
+              <div className="rounded-lg bg-[#D8F3DC] p-3">
+                <dt className="font-black text-[#10231F]">Fallback</dt>
+                <dd>{item.fallback}</dd>
+              </div>
+            </dl>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function BeforeAfterPanel({
+  label,
+  title,
+  body,
+}: {
+  label: string;
+  title: string;
+  body: string;
+}) {
+  return (
+    <article className="rounded-lg border-2 border-white/20 bg-white/10 p-5">
+      <p className="text-base font-black uppercase tracking-wide text-[#F6C85F]">
+        {label}
+      </p>
+      <h3 className="mt-2 text-2xl font-black leading-tight">{title}</h3>
+      <p className="mt-3 text-lg font-bold leading-relaxed text-white/95">
+        {body}
+      </p>
+    </article>
+  );
+}
+
+function IconMark({ icon }: { icon: MotionQuestIcon }) {
+  const paths: Record<MotionQuestIcon, React.ReactNode> = {
+    privacy: (
+      <>
+        <path d="M12 3l7 3v5c0 5-3 8-7 10-4-2-7-5-7-10V6l7-3z" />
+        <path d="M9 12l2 2 4-5" />
+      </>
+    ),
+    camera: (
+      <>
+        <path d="M4 8h4l2-3h4l2 3h4v11H4V8z" />
+        <path d="M12 11a3 3 0 100 6 3 3 0 000-6z" />
+      </>
+    ),
+    evidence: (
+      <>
+        <path d="M6 4h12v16H6V4z" />
+        <path d="M9 9h6" />
+        <path d="M9 13h6" />
+        <path d="M9 17h4" />
+      </>
+    ),
+    caregiver: (
+      <>
+        <path d="M8 11a3 3 0 100-6 3 3 0 000 6z" />
+        <path d="M16 11a3 3 0 100-6 3 3 0 000 6z" />
+        <path d="M4 20c0-3 2-5 4-5s4 2 4 5" />
+        <path d="M12 20c0-3 2-5 4-5s4 2 4 5" />
+      </>
+    ),
+    asset: (
+      <>
+        <path d="M5 5h14v14H5V5z" />
+        <path d="M8 16l3-4 2 3 2-2 2 3" />
+        <path d="M9 9h.1" />
+      </>
+    ),
+    warning: (
+      <>
+        <path d="M12 4l9 16H3L12 4z" />
+        <path d="M12 10v4" />
+        <path d="M12 17h.1" />
+      </>
+    ),
+    report: (
+      <>
+        <path d="M7 3h8l4 4v14H7V3z" />
+        <path d="M15 3v5h4" />
+        <path d="M10 12h6" />
+        <path d="M10 16h6" />
+      </>
+    ),
+  };
+
+  return (
+    <span className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#075E54] text-white">
+      <svg
+        aria-hidden="true"
+        viewBox="0 0 24 24"
+        className="h-8 w-8"
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2.4"
+      >
+        {paths[icon]}
+      </svg>
+    </span>
   );
 }
 
@@ -1045,47 +1583,6 @@ function OutcomeProofCard({
         {body}
       </p>
     </article>
-  );
-}
-
-function JudgeDemoEntry({
-  onStart,
-  onDemo,
-}: {
-  onStart: (sessionMode: SessionMode) => void;
-  onDemo: () => void;
-}) {
-  return (
-    <section className="rounded-lg bg-[#10231F] p-6 text-white shadow-camera md:p-8">
-      <p className="text-base font-bold uppercase tracking-wide text-[#F6C85F]">
-        Judge Proof · 90 seconds
-      </p>
-      <h2 className="mt-2 text-3xl font-black leading-tight">
-        A guided walkthrough from problem to camera proof to report.
-      </h2>
-      <div className="mt-5 grid gap-4 md:grid-cols-4">
-        <DemoStep time="0-15s" text="State the problem and why no wearable is needed." />
-        <DemoStep time="15-35s" text="Run camera check and show visible pose tracking." />
-        <DemoStep time="35-65s" text="Choose standing or seated adaptive movement, then complete Reach Stars or use fallback if stage conditions fail." />
-        <DemoStep time="65-90s" text="Open the caregiver report and show metrics, limits, and export." />
-      </div>
-      <div className="mt-6 flex flex-col gap-4 md:flex-row">
-        <button
-          type="button"
-          onClick={() => onStart("seated-adaptive")}
-          className="min-h-16 flex-1 rounded-xl bg-[#F6C85F] px-7 text-xl font-black text-[#10231F] focus-visible:outline focus-visible:outline-4 focus-visible:outline-white"
-        >
-          Start Seated Judge Walkthrough
-        </button>
-        <button
-          type="button"
-          onClick={onDemo}
-          className="min-h-14 flex-1 rounded-xl border-2 border-[#F6C85F] px-7 text-xl font-black text-white focus-visible:outline focus-visible:outline-4 focus-visible:outline-white"
-        >
-          Open Labeled Safe Demo Report
-        </button>
-      </div>
-    </section>
   );
 }
 
@@ -1159,15 +1656,6 @@ function VerificationStep({
       <p className="mt-3 text-lg font-bold leading-relaxed text-[#394B45]">
         {body}
       </p>
-    </article>
-  );
-}
-
-function DemoStep({ time, text }: { time: string; text: string }) {
-  return (
-    <article className="rounded-lg border-2 border-white/25 bg-white/10 p-4">
-      <p className="text-2xl font-black text-[#F6C85F]">{time}</p>
-      <p className="mt-2 text-lg font-bold leading-relaxed">{text}</p>
     </article>
   );
 }
@@ -1253,11 +1741,13 @@ function MetricCard({
   value,
   note,
   badge,
+  confidenceNote,
 }: {
   label: string;
   value: string;
   note: string;
   badge: string;
+  confidenceNote: string;
 }) {
   return (
     <article className="rounded-lg border-2 border-[#075E54] bg-white p-6 shadow-camera">
@@ -1274,6 +1764,9 @@ function MetricCard({
       </p>
       <p className="mt-4 text-lg font-bold leading-relaxed text-[#394B45]">
         {note}
+      </p>
+      <p className="mt-3 rounded-lg bg-[#FFF8E7] p-3 text-base font-black leading-relaxed text-[#394B45]">
+        Confidence explanation: {confidenceNote}
       </p>
     </article>
   );
@@ -1306,12 +1799,12 @@ function InfoGrid() {
       <InfoCard
         label="2. Move"
         title="Two short activities"
-        body="Adaptive Chair Movement supports standing or seated reps. Reach Stars records wrist-to-target interactions."
+        body="Adaptive Chair Movement supports standing or seated reps. Reach Stars records visible hand-to-target interactions."
       />
       <InfoCard
         label="3. Read report"
-        title="Explain the session"
-        body="The result is a caregiver-readable summary with metrics, tracking quality, and limitations."
+        title="Use the outcome"
+        body="The report is the main product artifact: a plain-language explanation of what was observed, what was limited, and what to do next."
       />
     </section>
   );
@@ -1339,7 +1832,7 @@ function MethodAndTrust({ id }: { id: string }) {
           />
           <MiniMethod
             title="Reach Stars"
-            body="A reach-practice target activity. MotionQuest records wrist-to-target hits and timing when available."
+            body="A reach-practice target activity. MotionQuest records visible hand-to-target hits and timing when available."
           />
         </div>
       </article>
@@ -1349,7 +1842,7 @@ function MethodAndTrust({ id }: { id: string }) {
         </p>
         <p className="mt-3 text-xl font-bold leading-relaxed">
           Video stays in the browser. No account, backend, or database is needed
-          for this MVP.
+          for this browser release.
         </p>
         <p className="mt-4 text-lg font-bold leading-relaxed text-[#394B45]">
           MotionQuest is a hackathon build. It does not diagnose, predict
@@ -1375,21 +1868,44 @@ function EvidenceNote({ label, text }: { label: string; text: string }) {
 
 function buildReportText(session: MotionQuestSession) {
   return [
-    "MotionQuest session report",
+    "MotionQuest personal practice note",
+    "Not an official medical record.",
+    session.source === "safe-demo"
+      ? "Sample session - not live camera data."
+      : "Live camera session.",
+    "",
+    "Session summary",
     `Created: ${new Date(session.createdAt).toLocaleString()}`,
     `Source: ${session.source === "safe-demo" ? "safe demo fallback" : "live camera session"}`,
     `Session mode: ${session.sessionMode}`,
     `Primary movement: ${session.primaryMovement}`,
+    `Summary: ${session.report.summary}`,
+    "",
+    "Observed activity",
     `Adaptive movement: ${session.adaptiveMovement.reps} ${session.adaptiveMovement.label} reps in ${session.adaptiveMovement.durationSec}s`,
     `Chair Stand: ${session.chairStand.reps} reps in ${session.chairStand.durationSec}s`,
     `Reach Stars: ${session.reachStars.targetsHit}/${session.reachStars.targetsShown} targets`,
     `Average reach reaction: ${session.reachStars.avgReactionMs ?? "n/a"} ms`,
+    "",
+    "Confidence",
     `Tracking confidence: ${session.poseConfidence}`,
     `Tracking validity: ${session.trackingQuality.validity}`,
-    `Next session suggestion: ${session.report.nextDifficulty}`,
+    `Adaptive movement confidence explanation: ${movementConfidenceNote(session)}`,
+    `Reach Stars confidence explanation: ${reachConfidenceNote(session)}`,
+    `Tracking confidence explanation: ${trackingConfidenceNote(session)}`,
+    "",
+    "Limitations",
+    session.trackingQuality.limitations.join(" | "),
+    "",
+    "Interpretation",
     `Interpretation: ${session.report.interpretation}`,
-    `Limitations: ${session.trackingQuality.limitations.join(" | ")}`,
-    "Limit: practice feedback only; not a medical assessment.",
+    "",
+    "Next safe step",
+    `Next session suggestion: ${session.report.nextDifficulty}. Keep the setup conservative unless tracking stays high and movement feels comfortable.`,
+    "",
+    "Disclaimer",
+    session.report.disclaimer,
+    "General wellness practice feedback only; not a medical assessment.",
   ].join("\n");
 }
 
@@ -1403,12 +1919,42 @@ function trackingQualityTitle(
 
 function trackingQualityText(session: MotionQuestSession) {
   if (session.trackingQuality.validity === "valid") {
-    return "Required movement data was visible enough to create a practice report.";
+    return "Required movement data was visible enough to create a personal practice note. This is still not clinical scoring or an official medical record.";
   }
   if (session.trackingQuality.validity === "limited") {
-    return "The report is still readable, but low pose confidence means the counts may be incomplete. Repeat with better lighting and full-body visibility before relying on the trend.";
+    return "The report is still readable, but low tracking confidence means the counts may be incomplete. Repeat with better lighting and clearer full-body or hand visibility before relying on the trend.";
   }
-  return "The app did not detect enough body landmarks to treat this as a usable session. Repeat calibration before judging the movement result.";
+  return "The app did not detect enough usable movement data to treat this as a usable session. Repeat calibration before judging the movement result.";
+}
+
+function movementConfidenceNote(session: MotionQuestSession) {
+  if (session.trackingQuality.validity === "not-valid-enough") {
+    return "Movement numbers are shown only for transparency because the camera did not capture enough signal.";
+  }
+  if (session.primaryMovement === "seated-arm-movement") {
+    return "Seated mode uses visible hand movement only; it does not interpret lower body or chair-stand ability.";
+  }
+  return "Standing mode counts chair-stand-style practice only while a plausible body frame is visible; it is not clinical scoring.";
+}
+
+function reachConfidenceNote(session: MotionQuestSession) {
+  if (session.trackingQuality.validity === "not-valid-enough") {
+    return "Reach numbers are setup feedback until the camera sees a usable hand signal in stable lighting and distance.";
+  }
+  return "Reach Stars counts hand dwell inside a large target as reach practice, not formal mobility assessment.";
+}
+
+function trackingConfidenceNote(session: MotionQuestSession) {
+  if (session.source === "safe-demo") {
+    return "This is labeled sample data and demonstrates the report format only.";
+  }
+  if (session.poseConfidence === "high") {
+    return "High confidence means the selected mode had enough visible landmarks for a practice note.";
+  }
+  if (session.poseConfidence === "medium") {
+    return "Medium confidence means at least one required signal was visible, but interpretation stays conservative.";
+  }
+  return "Low confidence means the app should weaken claims and ask for better camera setup.";
 }
 
 function downloadReport(reportText: string, session: MotionQuestSession) {

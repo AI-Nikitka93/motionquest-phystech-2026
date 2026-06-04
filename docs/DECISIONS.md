@@ -92,3 +92,61 @@ Rejected:
 - Treating safe demo data as real measured evidence.
 - Marking Devpost submission and presentation registration complete before those forms are actually submitted.
 - Closing post-contest tasks before presentation/results/book invitation exist.
+
+## 2026-05-05 - MotionQuest becomes an adaptive home movement lab
+
+Decision: Use `MotionQuest: Adaptive Home Movement Lab` as the recommended product framing, with caregiver-readable report as the main outcome and seated users as a first-class audience.
+
+Reason: The official PhysTech criteria reward Impact, Creativity and Presentation, and the current project is strongest when it proves inclusive physical activity, conservative research alignment and clear human communication rather than raw camera tracking novelty.
+
+Rejected:
+- Positioning MotionQuest as a generic webcam mini-game: too toy-like and weak against judging criteria.
+- Positioning MotionQuest as a clinical assessment: unsupported and unsafe.
+- Positioning MotionQuest as only a caregiver report tool: hides the physical activity experience that makes the demo compelling.
+- Adding broad social or community features as the first answer: dilutes the core contest story before the first release is credible.
+
+## 2026-05-06 - Submission story targets Research, Social Impact and Entrepreneurship
+
+Decision: Extend the MotionQuest master brief with one coherent three-award story: Research through evidence and confidence limits, Social Impact through seated inclusion and caregiver communication, and Entrepreneurship through caregiver/community wellness paths.
+
+Reason: The official contest page lists Research, Social Impact and Entrepreneurship awards, all with book-chapter invitations, and MotionQuest can support all three without changing the core product promise.
+
+Rejected:
+- A single Research-only story: underuses the caregiver and community product potential.
+- Entrepreneurship based on unverified TAM, pricing or revenue claims: would create fake business certainty.
+- Numeric lower-landmark loss claims without project validation or a cited exact source: unacceptable evidence risk.
+- "First in the world" positioning: not verified by competitor audit.
+
+## 2026-05-06 - Build enablement uses local checks before extra agent tooling
+
+Decision: Add a local `npm run project:readiness` check and keep MotionQuest on existing Codex/Vercel/Playwright/browser tooling instead of installing third-party AI skill bundles or external codebase indexers now.
+
+Reason: A current autoskills dry-run detected relevant React, Next.js, Tailwind CSS, TypeScript, Playwright, Vercel and Node.js skills, but the active project is still a small client-only Next.js app with enough local tests and searchable structure. Extra installs would add supply-chain and maintenance surface without solving a current MotionQuest blocker.
+
+Rejected:
+- Installing all autoskills recommendations: includes broad Node/backend guidance that is not needed for the no-backend MVP.
+- Using external codebase-indexing services now: unnecessary for the current repository size and adds privacy/indexing policy review work.
+- Relying on documentation-only readiness: project structure, scripts, no-backend boundary and token hygiene now have an executable check.
+
+## 2026-05-07 - Phase 7 workflow rules are executable gates
+
+Decision: Treat Phase 7 handoff, secret handling, dependency scope, artifact ownership and verification rules as executable readiness contracts, not only prose.
+
+Reason: Future agents must be able to continue the project without rediscovering context or silently changing claims, sample data, camera behavior or evidence boundaries. `project-readiness` now checks required instruction contracts, dependency allowlists, release artifacts and token-like patterns.
+
+Rejected:
+- Depending only on markdown checklists: too easy to drift from the actual app and artifact package.
+- Adding CI/deployment services during the MVP without a current blocker: increases setup surface before final public submission work.
+- Treating automated browser tests as a substitute for physical webcam evidence: creates fake confidence for the main live-demo risk.
+
+## 2026-06-04 - Dependency security gates stay inside the client-only stack
+
+Decision: Update `next` and `eslint-config-next` from `16.2.4` to `16.2.7`, then refresh the lockfile with non-forced `npm audit fix`.
+
+Reason: `npm audit --audit-level=moderate` found high-severity Next.js advisories and one moderate transitive `brace-expansion` advisory. The fix keeps the existing allowed dependency surface, adds no backend/auth/database code, and restores the project dependency gate to 0 known moderate-or-higher audit vulnerabilities.
+
+Rejected:
+- Ignoring the audit failure: would violate the release verification contract.
+- Running `npm audit fix --force`: unnecessary after `16.2.7` was available and would risk larger dependency drift.
+- Adding new runtime packages to work around audit warnings: outside the no-backend, tightly scoped MVP dependency policy.
+- Deploying the updated package automatically: production redeploy is a public action and still needs explicit approval.

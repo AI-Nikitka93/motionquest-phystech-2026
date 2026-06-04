@@ -4,11 +4,13 @@
 
 ## T081 Screenshot Set
 
-Готовый набор для README / Devpost:
+Historical 2026-05-05 README / Devpost set:
 
 - `output/devpost-screenshots/01-home-desktop.png`
 - `output/devpost-screenshots/02-home-mobile.png`
 - `output/devpost-screenshots/03-safe-demo-report-desktop.png`
+
+2026-06-04 archive note: the two older public filenames `02-home-mobile.png` and `03-safe-demo-report-desktop.png` were superseded by the current numbered public screenshot set in `output/devpost-screenshots/README.md`. They are intentionally no longer treated as current Devpost assets because the app and public proof package changed after the seated hand-tracking and evidence-surface refresh.
 
 Исходные свежие скриншоты:
 

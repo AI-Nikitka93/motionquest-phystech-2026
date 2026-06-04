@@ -2,14 +2,15 @@
 
 Research date: 2026-05-04, Europe/Minsk  
 Mode: VISUAL DIRECTION + VISUAL HANDOFF  
-Product: MotionQuest, webcam exergame for older adults  
+Product: MotionQuest, adaptive home movement lab for older adults and seated/standing users
 Source of truth: `docs/mvp-plan.md`, WCAG contrast and target-size guidance, current visual scouting
+Design handoff contract: `DESIGN.md` is the root Stitch-ready visual contract for future AI design and frontend work.
 
 ## 1. Visual Direction Summary
 
-MotionQuest should feel like a warm, trustworthy movement game, not a medical dashboard. The visual language is "warm kinetic trust": large readable typography, high contrast, calm surfaces, clear action buttons, and a camera stage that makes the movement feel immediate and slightly magical.
+MotionQuest should feel like a warm, trustworthy movement lab, not a medical dashboard or toy camera game. The visual language is "warm kinetic trust": large readable typography, high contrast, calm surfaces, clear action buttons, and a camera stage that makes the movement feel immediate, inclusive, and explainable.
 
-The interface must be usable by people 65+ without hidden menus, tiny icons, low-contrast labels, or fast-changing visual clutter. The product should still feel modern through confident spacing, game-like feedback, large live counters, and a friendly skeleton overlay.
+The interface must be usable by people 65+ without hidden menus, tiny icons, low-contrast labels, or fast-changing visual clutter. The product should still feel modern through confident spacing, game-like feedback, large live counters, task-relevant tracking overlays, and a caregiver-readable report that feels like the primary outcome.
 
 ## 2. Inspiration Board
 
@@ -17,7 +18,7 @@ EVIDENCE:
 - WCAG contrast guidance supports 7:1 contrast for enhanced normal text and 4.5:1 as the minimum AA baseline for normal text. MotionQuest uses AAA-level pairs for primary text and buttons where practical.
 - WCAG target-size guidance supports large pointer targets; MotionQuest exceeds the common 44-48px target by using 56-64px primary controls.
 - Older-adult accessibility guidance consistently points toward larger text, clear interaction states, reduced cognitive load, and visible controls rather than hidden gestures.
-- Webcam fitness and pose-tracking interfaces work best when the camera is the central stage and the UI overlay is sparse: live timer, large counter, limited skeleton landmarks, and immediate success feedback.
+- Webcam fitness and landmark-tracking interfaces work best when the camera is the central stage and the UI overlay is sparse: live timer, large counter, task-relevant points, and immediate success feedback.
 
 INFERENCE:
 - For this MVP, the strongest visual wedge is not a dense dashboard. It is a camera-first stage with very few, very large controls and a report screen that translates movement into caregiver-readable outcomes.
@@ -133,41 +134,42 @@ States:
 
 ## 4. Screen Set
 
-### Screen 1: Calibration / Home
+### Screen 1: Home / Camera Setup
 
-Purpose: Get the participant safely framed before starting. This screen reduces demo risk and makes the webcam "magic" credible.
+Purpose: Let the participant choose a safe standing or seated path, then understand what the camera must see for that path. This screen reduces demo risk and makes the webcam observation boundary credible.
 
 Composition:
 - Warm full-screen background.
-- Header: MotionQuest title and one-line promise: "Two quick movement games. Camera-only. No account."
+- Header: MotionQuest title and one-line promise: "Webcam movement practice with a clear caregiver report."
 - Central camera preview, max width `960px`, aspect ratio `4:3` or `16:9` depending on webcam.
 - Overlay silhouette guide: soft teal outline with high-contrast frame boundary.
 - Right side on desktop / below camera on mobile: checklist panel.
 - Checklist items:
-  - Shoulders visible.
-  - Hips visible.
-  - Knees visible.
+  - Seated/reach path: one open hand visible.
+  - Standing path: shoulders, hips and knees visible.
   - Enough light.
-- Primary button: "Start Chair Stand", `64px` high.
-- Secondary button: "Use Demo Mode", visible but less prominent, for presentation fallback.
+  - Comfortable movement range.
+- Primary buttons: "Seated adaptive" and "I can stand safely", `56-64px` high.
+- Secondary button: "Safe demo", visible and explicitly labeled for presentation fallback.
 
 Visual rules:
-- The instruction must be the largest text after the title: "Stand so your shoulders, hips, and knees are visible."
-- If tracking confidence is low, show amber panel over camera bottom: "Move back a little."
+- The instruction must be the largest text after the title: "Choose the safest movement path, then keep the required hand or body signals visible."
+- If tracking confidence is low, show an amber panel over the camera bottom with the specific missing signal: hand, shoulders, hips, knees, lighting, or camera startup.
 - No hidden hamburger menu.
 
-### Screen 2: Chair Stand Game
+### Screen 2: Adaptive Chair Movement
 
-Purpose: Demonstrate validated 30-second chair stand scoring with immediate visual feedback.
+Purpose: Demonstrate a 30-second adaptive movement practice branch with immediate visual feedback: chair-stand-style practice when standing is safe, or seated hand movement when standing is not the right path.
 
 Composition:
 - Camera is the main stage and takes most of the viewport.
 - Top-left HUD: timer, huge `30`, then counts down.
-- Top-right HUD: tracking status chip: "Tracking" / "Move into frame".
+- Top-right HUD: tracking status chip: "Tracking" / "Need hand" / "Move into frame".
 - Bottom-left HUD: repetition counter, huge number, label "stands".
 - Bottom-right: pause/finish control, always visible, `56px+`.
-- Skeleton overlay centered on participant.
-- Short instruction banner before start: "Stand up fully, then sit down. We count one full cycle."
+- Standing branch overlay centers on the participant's task-relevant body frame.
+- Seated branch overlay draws only task-relevant hand points.
+- Short instruction banner before start: "Choose standing only if safe; seated mode counts visible hand raises."
 
 Feedback:
 - On counted rep:
@@ -176,7 +178,7 @@ Feedback:
   - skeleton line flashes from teal to success green;
   - chip says "Rep counted".
 - On uncertain rep:
-  - amber chip: "Almost there - stand a little taller";
+  - amber chip names the missing signal, e.g. "Raise one open hand" or "Keep hips and knees visible";
   - do not subtract points or show failure tone.
 
 Cut for clarity:
@@ -184,7 +186,7 @@ Cut for clarity:
 - Do not show charts during movement.
 - Do not draw all landmarks.
 
-### Screen 3: Reach Stars Game
+### Screen 3: Reach Stars
 
 Purpose: Make upper-body reach measurable and game-like without becoming childish.
 
@@ -195,7 +197,7 @@ Composition:
 - Stars appear in large target zones left/right/up, not at extreme edges.
 - Each target is at least `96px`, preferred `112-128px` on desktop.
 - Active target uses amber fill `#F6C85F`, dark outline, and a simple star shape.
-- Wrist keypoint is highlighted only when reach game is active.
+- Hand point is highlighted only when Reach Stars is active.
 
 Feedback:
 - Hit:
@@ -217,9 +219,9 @@ Purpose: Translate the game session into a caregiver-readable summary without pr
 
 Composition:
 - Warm background, no camera required.
-- Header: "Today's Movement Summary".
+- Header: "Caregiver Report".
 - Three metric panels:
-  - Chair Stand: repetitions in 30 seconds.
+  - Adaptive Movement: standing reps or seated hand reps in 30 seconds.
   - Reach Stars: hits and reachable zones.
   - Tracking Confidence: percentage or simple "High / Medium / Low".
 - Plain-language insight block:
@@ -236,7 +238,7 @@ Visual rules:
 
 ## 5. Camera Overlay Aesthetics
 
-Do not render MediaPipe as a raw developer skeleton. The user should see a friendly movement guide, not a diagnostic rig.
+Do not render MediaPipe as a raw developer skeleton. The user should see a friendly movement guide, not a diagnostic rig. Draw only what the selected activity can honestly observe.
 
 Landmarks to draw:
 - Chair Stand:
@@ -244,16 +246,18 @@ Landmarks to draw:
   - hips `23/24`;
   - knees `25/26`;
   - ankles `27/28`.
+- Seated Adaptive:
+  - visible hand point from Hand Landmarker / merged wrist signal only;
+  - no hip, knee or lower-body overlay.
 - Reach Stars:
-  - shoulders `11/12`;
-  - elbows `13/14` only while reaching;
-  - wrists `15/16`;
-  - hips `23/24` for torso stability.
+  - visible hand point from Hand Landmarker / merged wrist signal only;
+  - large target zone and dwell feedback.
 
 Landmarks not drawn by default:
 - Face mesh / all facial points.
 - Fingers / all 33 pose landmarks.
 - Small intermediate points that add noise without helping the task.
+- Lower-body landmarks in seated/reach paths.
 
 Line style:
 - Stroke: `8px` desktop, `6px` mobile.

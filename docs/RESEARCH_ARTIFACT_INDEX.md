@@ -31,7 +31,7 @@ Purpose: let judges trace public MotionQuest claims to real sources and safe cla
 - https://link.springer.com/article/10.1186/s12877-026-07544-1
 - https://link.springer.com/article/10.1186/s12877-026-07471-1
 - https://www.nature.com/articles/s41591-023-02739-0
-- https://pubmed.ncbi.nlm.nih.gov/37585611/
+- https://journals.sagepub.com/doi/10.1089/g4h.2022.0194
 - https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0306816
 - https://www.sciencedirect.com/science/article/pii/S0003687022000138
 
@@ -50,4 +50,3 @@ Every public research statement must avoid:
 - clinical validation;
 - official clinical score;
 - medical-grade accuracy.
-

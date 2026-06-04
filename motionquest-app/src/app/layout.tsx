@@ -8,8 +8,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MotionQuest",
-  description: "Camera-only exergame prototype for older-adult movement.",
+  title: "MotionQuest: Adaptive Home Movement Lab",
+  description:
+    "Webcam movement practice for older adults and seated users, ending in a caregiver-readable report.",
 };
 
 export default function RootLayout({

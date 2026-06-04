@@ -113,11 +113,11 @@ export function buildSession(draft: SessionDraft): MotionQuestSession {
       leftRightBalance: "balanced",
     },
     report: {
-      summary: buildSummary(validity),
+      summary: buildSummary(draft, validity),
       interpretation: buildInterpretation(draft, validity),
       nextDifficulty: "same",
       disclaimer:
-        "Research-inspired movement feedback, not a medical diagnosis.",
+        "General wellness practice note only. Not a diagnosis, clinical score, official medical record, fall-risk prediction or replacement for professional care.",
     },
   };
 }
@@ -165,9 +165,9 @@ export function buildDemoSession(): MotionQuestSession {
     report: {
       ...session.report,
       summary:
-        "Safe demo data loaded to show the report format when a live webcam is unavailable.",
+        "Sample session loaded to show the caregiver report format when a live webcam is unavailable.",
       disclaimer:
-        "Safe demo data only; use live camera results for real session feedback.",
+        "Sample session only - not live camera data. Personal practice note only; not a diagnosis, clinical score or official medical record.",
     },
   };
 }
@@ -182,15 +182,19 @@ function getSessionValidity(
 }
 
 function buildSummary(
+  draft: SessionDraft,
   validity: MotionQuestSession["trackingQuality"]["validity"],
 ) {
   if (validity === "not-valid-enough") {
-    return "The session did not capture enough body landmarks for a usable movement report.";
+    return "The camera did not capture enough usable movement data for a caregiver-readable practice note.";
   }
   if (validity === "limited") {
-    return "Completed both movement games, but tracking quality was low. Treat the report as limited practice feedback.";
+    return "Camera observation was limited. Treat the report as setup feedback before using the numbers.";
   }
-  return "Completed both functional movement games with browser-based pose tracking.";
+  if (draft.primaryMovement === "seated-arm-movement") {
+    return "Live seated session captured visible hand-based upper-body movement practice and Reach Stars interaction. No lower-body ability was interpreted.";
+  }
+  return "Live standing session captured chair-stand-style practice and Reach Stars interaction without treating the count as a clinical score.";
 }
 
 function buildInterpretation(
@@ -198,7 +202,7 @@ function buildInterpretation(
   validity: MotionQuestSession["trackingQuality"]["validity"],
 ) {
   if (validity === "not-valid-enough") {
-    return "No usable body tracking was detected. Repeat the setup with full-body visibility before using the numbers.";
+    return "The camera did not capture enough movement signal. Try a calmer setup before using the numbers; this is setup feedback, not a completed movement result.";
   }
 
   const reachRatio =
@@ -211,8 +215,8 @@ function buildInterpretation(
         ? `${draft.seatedArmReps} seated arm movement reps were recorded`
         : "no complete seated arm movement reps were recorded"
       : draft.chairReps > 0
-        ? `${draft.chairReps} chair-stand reps were recorded`
-        : "no complete chair-stand reps were recorded";
+        ? `${draft.chairReps} chair-stand-style practice reps were recorded`
+        : "no complete chair-stand-style practice reps were recorded";
   const reachSignal =
     draft.reachTargetsShown > 0
       ? `${draft.reachTargetsHit} of ${draft.reachTargetsShown} reach targets were hit`
@@ -228,7 +232,7 @@ function buildInterpretation(
       ? "reach interaction looked consistent"
       : "reach interaction may need easier target placement";
 
-  return `${movementSignal}, ${reachSignal}, and ${confidenceSignal}. ${reachMeaning}. Use this as session feedback, not diagnosis.`;
+  return `${movementSignal}, ${reachSignal}, and ${confidenceSignal}. ${reachMeaning}. Use this as personal practice feedback, not diagnosis, clinical scoring or formal mobility assessment.`;
 }
 
 function buildLimitations(
@@ -238,30 +242,44 @@ function buildLimitations(
 ) {
   const limitations = [
     "Results depend on camera angle, lighting, body visibility, and safe chair setup.",
+    "A close camera can crop shoulders, hands, hips or knees, so movement claims stay conservative.",
+    "A hand very near the lens can hide the body frame, so hits and reps may be incomplete.",
+    "Partial view limits interpretation to the movement signals that were actually visible.",
+    "Poor lighting or backlight can reduce landmark confidence and should trigger a calmer repeat setup.",
   ];
 
   if (!bodyLandmarksDetected) {
-    limitations.push("No body landmarks were detected during the session.");
+    limitations.push("The camera did not keep enough movement landmarks visible during the session.");
   }
   if (validity === "limited") {
     limitations.push("Tracking confidence was low, so movement counts may be incomplete.");
   }
   if (draft.primaryMovement === "seated-arm-movement") {
     limitations.push(
-      "Seated adaptive mode uses visible hand tracking and is not a clinical strength score.",
+      "Seated adaptive mode uses visible hand tracking only; lower-body ability is not interpreted.",
     );
   }
   if (draft.primaryMovement === "chair-stand" && draft.chairReps === 0) {
-    limitations.push("No complete chair-stand cycle was recorded.");
+    limitations.push("No complete chair-stand-style practice cycle was visible to the camera.");
+  }
+  if (draft.primaryMovement === "chair-stand") {
+    limitations.push(
+      "Standing mode is chair-stand-inspired practice feedback, not clinical scoring.",
+    );
   }
   if (
     draft.primaryMovement === "seated-arm-movement" &&
     draft.seatedArmReps === 0
   ) {
-    limitations.push("No complete seated arm movement cycle was recorded.");
+    limitations.push("No complete seated arm movement cycle was visible to the camera.");
   }
   if (draft.reachTargetsShown === 0 || draft.reachTargetsHit === 0) {
-    limitations.push("Reach target interaction was not strong enough to show consistent hits.");
+    limitations.push("Reach target interaction was not visible enough to show consistent hits.");
+  }
+  if (draft.reachTargetsShown > 0) {
+    limitations.push(
+      "Reach Stars describes reach engagement practice, not formal mobility assessment.",
+    );
   }
 
   return limitations;

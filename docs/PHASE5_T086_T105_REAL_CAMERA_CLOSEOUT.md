@@ -1,8 +1,8 @@
 # Phase 5 Real Camera Closeout Package
 
-Date: 2026-05-05  
+Date: 2026-05-06
 Production URL: https://motionquest-app.vercel.app  
-Latest deployment: `dpl_BcT6QQDRShkgSxosRLaS4CtE4W1o`
+Latest deployment: `dpl_Hj36ts53czQhjBHqUFpBTGwCEUY8`
 
 ## Status
 
@@ -16,6 +16,11 @@ capture surface needed to close them quickly after a real run.
 ## Implemented For This Closeout
 
 - Added `Copy live evidence` to every camera stage.
+- Added camera startup diagnostics to live evidence and the screen UI:
+  detected video inputs, each camera-start attempt, and active track settings
+  when frames arrive.
+- Added bounded camera-start attempts so the UI does not stay forever on
+  `Starting camera` when the browser detects a webcam but no frames arrive.
 - Evidence text includes timestamp, URL, stage, mode, camera state, pose
   confidence, body-frame usability, visible joint groups and current status.
 - Added body geometry validation so a close hand cannot pass as a usable body
@@ -31,7 +36,7 @@ capture surface needed to close them quickly after a real run.
 
 | TODO | Closure evidence required |
 |---|---|
-| T086 Home calibration | `home-calibration.png` plus copied evidence with `cameraActive: yes`, `bodyFrameUsable: yes`, no error. |
+| T086 Home calibration | `home-calibration.png` plus copied evidence with `cameraActive: yes`, `stageTrackingUsable: yes`, no error. |
 | T087 Standing branch | `chair-stand-tracking.png` plus copied evidence and visible rep change after sit-to-stand-return. |
 | T088 Reach Stars | `reach-stars-tracking.png` plus copied evidence and visible star hit after 0.5 sec wrist hold. |
 | T089 Working setup | `live-evidence.txt` must include distance, lighting and chair placement used in the successful run. |

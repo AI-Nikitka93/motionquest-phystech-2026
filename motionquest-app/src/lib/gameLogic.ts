@@ -54,6 +54,8 @@ export type ReachDwellInput = {
 
 export const LANDMARK_VISIBILITY_THRESHOLD = 0.55;
 export const REACH_TARGET_DWELL_MS = 500;
+const HAND_LANDMARK_COUNT = 21;
+const REACH_HAND_HIT_PADDING = 0.06;
 
 const REQUIRED_LANDMARKS: Record<PoseMode, number[]> = {
   calibration: [11, 12, 23, 24, 25, 26, 27, 28],
@@ -311,19 +313,26 @@ export function detectReachHit(
     return false;
   }
 
-  const wrists = [landmarks[15], landmarks[16]].filter(
+  const interactionPoints = [landmarks[15], landmarks[16]].filter(
     (point) => isVisibleLandmark(point),
   );
-  const left = target.x;
-  const right = target.x + target.size;
-  const top = target.y;
-  const bottom = target.y + target.size;
+  const targetCenter = {
+    x: (target.x + target.size / 2) / 100,
+    y: (target.y + target.size / 2) / 100,
+  };
+  const targetRadius = target.size / 200;
 
-  return wrists.some((wrist) => {
-    const x = wrist.x * 100;
-    const y = wrist.y * 100;
-    return x >= left && x <= right && y >= top && y <= bottom;
-  });
+  if (
+    interactionPoints.some(
+      (point) => distance(point, targetCenter) <= targetRadius,
+    )
+  ) {
+    return true;
+  }
+
+  return getHandLandmarkGroups(landmarks).some((group) =>
+    handAreaIntersectsTarget(group, targetCenter, targetRadius),
+  );
 }
 
 export function detectReachDwellHit({
@@ -382,6 +391,38 @@ function calculateWristLiftDelta(wrist: NormalizedLandmark | undefined) {
 
 function hasVisibleHand(landmarks: NormalizedLandmark[]) {
   return countVisibleLandmarks(landmarks, [15, 16], 0.42) >= 1;
+}
+
+function getHandLandmarkGroups(landmarks: NormalizedLandmark[]) {
+  const groups: NormalizedLandmark[][] = [];
+  for (let start = 33; start < landmarks.length; start += HAND_LANDMARK_COUNT) {
+    const group = landmarks
+      .slice(start, start + HAND_LANDMARK_COUNT)
+      .filter((point) => isVisibleLandmark(point, 0.2));
+    if (group.length >= 5) {
+      groups.push(group);
+    }
+  }
+  return groups;
+}
+
+function handAreaIntersectsTarget(
+  hand: NormalizedLandmark[],
+  targetCenter: { x: number; y: number },
+  targetRadius: number,
+) {
+  const bounds = {
+    left: Math.min(...hand.map((point) => point.x)) - REACH_HAND_HIT_PADDING,
+    right: Math.max(...hand.map((point) => point.x)) + REACH_HAND_HIT_PADDING,
+    top: Math.min(...hand.map((point) => point.y)) - REACH_HAND_HIT_PADDING,
+    bottom: Math.max(...hand.map((point) => point.y)) + REACH_HAND_HIT_PADDING,
+  };
+  const closest = {
+    x: Math.min(bounds.right, Math.max(bounds.left, targetCenter.x)),
+    y: Math.min(bounds.bottom, Math.max(bounds.top, targetCenter.y)),
+  };
+
+  return distance(closest, targetCenter) <= targetRadius;
 }
 
 function hasPlausibleArm(

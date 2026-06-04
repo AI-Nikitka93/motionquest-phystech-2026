@@ -23,6 +23,11 @@ type HandLandmarkerInstance = {
   ) => { landmarks?: NormalizedLandmark[][] };
 };
 
+type CameraAttempt = {
+  label: string;
+  constraints: MediaStreamConstraints;
+};
+
 const TASKS_VERSION = "0.10.35";
 const WASM_ROOT = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${TASKS_VERSION}/wasm`;
 const MODEL_URL =
@@ -70,6 +75,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
   const [status, setStatus] = useState("Camera not started");
   const [isReady, setIsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [cameraDiagnostics, setCameraDiagnostics] = useState<string[]>([]);
 
   const drawOverlay = useCallback(
     (points: NormalizedLandmark[]) => {
@@ -181,9 +187,51 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
   }, [drawOverlay, mode]);
 
   const startCamera = useCallback(async () => {
+    if (frameRef.current) {
+      window.cancelAnimationFrame(frameRef.current);
+      frameRef.current = null;
+    }
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    smoothedLandmarksRef.current = [];
+    missingFramesRef.current = 0;
+    setLandmarks([]);
+    drawOverlay([]);
+    setConfidence("low");
+    setIsReady(false);
+    setCameraDiagnostics([]);
+    setError(null);
+
     try {
-      setError(null);
+      setStatus("Starting camera");
+      const { stream, diagnostics } = await requestCameraStream();
+      streamRef.current = stream;
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+        await waitForVideoFrames(videoRef.current, diagnostics);
+      }
+
+      const videoSettings = stream.getVideoTracks()[0]?.getSettings();
+      setCameraDiagnostics([
+        ...diagnostics,
+        `active settings: ${formatTrackSettings(videoSettings)}`,
+      ]);
+      setIsReady(true);
       setStatus("Loading pose model");
+    } catch (cause) {
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      setError(formatCameraError(cause));
+      setStatus("Demo mode available");
+      if (isCameraStartError(cause)) {
+        setCameraDiagnostics(cause.diagnostics);
+      }
+      return;
+    }
+
+    try {
       const vision = await import("@mediapipe/tasks-vision");
       const filesetResolver = await vision.FilesetResolver.forVisionTasks(WASM_ROOT);
       try {
@@ -250,38 +298,19 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
         }
       }
     } catch {
+      streamRef.current?.getTracks().forEach((track) => track.stop());
+      streamRef.current = null;
+      setIsReady(false);
       setError(
         "Pose model could not load. Check internet connection, reload the page, or use safe demo data for the presentation fallback.",
       );
-      setStatus("Model loading failed");
+      setStatus("Pose model needs retry");
       return;
     }
 
-    try {
-      setStatus("Starting camera");
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {
-          width: { ideal: 1280 },
-          height: { ideal: 720 },
-          facingMode: "user",
-        },
-      });
-      streamRef.current = stream;
-
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-
-      setIsReady(true);
-      setStatus("Move into frame for body tracking");
-      frameRef.current = window.requestAnimationFrame(runFrameRef.current);
-    } catch (cause) {
-      setError(formatCameraError(cause));
-      setStatus("Demo mode available");
-    }
-  }, [mode]);
+    setStatus("Move into frame for body tracking");
+    frameRef.current = window.requestAnimationFrame(runFrameRef.current);
+  }, [drawOverlay, mode]);
 
   useEffect(() => {
     let autoStartTimer: number | null = null;
@@ -308,11 +337,121 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
     status,
     error,
     isReady,
+    cameraDiagnostics,
     startCamera,
   };
 }
 
-function mergeHandLandmarksIntoPose(
+class CameraStartError extends Error {
+  constructor(
+    message: string,
+    public diagnostics: string[],
+    public causeName: string,
+  ) {
+    super(message);
+    this.name = causeName;
+  }
+}
+
+async function requestCameraStream() {
+  const diagnostics: string[] = [];
+  const devices = await navigator.mediaDevices.enumerateDevices();
+  const videoInputs = devices.filter((device) => device.kind === "videoinput");
+  diagnostics.push(
+    `video inputs: ${
+      videoInputs.length > 0
+        ? videoInputs.map((device) => device.label || "unlabeled camera").join(", ")
+        : "none"
+    }`,
+  );
+
+  const attempts: CameraAttempt[] = [
+    {
+      label: "browser default camera",
+      constraints: {
+        audio: false,
+        video: true,
+      },
+    },
+    {
+      label: "presenter HD ideal",
+      constraints: {
+        audio: false,
+        video: {
+          width: { ideal: 1280 },
+          height: { ideal: 720 },
+          facingMode: { ideal: "user" },
+        },
+      },
+    },
+    {
+      label: "stable VGA fallback",
+      constraints: {
+        audio: false,
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          frameRate: { ideal: 15, max: 24 },
+          facingMode: { ideal: "user" },
+        },
+      },
+    },
+  ];
+
+  let lastError: unknown = null;
+  for (const attempt of attempts) {
+    try {
+      diagnostics.push(`attempt: ${attempt.label}`);
+      const stream = await navigator.mediaDevices.getUserMedia(attempt.constraints);
+      diagnostics.push(`attempt result: ${attempt.label} ok`);
+      return { stream, diagnostics };
+    } catch (cause) {
+      lastError = cause;
+      diagnostics.push(
+        `attempt result: ${attempt.label} failed: ${formatCauseName(cause)} ${
+          cause instanceof Error ? cause.message : ""
+        }`.trim(),
+      );
+    }
+  }
+
+  throw new CameraStartError(
+    lastError instanceof Error
+      ? lastError.message
+      : "Camera stream could not start.",
+    diagnostics,
+    formatCauseName(lastError),
+  );
+}
+
+function formatTrackSettings(settings: MediaTrackSettings | undefined) {
+  if (!settings) return "unknown";
+  const parts = [
+    settings.deviceId ? "deviceId=present" : null,
+    settings.width ? `width=${settings.width}` : null,
+    settings.height ? `height=${settings.height}` : null,
+    settings.frameRate ? `frameRate=${settings.frameRate}` : null,
+    settings.facingMode ? `facingMode=${settings.facingMode}` : null,
+  ].filter(Boolean);
+  return parts.length > 0 ? parts.join(", ") : "unknown";
+}
+
+function formatCauseName(cause: unknown) {
+  if (cause instanceof DOMException || cause instanceof Error) {
+    return cause.name;
+  }
+  return "UnknownError";
+}
+
+function isCameraStartError(cause: unknown): cause is CameraStartError {
+  return Boolean(
+    cause &&
+      typeof cause === "object" &&
+      Array.isArray((cause as { diagnostics?: unknown }).diagnostics),
+  );
+}
+
+export function mergeHandLandmarksIntoPose(
   poseLandmarks: NormalizedLandmark[],
   handLandmarks: NormalizedLandmark[][],
   mode: PoseMode,
@@ -321,11 +460,15 @@ function mergeHandLandmarksIntoPose(
     return poseLandmarks;
   }
 
-  const merged: NormalizedLandmark[] = Array.from({ length: Math.max(33, poseLandmarks.length) }, () => ({
-    x: 0,
-    y: 0,
-    visibility: 0,
-  }));
+  const merged: NormalizedLandmark[] = Array.from(
+    { length: Math.max(33, poseLandmarks.length) },
+    (_, index) =>
+      poseLandmarks[index] ?? {
+        x: 0,
+        y: 0,
+        visibility: 0,
+      },
+  );
 
   if (handLandmarks.length === 0) {
     return merged;
@@ -336,40 +479,134 @@ function mergeHandLandmarksIntoPose(
     if (!isVisibleLandmark(wrist, 0.2)) continue;
 
     const wristIndex = wrist.x < 0.5 ? 15 : 16;
+    const targetPoint = mode === "reach" ? palmCenter(hand) ?? wrist : wrist;
     merged[wristIndex] = {
-      x: wrist.x,
-      y: wrist.y,
-      z: wrist.z,
+      x: targetPoint.x,
+      y: targetPoint.y,
+      z: targetPoint.z,
       visibility: 0.96,
     };
+
+    if (mode === "reach") {
+      merged.push(
+        ...hand.map((point) => ({
+          x: point.x,
+          y: point.y,
+          z: point.z,
+          visibility: point.visibility ?? 1,
+        })),
+      );
+    }
   }
 
   return merged;
 }
 
+function palmCenter(hand: NormalizedLandmark[]) {
+  const palmPoints = [5, 9, 13, 17]
+    .map((index) => hand[index])
+    .filter((point) => isVisibleLandmark(point, 0.2));
+
+  if (palmPoints.length < 3) {
+    return null;
+  }
+
+  return {
+    x: palmPoints.reduce((sum, point) => sum + point.x, 0) / palmPoints.length,
+    y: palmPoints.reduce((sum, point) => sum + point.y, 0) / palmPoints.length,
+    z:
+      palmPoints.reduce((sum, point) => sum + (point.z ?? 0), 0) /
+      palmPoints.length,
+    visibility: Math.max(...palmPoints.map((point) => point.visibility ?? 1)),
+  };
+}
+
 function formatCameraError(cause: unknown) {
-  if (cause instanceof DOMException) {
-    if (cause.name === "NotAllowedError" || cause.name === "SecurityError") {
+  const causeName = formatCauseName(cause);
+  const causeMessage = cause instanceof Error ? cause.message : "";
+
+  if (cause instanceof DOMException || isCameraStartError(cause)) {
+    if (causeName === "NotAllowedError" || causeName === "SecurityError") {
       return "Camera permission is blocked. Allow camera access in the browser, keep the HTTPS page open, then press Start Camera Check again.";
     }
-    if (cause.name === "NotFoundError" || cause.name === "OverconstrainedError") {
+    if (causeName === "NotFoundError" || causeName === "OverconstrainedError") {
       return "No usable camera was found. Connect a webcam or use the labeled safe demo report until a real camera is available.";
     }
-    if (cause.name === "NotReadableError") {
+    if (causeName === "NotReadableError") {
       return "The camera is busy in another app. Close the other camera app, reload this page, then retry.";
+    }
+    if (causeName === "AbortError") {
+      return "The camera was found but the video source did not start. Close other camera tabs/apps, reconnect the webcam, then retry the camera check.";
+    }
+    if (causeName === "NotSupportedError") {
+      return "Browser camera runtime is not supported in this browser mode. Open the HTTPS page in a regular Chrome or Edge window, then retry Start Camera Check.";
     }
   }
 
   if (
-    cause instanceof Error &&
-    cause.message.toLowerCase().includes("not supported")
+    causeMessage.toLowerCase().includes("not supported")
   ) {
     return "No usable camera was found. Connect a webcam, enable browser camera support, or use the labeled safe demo report until a real camera is available.";
   }
 
-  return cause instanceof Error
-    ? cause.message
-    : "Camera failed. Check camera permission, lighting, and browser support.";
+  if (causeMessage.toLowerCase().includes("timeout starting video source")) {
+    return "The camera was found but the video source timed out before frames arrived. Close other camera tabs/apps, reconnect the webcam, then retry the camera check.";
+  }
+
+  return causeMessage
+    ? `${causeName}: ${causeMessage}`
+    : "Camera needs attention. Check camera permission, lighting, and browser support.";
+}
+
+function waitForVideoFrames(video: HTMLVideoElement, diagnostics: string[]) {
+  if (hasVideoFrame(video)) {
+    return Promise.resolve();
+  }
+
+  return new Promise<void>((resolve, reject) => {
+    let frameId: number | null = null;
+    const timeoutId = window.setTimeout(() => {
+      cleanup();
+      reject(
+        new CameraStartError(
+          "The camera was found but the video source timed out before frames arrived.",
+          [
+            ...diagnostics,
+            `video element: readyState=${video.readyState}, width=${video.videoWidth}, height=${video.videoHeight}`,
+          ],
+          "AbortError",
+        ),
+      );
+    }, 5000);
+
+    const cleanup = () => {
+      window.clearTimeout(timeoutId);
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId);
+      }
+      video.removeEventListener("loadeddata", check);
+      video.removeEventListener("playing", check);
+    };
+
+    const check = () => {
+      if (hasVideoFrame(video)) {
+        cleanup();
+        resolve();
+        return;
+      }
+      frameId = window.requestAnimationFrame(check);
+    };
+
+    video.addEventListener("loadeddata", check);
+    video.addEventListener("playing", check);
+    check();
+  });
+}
+
+function hasVideoFrame(video: HTMLVideoElement) {
+  return video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA &&
+    video.videoWidth > 0 &&
+    video.videoHeight > 0;
 }
 
 function drawLine(

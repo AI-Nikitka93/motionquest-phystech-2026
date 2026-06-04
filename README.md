@@ -5,7 +5,7 @@ MotionQuest is an accessible browser-based functional movement lab for older adu
 - Live app: https://motionquest-app.vercel.app
 - Public source package: https://github.com/AI-Nikitka93/motionquest-phystech-2026
 - Hackathon: [PhysTech 2026: Physical Activity and Technology Hack Day](https://phystech-2026.devpost.com/)
-- Verification date for contest rules: 2026-05-05
+- Verification date for contest rules: 2026-06-04
 
 ## Problem
 
@@ -16,7 +16,7 @@ Physical activity tools often assume that users can install apps, wear sensors, 
 MotionQuest runs entirely in the browser:
 
 1. The user chooses a safe movement branch.
-2. MediaPipe Pose estimates visible body landmarks locally.
+2. Browser MediaPipe Pose/Hand landmark tracking estimates only task-relevant visible signals locally.
 3. The app runs two short movement activities.
 4. The report explains reps, reach hits, tracking quality, limitations, and export text.
 
@@ -27,7 +27,7 @@ MotionQuest runs entirely in the browser:
 The first activity is no longer standing-only.
 
 - `standing` branch: counts visible sit-to-stand cycles when standing is safe.
-- `seated-adaptive` branch: counts seated arm movement cycles using visible shoulder-elbow-wrist angles.
+- `seated-adaptive` branch: counts seated hand movement cycles when at least one open hand is visible.
 
 This keeps the project inclusive without adding a third game or requiring custom hardware.
 
@@ -40,9 +40,9 @@ The user reaches toward large targets. A hit counts only when a visible wrist st
 Open the live app at https://motionquest-app.vercel.app and check:
 
 1. Home explains the physical-activity problem, method, privacy boundary, and judging story.
-2. `I will stay seated` starts the seated-adaptive path.
+2. `Seated adaptive` starts the seated hand-movement path.
 3. `I can stand safely` starts the standing path.
-4. `Use Safe Demo Data` opens a clearly labeled fallback report when camera conditions fail.
+4. `Safe demo` opens a clearly labeled fallback report when camera conditions fail.
 5. The Caregiver Report labels source, session mode, primary movement, tracking confidence, limitations, and export text.
 
 ## Privacy
@@ -78,7 +78,7 @@ It does not:
 | Criterion | MotionQuest Fit |
 |---|---|
 | Impact | Supports low-friction movement practice for older adults, caregivers, and seated users without wearables or accounts. |
-| Creativity | Turns browser pose landmarks into an adaptive movement lab, not a generic fitness tracker or leaderboard. |
+| Creativity | Turns browser pose and hand landmark signals into an adaptive movement lab, not a generic fitness tracker or leaderboard. |
 | Presentation | Provides a 90-second judge walkthrough, safe fallback report, exportable artifact, and clear claim boundaries. |
 
 ## Award Fit
@@ -101,11 +101,16 @@ npm run dev -- --port 3001
 
 ```bash
 cd motionquest-app
+npm run project:readiness
 npm run lint
 npm test
 npm run build
-npm run test:e2e
+npm audit --audit-level=moderate
+E2E_APP_URL=http://localhost:3013 npm run test:e2e
+npm run project:final-audit -- --public-smoke
 ```
+
+Current final audit boundary: the local package can be `GO`, but final public submission remains `NO-GO` until final deploy/push, Devpost submission, presentation registration, final clean-browser public-link proof and real camera evidence exist.
 
 ## Key Artifacts
 

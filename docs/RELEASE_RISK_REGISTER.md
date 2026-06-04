@@ -14,3 +14,7 @@ Date: 2026-05-05
 | Medical overclaim | High | Presenter | Use scripted language and visible limitations. | Copy prepared. |
 | Public package missing actual outcome | High | Engineer | Publish source/storage link and verify from clean session. | Pending GitHub publication/verification. |
 | Presentation overruns 10 minutes | Medium | Presenter | Use 7-minute story + 3-minute Q&A script. | Script prepared; rehearsal pending. |
+| Public app link fails during verification | High | Presenter/Engineer | Restore app if approved; otherwise provide public source package, screenshot set and backup video through official channel. | Recovery protocol prepared in `docs/FINAL_SUBMISSION_CHECKLIST.md`. |
+| Discord schedule or Zoom link missed | High | Presenter | Check Discord morning EDT on June 28 and again before presentation slot. | Day-of checklist prepared. |
+| Support question exposes product gap | Medium | Presenter | Log the exact question, answer conservatively, and classify it for post-contest work. | Continuity templates prepared. |
+| Future feature creates medical overclaim | High | Engineer/Presenter | Apply long-term claim review and decision filter before changing copy or scope. | Governance prepared in `docs/POST_CONTEST_CONTINUITY.md`. |

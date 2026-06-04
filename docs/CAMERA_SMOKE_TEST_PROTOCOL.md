@@ -17,7 +17,7 @@ Each camera stage now has a `Copy live evidence` button. Press it after every
 stage and paste the text into `live-evidence.txt`. A pass requires:
 
 - `cameraActive: yes`
-- `bodyFrameUsable: yes`
+- `stageTrackingUsable: yes`
 - expected joint groups listed as `visible`
 - no camera/model error
 
@@ -78,7 +78,7 @@ reps:
 
 T093 can close only if Reach Stars passes these checks:
 
-- no hit is counted while `bodyFrameUsable: no`;
+- no hit is counted while `stageTrackingUsable: no`;
 - a wrist inside a target for less than 0.5 sec does not count;
 - a wrist held in the target for at least 0.5 sec counts once;
 - the next target appears after a valid hit.

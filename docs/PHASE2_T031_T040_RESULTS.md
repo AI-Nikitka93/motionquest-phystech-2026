@@ -87,7 +87,7 @@ Footer disclaimer:
 | AI exercise for healthy ageing | A 2026 scoping review maps AI exercise tools for older adults and highlights sensing, tracking, feedback and personalization. | https://link.springer.com/article/10.1186/s12877-026-07544-1 |
 | Exergames and balance | A 2026 systematic review/meta-analysis reports balance-related signals for exergame training in older-adult care settings, with low-certainty caveats. | https://link.springer.com/article/10.1186/s12877-026-07471-1 |
 | Step exergame RCT | A 2024 Nature Medicine randomized trial provides broader evidence that exergame-style movement training can matter for older adults. | https://www.nature.com/articles/s41591-023-02739-0 |
-| Chair-stand inspiration | A 2023 Games for Health Journal RCT used the 30-second chair stand in functional performance evaluation for older adults. | https://pubmed.ncbi.nlm.nih.gov/37585611/ |
+| Chair-stand inspiration | A 2023 Games for Health Journal RCT used the 30-second chair stand in functional performance evaluation for older adults. | https://journals.sagepub.com/doi/10.1089/g4h.2022.0194 |
 | Home exergame usability | A 2024 PLOS ONE review supports immediate feedback, challenge, usability and engagement as home-based exergame design primitives. | https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0306816 |
 
 UI rule:

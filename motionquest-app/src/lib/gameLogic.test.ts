@@ -49,7 +49,7 @@ test("detectChairStandTransition counts one full seated to standing to seated cy
   assert.equal(phase, "seated");
 });
 
-test("detectReachHit returns true when either wrist enters the star target box", () => {
+test("detectReachHit returns true when either hand interaction point enters the star target", () => {
   const target: StarTarget = {
     id: "left",
     label: "Left",
@@ -63,6 +63,48 @@ test("detectReachHit returns true when either wrist enters the star target box",
   landmarks[15] = landmark(0.22, 0.48, 0.96);
 
   assert.equal(detectReachHit(landmarks, target), true);
+});
+
+test("detectReachHit accepts target overlap with visible hand area", () => {
+  const target: StarTarget = {
+    id: "palm-overlap",
+    label: "Palm overlap",
+    x: 10,
+    y: 24,
+    size: 15,
+    shownAt: 0,
+  };
+
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
+  landmarks[15] = landmark(0.34, 0.14, 0.96);
+  const handArea = Array.from({ length: 21 }, (_, index) => {
+    const column = index % 4;
+    const row = Math.floor(index / 4);
+    return landmark(0.16 + column * 0.07, 0.18 + row * 0.08, 0.92);
+  });
+
+  assert.equal(detectReachHit([...landmarks, ...handArea], target), true);
+});
+
+test("detectReachHit rejects hand area away from the target", () => {
+  const target: StarTarget = {
+    id: "miss",
+    label: "Miss",
+    x: 10,
+    y: 24,
+    size: 15,
+    shownAt: 0,
+  };
+
+  const landmarks = Array.from({ length: 33 }, () => landmark(0.5, 0.5, 0.02));
+  landmarks[15] = landmark(0.72, 0.72, 0.96);
+  const handArea = Array.from({ length: 21 }, (_, index) => {
+    const column = index % 4;
+    const row = Math.floor(index / 4);
+    return landmark(0.66 + column * 0.04, 0.62 + row * 0.04, 0.92);
+  });
+
+  assert.equal(detectReachHit([...landmarks, ...handArea], target), false);
 });
 
 test("getPoseConfidence returns low when required landmarks are missing", () => {
@@ -143,7 +185,7 @@ test("buildSession marks sessions without landmarks as not valid enough", () => 
   });
 
   assert.equal(session.trackingQuality.validity, "not-valid-enough");
-  assert.match(session.report.interpretation, /No usable body tracking/);
+  assert.match(session.report.interpretation, /camera did not capture enough movement signal/i);
 });
 
 test("buildSession labels seated adaptive movement without pretending chair stand was required", () => {
@@ -167,12 +209,54 @@ test("buildSession labels seated adaptive movement without pretending chair stan
   assert.doesNotMatch(session.report.interpretation, /chair-stand reps/);
 });
 
+test("buildSession writes caregiver copy for valid standing sessions", () => {
+  const session = buildSession({
+    sessionMode: "standing",
+    primaryMovement: "chair-stand",
+    chairReps: 6,
+    seatedArmReps: 0,
+    chairDurationSec: 30,
+    reachTargetsShown: 5,
+    reachTargetsHit: 4,
+    reachReactionTimes: [700, 760, 810, 790],
+    poseConfidence: "high",
+    bodyLandmarksDetected: true,
+  });
+
+  assert.match(session.report.summary, /Live standing session/);
+  assert.match(session.report.interpretation, /6 chair-stand-style practice reps/);
+  assert.match(session.report.disclaimer, /Not a diagnosis/);
+  assert.equal(session.trackingQuality.validity, "valid");
+});
+
+test("buildSession writes caregiver copy for limited-confidence sessions", () => {
+  const session = buildSession({
+    sessionMode: "standing",
+    primaryMovement: "chair-stand",
+    chairReps: 2,
+    seatedArmReps: 0,
+    chairDurationSec: 30,
+    reachTargetsShown: 3,
+    reachTargetsHit: 1,
+    reachReactionTimes: [1200],
+    poseConfidence: "low",
+    bodyLandmarksDetected: true,
+  });
+
+  assert.equal(session.trackingQuality.validity, "limited");
+  assert.match(session.report.summary, /Camera observation was limited/);
+  assert.match(session.trackingQuality.limitations.join(" "), /may be incomplete/);
+  assert.match(session.trackingQuality.limitations.join(" "), /close camera/i);
+  assert.match(session.trackingQuality.limitations.join(" "), /Poor lighting/i);
+});
+
 test("buildDemoSession labels fallback data explicitly", () => {
   const session = buildDemoSession();
 
   assert.equal(session.source, "safe-demo");
   assert.equal(session.trackingQuality.validity, "valid");
-  assert.match(session.report.disclaimer, /Safe demo data only/);
+  assert.match(session.report.summary, /Sample session loaded/);
+  assert.match(session.report.disclaimer, /not live camera data/);
 });
 
 test("classifyPoseReadiness accepts seated hand tracking without visible knees", () => {
@@ -229,7 +313,7 @@ test("getVisibleWristLiftDeltas reads a raised hand as positive lift without sho
   assert.equal(getVisibleWristLiftDeltas(landmarks)[0]?.toFixed(2), "0.43");
 });
 
-test("detectReachDwellHit requires the wrist to stay inside the target for 500ms", () => {
+test("detectReachDwellHit requires the hand to stay inside the target for 500ms", () => {
   const target: StarTarget = {
     id: "safe-left",
     label: "Left",

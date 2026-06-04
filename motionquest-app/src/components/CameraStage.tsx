@@ -4,6 +4,13 @@ import type { ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { usePoseTracking } from "@/hooks/usePoseTracking";
 import {
+  cameraRecoveryContent,
+  classifyCameraIssue,
+  isPreparingStatus,
+  partialVisibilityMessage,
+} from "@/lib/cameraRecovery";
+import { cameraSetupGuidance } from "@/lib/visualSystem";
+import {
   countVisibleLandmarks,
   hasUsablePose,
   isVisibleLandmark,
@@ -17,7 +24,7 @@ const DIAGNOSTIC_VISIBILITY_THRESHOLD = 0.3;
 export type CameraStageRenderProps = ReturnType<typeof usePoseTracking>;
 export type CameraTrackingData = Pick<
   CameraStageRenderProps,
-  "landmarks" | "confidence" | "status" | "error" | "isReady"
+  "landmarks" | "confidence" | "status" | "error" | "isReady" | "cameraDiagnostics"
 >;
 
 export function CameraStage({
@@ -41,6 +48,7 @@ export function CameraStage({
     status,
     error,
     isReady,
+    cameraDiagnostics,
     startCamera,
   } = usePoseTracking(mode, autoStart);
   const trackingData: CameraTrackingData = {
@@ -49,8 +57,11 @@ export function CameraStage({
     status,
     error,
     isReady,
+    cameraDiagnostics,
   };
   const poseUsable = hasUsablePose(landmarks, mode);
+  const recovery = cameraRecoveryContent(error);
+  const cameraIssue = classifyCameraIssue(error);
   const [copyStatus, setCopyStatus] = useState("Copy live evidence");
   const evidenceText = useMemo(
     () =>
@@ -63,8 +74,19 @@ export function CameraStage({
         isReady,
         poseUsable,
         landmarks,
+        cameraDiagnostics,
       }),
-    [confidence, error, isReady, landmarks, mode, poseUsable, status, title],
+    [
+      cameraDiagnostics,
+      confidence,
+      error,
+      isReady,
+      landmarks,
+      mode,
+      poseUsable,
+      status,
+      title,
+    ],
   );
 
   const copyEvidence = async () => {
@@ -79,7 +101,7 @@ export function CameraStage({
   };
 
   return (
-    <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
+    <section className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(280px,360px)]">
       <div className="relative overflow-hidden rounded-2xl border-4 border-[#075E54] bg-[#071B17] shadow-camera">
         <video
           ref={videoRef}
@@ -115,6 +137,29 @@ export function CameraStage({
           This stage verifies camera readiness and tracking model
           status before the report treats the session as usable practice data.
         </p>
+        <div className="mt-5 rounded-lg bg-[#FFF8E7] p-4">
+          <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+            Human setup guidance
+          </p>
+          <ul className="mt-3 space-y-2 text-base font-bold leading-relaxed text-[#394B45]">
+            {cameraSetupGuidance.map((item) => (
+              <li key={item}>{item}</li>
+            ))}
+          </ul>
+        </div>
+        {isPreparingStatus(status) && !error ? (
+          <div
+            className="mt-5 rounded-lg border-2 border-[#075E54] bg-[#D8F3DC] p-4"
+            role="status"
+            aria-live="polite"
+          >
+            <p className="text-xl font-black">Preparing camera check</p>
+            <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+              MotionQuest is loading the camera/model path. The page is still
+              working; keep this tab open and wait for the readiness result.
+            </p>
+          </div>
+        ) : null}
         <div className="mt-5 space-y-4 text-xl leading-relaxed">
           <StageStatusItem tone={poseUsable ? "success" : "warning"}>
             {mode === "seated"
@@ -141,15 +186,31 @@ export function CameraStage({
         <JointVisibilityPanel mode={mode} landmarks={landmarks} />
         {error ? (
           <div className="mt-6 rounded-lg bg-[#8A1C1C] p-4 text-base font-bold leading-relaxed text-white">
-            <p className="text-xl font-black">{recoveryTitle(error)}</p>
-            <p className="mt-2">{error}</p>
+            <p className="text-xl font-black">{recovery.title}</p>
+            <p className="mt-2">{recovery.explanation}</p>
+            <p className="mt-3 rounded-lg bg-white/15 p-3">
+              {recovery.reassurance}
+            </p>
             <ul className="mt-3 list-inside list-disc space-y-1">
-              {recoverySteps(error).map((step) => (
+              {recovery.steps.map((step) => (
                 <li key={step}>{step}</li>
               ))}
             </ul>
           </div>
         ) : null}
+        {cameraDiagnostics.length > 0 ? (
+          <div className="mt-5 rounded-lg border-2 border-[#F6C85F] bg-[#FFF8E7] p-4">
+            <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+              Camera diagnostics
+            </p>
+            <ul className="mt-3 space-y-2 text-base font-bold leading-relaxed text-[#394B45]">
+              {cameraDiagnostics.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+        {cameraIssue === "no-camera" ? <NoCameraProductPath /> : null}
         {!isReady ? (
           <button
             type="button"
@@ -178,48 +239,6 @@ export function CameraStage({
       </aside>
     </section>
   );
-}
-
-function recoveryTitle(error: string) {
-  if (error.includes("Pose model could not load")) {
-    return "Pose model loading failed";
-  }
-  if (error.includes("permission is blocked")) {
-    return "Camera permission blocked";
-  }
-  if (error.includes("No usable camera")) {
-    return "Camera not found";
-  }
-  return "Camera issue";
-}
-
-function recoverySteps(error: string) {
-  if (error.includes("Pose model could not load")) {
-    return [
-      "Check internet connection.",
-      "Reload the HTTPS page.",
-      "Use labeled safe demo data if the stage network blocks model files.",
-    ];
-  }
-  if (error.includes("permission is blocked")) {
-    return [
-      "Click the browser camera icon and allow access.",
-      "Keep using the HTTPS production URL.",
-      "Press Start Camera Check again after permission changes.",
-    ];
-  }
-  if (error.includes("No usable camera")) {
-    return [
-      "Connect a webcam or enable the built-in camera.",
-      "Close privacy shutters or OS camera blockers.",
-      "Use safe demo data only as a clearly labeled fallback.",
-    ];
-  }
-  return [
-    "Close other apps using the camera.",
-    "Improve lighting and reload the page.",
-    "Use safe demo data only as a clearly labeled fallback.",
-  ];
 }
 
 const JOINT_GROUPS: Record<
@@ -304,11 +323,20 @@ function JointVisibilityPanel({
   landmarks: NormalizedLandmark[];
 }) {
   const requiredGroups = JOINT_GROUPS[mode];
+  const groupStates = requiredGroups.map((group) => ({
+    ...group,
+    visible: isGroupVisible(group, landmarks),
+  }));
+  const missingLabels = groupStates
+    .filter((group) => !group.visible)
+    .map((group) => group.label);
+  const hasAnyVisible = groupStates.some((group) => group.visible);
+  const hasPartialVisibility = hasAnyVisible && missingLabels.length > 0;
   const allVisible =
     mode === "reach" || mode === "seated"
-      ? requiredGroups.some((group) => isGroupVisible(group, landmarks))
+      ? groupStates.some((group) => group.visible)
       : requiredGroups.length > 0 &&
-        requiredGroups.every((group) => isGroupVisible(group, landmarks));
+        groupStates.every((group) => group.visible);
   const poseUsable = hasUsablePose(landmarks, mode);
 
   return (
@@ -336,9 +364,17 @@ function JointVisibilityPanel({
                 : "Show every required joint before treating the session as usable."}
         </p>
       </div>
+      {hasPartialVisibility ? (
+        <div className="mt-3 rounded-lg border-2 border-[#F6C85F] bg-white p-4">
+          <p className="text-lg font-black">Partial visibility</p>
+          <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+            {partialVisibilityMessage(missingLabels)}
+          </p>
+        </div>
+      ) : null}
       <div className="mt-3 grid gap-3">
-        {requiredGroups.map((group) => {
-          const visible = isGroupVisible(group, landmarks);
+        {groupStates.map((group) => {
+          const visible = group.visible;
           return (
             <div
               key={group.label}
@@ -371,6 +407,19 @@ function JointVisibilityPanel({
   );
 }
 
+function NoCameraProductPath() {
+  return (
+    <div className="mt-5 rounded-lg border-2 border-[#075E54] bg-[#FFF8E7] p-4">
+      <p className="text-xl font-black">No camera is not a dead end</p>
+      <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+        The home screen still shows the product promise, research boundary,
+        privacy layer and safe demo report. The fallback remains labeled so
+        judges can inspect the full flow without confusing it with live data.
+      </p>
+    </div>
+  );
+}
+
 function isGroupVisible(
   group: { indexes: number[] },
   landmarks: NormalizedLandmark[],
@@ -390,6 +439,7 @@ function buildCameraEvidenceText({
   isReady,
   poseUsable,
   landmarks,
+  cameraDiagnostics,
 }: {
   mode: PoseMode;
   title: string;
@@ -399,6 +449,7 @@ function buildCameraEvidenceText({
   isReady: boolean;
   poseUsable: boolean;
   landmarks: NormalizedLandmark[];
+  cameraDiagnostics: string[];
 }) {
   const groups = JOINT_GROUPS[mode].map((group) => {
     const visible = group.indexes.every((index) =>
@@ -425,6 +476,9 @@ function buildCameraEvidenceText({
     `error: ${error ?? "none"}`,
     `visibleKeypoints: ${visibleKeypoints}`,
     `jointGroups: ${groups.join("; ")}`,
+    `cameraDiagnostics: ${
+      cameraDiagnostics.length > 0 ? cameraDiagnostics.join(" | ") : "none"
+    }`,
     "setupTarget: seated/reach modes need one visible open hand; standing mode needs shoulders/hips/knees",
   ].join("\n");
 }
@@ -473,7 +527,10 @@ function confidenceLabel(
 ) {
   if (confidence === "high") return "Tracking: High";
   if (confidence === "medium") return "Tracking: Medium";
-  if (mode === "seated" || mode === "reach") return status;
+  if (mode === "seated" || mode === "reach") {
+    if (/stable|visible/i.test(status)) return "Tracking: Hand visible";
+    return "Tracking: Need hand";
+  }
   return "Move into frame";
 }
 
