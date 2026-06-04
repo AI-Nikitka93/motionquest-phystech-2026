@@ -5,6 +5,7 @@ import { join, resolve } from "node:path";
 const appRoot = resolve(process.cwd());
 const projectRoot = resolve(appRoot, "..");
 const args = new Set(process.argv.slice(2));
+const publicSmokeDryRun = args.has("--public-smoke-dry-run");
 
 const checks = [];
 const problems = [];
@@ -119,6 +120,34 @@ const publicPackagePathspecs = [
   "docs",
   "motionquest-app",
   "output",
+];
+
+const publicSmokeSpecs = [
+  {
+    name: "production_app",
+    url: "https://motionquest-app.vercel.app",
+    expected: ["MotionQuest", "Adaptive Home Movement Lab", "Safe demo"],
+  },
+  {
+    name: "public_source",
+    url: "https://github.com/AI-Nikitka93/motionquest-phystech-2026",
+    expected: ["motionquest-phystech-2026"],
+  },
+  {
+    name: "raw_readme",
+    url: "https://raw.githubusercontent.com/AI-Nikitka93/motionquest-phystech-2026/master/README.md",
+    expected: ["MotionQuest", "Adaptive Home Movement Lab", "caregiver-readable"],
+  },
+  {
+    name: "devpost",
+    url: "https://phystech-2026.devpost.com/",
+    expected: ["Physical Activity and Technology Hack Day"],
+  },
+  {
+    name: "binnovative",
+    url: "https://binnovative-boston.github.io/phystech/2026.html",
+    expected: ["PhysTech 2026"],
+  },
 ];
 
 const todoText = readProjectFile("docs/MOTIONQUEST_FULL_RELEASE_MASTER_TODO_2026_05_06.md");
@@ -243,6 +272,13 @@ check("real_camera", "real-camera screenshots are plausible image files", realCa
 check("real_camera", "live-evidence.txt contains cameraActive/stageTrackingUsable/error proof", hasLiveCameraEvidence("evidence/camera-smoke/live-evidence.txt"));
 
 const publicSmokeResults = args.has("--public-smoke") ? await runPublicSmoke() : [];
+if (args.has("--public-smoke")) {
+  check(
+    "public_publication",
+    "public smoke content matches expected current public surfaces",
+    publicSmokeResults.every((result) => result.status >= 200 && result.status < 400 && result.contentOk),
+  );
+}
 
 const decisions = {
   local_package: decide("local_package"),
@@ -387,23 +423,25 @@ function hasTaskStatus(text, task, status) {
 }
 
 async function runPublicSmoke() {
-  const urls = [
-    ["production_app", "https://motionquest-app.vercel.app"],
-    ["public_source", "https://github.com/AI-Nikitka93/motionquest-phystech-2026"],
-    ["raw_readme", "https://raw.githubusercontent.com/AI-Nikitka93/motionquest-phystech-2026/master/README.md"],
-    ["devpost", "https://phystech-2026.devpost.com/"],
-    ["binnovative", "https://binnovative-boston.github.io/phystech/2026.html"],
-  ];
   const results = [];
-  for (const [name, url] of urls) {
+  for (const spec of publicSmokeSpecs) {
     let timeout;
     try {
       const controller = new AbortController();
       timeout = setTimeout(() => controller.abort(), 20_000);
-      const response = await fetch(url, { signal: controller.signal });
-      results.push({ name, url, status: response.status });
+      const response = await fetch(spec.url, { signal: controller.signal });
+      const text = await response.text();
+      const normalizedText = text.toLowerCase();
+      const missing = spec.expected.filter((snippet) => !normalizedText.includes(snippet.toLowerCase()));
+      results.push({
+        name: spec.name,
+        url: spec.url,
+        status: response.status,
+        contentOk: missing.length === 0,
+        missing,
+      });
     } catch (error) {
-      results.push({ name, url, error: String(error) });
+      results.push({ name: spec.name, url: spec.url, error: String(error), contentOk: false, missing: spec.expected });
     } finally {
       clearTimeout(timeout);
     }
@@ -430,8 +468,15 @@ function printAudit(decisions, publicSmokeResults) {
   if (publicSmokeResults.length > 0) {
     console.log("public_smoke:");
     for (const result of publicSmokeResults) {
-      const status = result.error ? result.error : `HTTP ${result.status}`;
+      const content = result.contentOk ? "; content OK" : `; content MISSING: ${(result.missing ?? []).join(", ")}`;
+      const status = result.error ? result.error : `HTTP ${result.status}${content}`;
       console.log(`- ${result.name}: ${status}`);
+    }
+  }
+  if (publicSmokeDryRun) {
+    console.log("public_smoke_requirements:");
+    for (const spec of publicSmokeSpecs) {
+      console.log(`- ${spec.name} requires: ${spec.expected.join("; ")}`);
     }
   }
 }

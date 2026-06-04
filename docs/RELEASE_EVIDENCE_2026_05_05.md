@@ -589,6 +589,25 @@ Post-commit publication audit:
 | Public HTTP smoke | Production app, public source, raw README, Devpost and Binnovative returned HTTP 200. |
 | Final submission | `NO-GO` until final push/deploy, clean-browser public proof, Devpost submission, presentation registration and real-camera evidence exist. |
 
+## Content-Aware Public Smoke Gate
+
+2026-06-04 12:52 update:
+
+- Added a TDD-covered public-smoke requirements path: `node scripts/final-submission-audit.mjs --public-smoke-dry-run`.
+- `npm run project:final-audit -- --public-smoke` now checks expected text content, not only HTTP status, for the production app, GitHub source page, raw README, Devpost page and Binnovative page.
+- Root `README.md` now starts with the final public title `MotionQuest: Adaptive Home Movement Lab — PhysTech 2026`, so raw README can pass the current-title content gate after the release-candidate commit is pushed.
+- Current public smoke correctly reports content mismatch before push/deploy: production app and raw README return HTTP 200 but still miss `Adaptive Home Movement Lab` in the public content. This keeps `public_publication` at `NO-GO` until the release candidate is pushed/deployed and rechecked.
+
+Current public-smoke content expectations:
+
+| Surface | Required content snippets |
+|---|---|
+| Production app | `MotionQuest`, `Adaptive Home Movement Lab`, `Safe demo` |
+| Public source | `motionquest-phystech-2026` |
+| Raw README | `MotionQuest`, `Adaptive Home Movement Lab`, `caregiver-readable` |
+| Devpost | `Physical Activity and Technology Hack Day` |
+| Binnovative | `PhysTech 2026` |
+
 ## Honest Open Blockers
 
 These tasks are not closed because they need physical, public-action or future evidence:

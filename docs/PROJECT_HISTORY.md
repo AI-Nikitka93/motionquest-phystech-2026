@@ -809,3 +809,12 @@
 Локальный account context: без изменений.
 Локальная карта секретов: без изменений.
 Следующий шаг: with explicit approval, push/deploy the release-candidate commit, rerun clean-browser public proof, then collect Devpost/registration and real-camera evidence.
+
+Дата и время: 2026-06-04 12:52
+Роль: Final Submission Audit Gate / Content-Aware Public Smoke
+Сделано: strengthened `--public-smoke` so it validates expected public text content instead of treating HTTP 200 alone as enough. Added a TDD-covered `--public-smoke-dry-run` requirements output and updated root README title to the final `MotionQuest: Adaptive Home Movement Lab — PhysTech 2026` wording for raw README verification after push.
+Изменены файлы: `README.md`, `motionquest-app/scripts/final-submission-audit.mjs`, `motionquest-app/src/lib/finalSubmissionAuditOutput.test.ts`, `docs/STATE.md`, `docs/RELEASE_EVIDENCE_2026_05_05.md`, `docs/PROJECT_HISTORY.md`.
+Результат/доказательство: RED was confirmed first: `npm test` failed because the audit did not print `public_smoke_requirements`. After implementation, `npm test` passed 35/35. `npm run project:final-audit -- --public-smoke` now reports `public smoke content matches expected current public surfaces` as missing while the release candidate is not pushed/deployed; production app and raw README return HTTP 200 but miss `Adaptive Home Movement Lab`, while public source, Devpost and Binnovative content checks pass. This is the intended stricter `NO-GO` before final publication.
+Локальный account context: без изменений.
+Локальная карта секретов: без изменений.
+Следующий шаг: verify and commit this content-smoke hardening locally; final public publication still requires explicit push/deploy and proof capture.

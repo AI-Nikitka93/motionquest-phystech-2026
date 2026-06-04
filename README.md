@@ -1,4 +1,4 @@
-# MotionQuest — PhysTech 2026
+# MotionQuest: Adaptive Home Movement Lab — PhysTech 2026
 
 MotionQuest is an accessible browser-based functional movement lab for older adults and seated/standing users. It turns a normal webcam into two short evidence-aligned movement activities and a caregiver-readable report.
 
