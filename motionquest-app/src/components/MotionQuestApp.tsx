@@ -13,6 +13,7 @@ import {
   getVisibleWristLiftDeltas,
   getPoseConfidence,
   hasUsablePose,
+  resetInitialTimerWhenTrackingLost,
   type ChairStandPhase,
   type PoseConfidence,
   type SeatedArmPhase,
@@ -567,9 +568,15 @@ function SeatedArmHud({
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      if (hasUsableSeatedPose) {
-        setSecondsLeft((value) => Math.max(0, value - 1));
-      }
+      setSecondsLeft((value) => {
+        const guardedValue = resetInitialTimerWhenTrackingLost({
+          secondsLeft: value,
+          initialSeconds: 30,
+          hasUsableTracking: hasUsableSeatedPose,
+          resultCount: repsRef.current,
+        });
+        return hasUsableSeatedPose ? Math.max(0, guardedValue - 1) : guardedValue;
+      });
     }, 1000);
     return () => window.clearInterval(timer);
   }, [hasUsableSeatedPose]);
@@ -621,13 +628,14 @@ function SeatedArmHud({
       <HudChip className="left-4 right-4 top-44 md:left-auto md:right-4 md:top-24 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
-          Seated mode is already selected. Raise and lower the same visible hand
-          to complete the rep.
+          Show one open palm with fingers visible. Then raise and lower the same
+          locked hand to complete the rep.
         </span>
       </HudChip>
       {!hasUsableSeatedPose ? (
         <div className="absolute bottom-28 left-4 max-w-xl rounded-xl bg-[#D8F3DC] p-4 text-xl font-bold text-[#10231F] shadow-camera">
-          Timer is paused. Raise one open hand where the camera can see it.
+          Timer waits for hand lock. Show one open palm with fingers visible
+          inside the frame.
         </div>
       ) : null}
       {pulse ? (
@@ -679,7 +687,7 @@ function ReachStarsScreen({
           title="Ready for Reach Stars"
           checks={[
             "Sit or stand in a comfortable position.",
-            "Raise one open hand where the camera can see it.",
+            "Show one open palm with fingers visible inside the frame.",
             "Reach only within a comfortable range; large targets are enough.",
           ]}
           action="Start Reach Stars"
@@ -730,7 +738,7 @@ function ReachStarsHud({
   const hasUsableReachPose = hasUsablePose(tracking.landmarks, "reach");
   const displayFeedback = hasUsableReachPose
     ? feedback
-    : "Raise one open hand where the camera can see it.";
+    : "Show one open palm with fingers visible inside the frame.";
 
   const finish = useCallback(
     (confidence: PoseConfidence) => {
@@ -750,12 +758,18 @@ function ReachStarsHud({
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      if (hasUsableReachPose) {
-        setSecondsLeft((value) => Math.max(0, value - 1));
-      }
+      setSecondsLeft((value) => {
+        const guardedValue = resetInitialTimerWhenTrackingLost({
+          secondsLeft: value,
+          initialSeconds: 30,
+          hasUsableTracking: hasUsableReachPose,
+          resultCount: score,
+        });
+        return hasUsableReachPose ? Math.max(0, guardedValue - 1) : guardedValue;
+      });
     }, 1000);
     return () => window.clearInterval(timer);
-  }, [hasUsableReachPose]);
+  }, [hasUsableReachPose, score]);
 
   useEffect(() => {
     if (!hasUsableReachPose) {
@@ -832,8 +846,7 @@ function ReachStarsHud({
       <HudChip className="left-4 right-4 top-44 md:left-auto md:right-4 md:max-w-sm">
         <span className="block text-base">What counts</span>
         <span className="text-xl font-black leading-snug">
-          Cover the yellow target with one visible hand and hold for half a
-          second.
+          Cover the yellow target with one open palm and hold for half a second.
         </span>
       </HudChip>
       <button

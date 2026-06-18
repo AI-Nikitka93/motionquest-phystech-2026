@@ -11,6 +11,7 @@ import {
   getVisibleWristLiftDeltas,
   hasPlausibleBodyFrame,
   hasUsablePose,
+  resetInitialTimerWhenTrackingLost,
   type ChairStandPhase,
   type NormalizedLandmark,
   type SeatedArmPhase,
@@ -304,6 +305,36 @@ test("detectSeatedWristLiftTransition counts one visible hand raise and lower cy
 
   assert.equal(reps, 1);
   assert.equal(phase, "extended");
+});
+
+test("initial hand-mode timer resets while tracking is lost before any result", () => {
+  assert.equal(
+    resetInitialTimerWhenTrackingLost({
+      secondsLeft: 28,
+      initialSeconds: 30,
+      hasUsableTracking: false,
+      resultCount: 0,
+    }),
+    30,
+  );
+  assert.equal(
+    resetInitialTimerWhenTrackingLost({
+      secondsLeft: 28,
+      initialSeconds: 30,
+      hasUsableTracking: false,
+      resultCount: 1,
+    }),
+    28,
+  );
+  assert.equal(
+    resetInitialTimerWhenTrackingLost({
+      secondsLeft: 28,
+      initialSeconds: 30,
+      hasUsableTracking: true,
+      resultCount: 0,
+    }),
+    28,
+  );
 });
 
 test("getVisibleWristLiftDeltas reads a raised hand as positive lift without shoulders", () => {

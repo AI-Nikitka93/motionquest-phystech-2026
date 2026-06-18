@@ -32,7 +32,7 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
 
   await page.getByRole("button", { name: "Start seated mode" }).click();
   await expect(
-    page.getByText("Seated mode is already selected."),
+    page.getByText("Show one open palm with fingers visible."),
   ).toBeVisible();
   await page.getByRole("button", { name: "Finish early" }).click();
 
@@ -44,7 +44,7 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
 
   await page.getByRole("button", { name: "Start Reach Stars" }).click();
   await expect(
-    page.getByText("Cover the yellow target with one visible hand"),
+    page.getByText("Cover the yellow target with one open palm"),
   ).toBeVisible();
   await page.getByRole("button", { name: "Finish & View Report" }).click();
 

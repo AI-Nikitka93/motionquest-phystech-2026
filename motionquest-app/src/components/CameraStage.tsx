@@ -165,11 +165,11 @@ export function CameraStage({
             {mode === "seated"
               ? poseUsable
                 ? "Seated mode is selected and one hand is visible"
-                : "Seated mode is selected; raise one open hand"
+                : "Show one open palm with fingers visible"
               : mode === "reach"
                 ? poseUsable
                   ? "At least one reaching hand is visible"
-                  : "Raise one open hand for tracking"
+                  : "Show one open palm for tracking"
                 : poseUsable
                   ? "Shoulders, hips and knees are visible"
                   : "Show shoulders, hips and knees before standing counts"}
@@ -362,7 +362,7 @@ function JointVisibilityPanel({
             : allVisible
               ? "Tracking points are detected, but the stage is not stable yet."
               : mode === "reach" || mode === "seated"
-                ? "Raise one open hand where the camera can see it."
+                ? "Show one open palm with fingers visible inside the frame."
                 : "Show every required joint before treating the session as usable."}
         </p>
       </div>
@@ -531,7 +531,7 @@ function confidenceLabel(
   if (confidence === "medium") return "Tracking: Medium";
   if (mode === "seated" || mode === "reach") {
     if (/stable|visible/i.test(status)) return "Tracking: Hand visible";
-    return "Tracking: Need hand";
+    return "Tracking: Show palm";
   }
   return "Move into frame";
 }

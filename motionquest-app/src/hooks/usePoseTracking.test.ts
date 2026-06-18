@@ -122,7 +122,7 @@ test("standing pose options use the full model and stricter confidence threshold
   assert.equal(options.minTrackingConfidence, 0.6);
 });
 
-test("hand-mode options use the lightweight pose model and strict hand thresholds", () => {
+test("hand-mode options use the lightweight pose model with demo-tolerant thresholds", () => {
   const poseOptions = buildPoseLandmarkerOptions("reach", "CPU");
   const handOptions = buildHandLandmarkerOptions("CPU");
 
@@ -131,9 +131,9 @@ test("hand-mode options use the lightweight pose model and strict hand threshold
     /pose_landmarker_lite\/float16\/latest\/pose_landmarker_lite\.task$/,
   );
   assert.equal(handOptions.baseOptions.delegate, "CPU");
-  assert.equal(handOptions.minHandDetectionConfidence, 0.6);
-  assert.equal(handOptions.minHandPresenceConfidence, 0.6);
-  assert.equal(handOptions.minTrackingConfidence, 0.6);
+  assert.equal(handOptions.minHandDetectionConfidence, 0.5);
+  assert.equal(handOptions.minHandPresenceConfidence, 0.5);
+  assert.equal(handOptions.minTrackingConfidence, 0.5);
 });
 
 test("video detection skips duplicate video timestamps", () => {
@@ -193,7 +193,7 @@ test("hand-mode status asks for steady hold before the signal is stable", () => 
 
   assert.equal(
     trackingStatusForFrame("reach", false, true, landmarks),
-    "Hold one open hand steady for camera lock",
+    "Keep one open palm steady with fingers visible",
   );
   assert.equal(
     trackingStatusForFrame("reach", true, true, landmarks),

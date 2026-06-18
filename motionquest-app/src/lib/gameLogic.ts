@@ -293,6 +293,24 @@ export function detectSeatedWristLiftTransition({
   return { phase: previousPhase, reps };
 }
 
+export function resetInitialTimerWhenTrackingLost({
+  secondsLeft,
+  initialSeconds,
+  hasUsableTracking,
+  resultCount,
+}: {
+  secondsLeft: number;
+  initialSeconds: number;
+  hasUsableTracking: boolean;
+  resultCount: number;
+}) {
+  if (!hasUsableTracking && resultCount === 0) {
+    return initialSeconds;
+  }
+
+  return secondsLeft;
+}
+
 export function getVisibleElbowAngles(landmarks: NormalizedLandmark[]) {
   const left = calculateJointAngle(landmarks[11], landmarks[13], landmarks[15]);
   const right = calculateJointAngle(landmarks[12], landmarks[14], landmarks[16]);

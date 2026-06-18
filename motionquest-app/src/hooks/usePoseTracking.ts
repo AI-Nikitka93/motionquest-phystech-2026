@@ -371,9 +371,9 @@ export function buildHandLandmarkerOptions(delegate: VisionDelegate) {
     },
     runningMode: "VIDEO",
     numHands: 2,
-    minHandDetectionConfidence: 0.6,
-    minHandPresenceConfidence: 0.6,
-    minTrackingConfidence: 0.6,
+    minHandDetectionConfidence: 0.5,
+    minHandPresenceConfidence: 0.5,
+    minTrackingConfidence: 0.5,
   } as const;
 }
 
@@ -811,10 +811,10 @@ function smoothLandmarks(
 
 function framingHint(mode: PoseMode, landmarks: NormalizedLandmark[]) {
   if (mode === "reach") {
-    return "Raise one open hand where the camera can see it";
+    return "Show one open palm with fingers visible inside the frame";
   }
   if (mode === "seated") {
-    return "Seated mode is selected. Raise and lower one open hand in view";
+    return "Show one open palm with fingers visible, then raise and lower it";
   }
 
   const upperBodyCandidate = countVisibleLandmarks(landmarks, [
@@ -844,7 +844,7 @@ export function trackingStatusForFrame(
     return stableTrackingStatus(mode);
   }
   if ((mode === "reach" || mode === "seated") && rawUsable) {
-    return "Hold one open hand steady for camera lock";
+    return "Keep one open palm steady with fingers visible";
   }
   return framingHint(mode, landmarks);
 }
