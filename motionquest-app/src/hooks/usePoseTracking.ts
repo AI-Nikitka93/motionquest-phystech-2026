@@ -28,6 +28,12 @@ type CameraAttempt = {
   constraints: MediaStreamConstraints;
 };
 
+export type HandSignalStability = {
+  frames: number;
+  point?: NormalizedLandmark;
+  stable?: boolean;
+};
+
 const TASKS_VERSION = "0.10.35";
 const WASM_ROOT = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${TASKS_VERSION}/wasm`;
 const MODEL_URL =
@@ -58,6 +64,8 @@ const KEY_POINTS: Record<PoseMode, number[]> = {
 const SMOOTHING_ALPHA = 0.38;
 const MAX_MISSING_FRAMES_BEFORE_CLEAR = 8;
 const DIAGNOSTIC_VISIBILITY_THRESHOLD = 0.3;
+export const HAND_STABLE_FRAME_THRESHOLD = 4;
+const MAX_HAND_FRAME_JUMP = 0.28;
 
 export function usePoseTracking(mode: PoseMode, autoStart = false) {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -69,6 +77,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
   const streamRef = useRef<MediaStream | null>(null);
   const smoothedLandmarksRef = useRef<NormalizedLandmark[]>([]);
   const missingFramesRef = useRef(0);
+  const handSignalStabilityRef = useRef<HandSignalStability>({ frames: 0 });
 
   const [landmarks, setLandmarks] = useState<NormalizedLandmark[]>([]);
   const [confidence, setConfidence] = useState<PoseConfidence>("low");
@@ -155,29 +164,42 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
           handResult?.landmarks ?? [],
           mode,
         );
-        const usable = hasUsablePose(rawLandmarks, mode);
+        const handStability = updateHandSignalStability(
+          handSignalStabilityRef.current,
+          rawLandmarks,
+          mode,
+        );
+        handSignalStabilityRef.current = handStability;
+        const rawUsable = hasUsablePose(rawLandmarks, mode);
+        const usable = rawUsable && handStability.stable !== false;
+        const displayRawLandmarks =
+          rawUsable && !usable
+            ? hideHandTrackingLandmarks(rawLandmarks, mode)
+            : rawLandmarks;
 
-        if (usable || hasDiagnosticPose(rawLandmarks, mode)) {
+        if (usable || rawUsable || hasDiagnosticPose(rawLandmarks, mode)) {
           missingFramesRef.current = 0;
           const nextLandmarks = smoothLandmarks(
             smoothedLandmarksRef.current,
-            rawLandmarks,
+            displayRawLandmarks,
           );
           smoothedLandmarksRef.current = nextLandmarks;
           setLandmarks(nextLandmarks);
           setConfidence(usable ? getPoseConfidence(nextLandmarks, mode) : "low");
           setStatus(
-            usable ? stableTrackingStatus(mode) : framingHint(mode, nextLandmarks),
+            trackingStatusForFrame(mode, usable, rawUsable, rawLandmarks),
           );
           drawOverlay(nextLandmarks);
         } else {
           missingFramesRef.current += 1;
+          handSignalStabilityRef.current = { frames: 0 };
           setConfidence("low");
           setStatus(framingHint(mode, rawLandmarks));
           if (mode === "seated" || mode === "reach") {
-            smoothedLandmarksRef.current = rawLandmarks;
-            setLandmarks(rawLandmarks);
-            drawOverlay(rawLandmarks);
+            const nextLandmarks = hideHandTrackingLandmarks(rawLandmarks, mode);
+            smoothedLandmarksRef.current = nextLandmarks;
+            setLandmarks(nextLandmarks);
+            drawOverlay(nextLandmarks);
           } else if (missingFramesRef.current >= MAX_MISSING_FRAMES_BEFORE_CLEAR) {
             smoothedLandmarksRef.current = [];
             setLandmarks([]);
@@ -199,6 +221,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
     streamRef.current = null;
     smoothedLandmarksRef.current = [];
     missingFramesRef.current = 0;
+    handSignalStabilityRef.current = { frames: 0 };
     setLandmarks([]);
     drawOverlay([]);
     setConfidence("low");
@@ -369,7 +392,49 @@ async function requestCameraStream() {
     }`,
   );
 
-  const attempts: CameraAttempt[] = [
+  const attempts = buildCameraAttempts();
+
+  let lastError: unknown = null;
+  for (const attempt of attempts) {
+    try {
+      diagnostics.push(`attempt: ${attempt.label}`);
+      const stream = await navigator.mediaDevices.getUserMedia(attempt.constraints);
+      diagnostics.push(`attempt result: ${attempt.label} ok`);
+      return { stream, diagnostics };
+    } catch (cause) {
+      lastError = cause;
+      diagnostics.push(
+        `attempt result: ${attempt.label} failed: ${formatCauseName(cause)} ${
+          cause instanceof Error ? cause.message : ""
+        }`.trim(),
+      );
+    }
+  }
+
+  throw new CameraStartError(
+    lastError instanceof Error
+      ? lastError.message
+      : "Camera stream could not start.",
+    diagnostics,
+    formatCauseName(lastError),
+  );
+}
+
+export function buildCameraAttempts(): CameraAttempt[] {
+  return [
+    {
+      label: "stable 4:3 presenter camera",
+      constraints: {
+        audio: false,
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          aspectRatio: { ideal: 4 / 3 },
+          frameRate: { ideal: 24, max: 30 },
+          facingMode: { ideal: "user" },
+        },
+      },
+    },
     {
       label: "browser default camera",
       constraints: {
@@ -401,31 +466,6 @@ async function requestCameraStream() {
       },
     },
   ];
-
-  let lastError: unknown = null;
-  for (const attempt of attempts) {
-    try {
-      diagnostics.push(`attempt: ${attempt.label}`);
-      const stream = await navigator.mediaDevices.getUserMedia(attempt.constraints);
-      diagnostics.push(`attempt result: ${attempt.label} ok`);
-      return { stream, diagnostics };
-    } catch (cause) {
-      lastError = cause;
-      diagnostics.push(
-        `attempt result: ${attempt.label} failed: ${formatCauseName(cause)} ${
-          cause instanceof Error ? cause.message : ""
-        }`.trim(),
-      );
-    }
-  }
-
-  throw new CameraStartError(
-    lastError instanceof Error
-      ? lastError.message
-      : "Camera stream could not start.",
-    diagnostics,
-    formatCauseName(lastError),
-  );
 }
 
 function formatTrackSettings(settings: MediaTrackSettings | undefined) {
@@ -515,6 +555,59 @@ export function mergeHandLandmarksIntoPose(
 
 function hiddenLandmark(): NormalizedLandmark {
   return { x: 0, y: 0, visibility: 0 };
+}
+
+function hideHandTrackingLandmarks(
+  landmarks: NormalizedLandmark[],
+  mode: PoseMode,
+) {
+  if (mode !== "seated" && mode !== "reach") {
+    return landmarks;
+  }
+
+  const next = landmarks.slice(0, Math.max(33, landmarks.length));
+  next[15] = hiddenLandmark();
+  next[16] = hiddenLandmark();
+  if (mode === "reach") {
+    return next.slice(0, 33);
+  }
+  return next;
+}
+
+export function updateHandSignalStability(
+  previous: HandSignalStability,
+  landmarks: NormalizedLandmark[],
+  mode: PoseMode,
+): HandSignalStability {
+  if (mode !== "seated" && mode !== "reach") {
+    return { frames: HAND_STABLE_FRAME_THRESHOLD, stable: true };
+  }
+
+  const point = primaryVisibleHandPoint(landmarks);
+  if (!point) {
+    return { frames: 0, stable: false };
+  }
+
+  const jumped =
+    previous.point && distance(previous.point, point) > MAX_HAND_FRAME_JUMP;
+  const frames = jumped ? 1 : previous.frames + 1;
+
+  return {
+    frames,
+    point,
+    stable: frames >= HAND_STABLE_FRAME_THRESHOLD,
+  };
+}
+
+function primaryVisibleHandPoint(landmarks: NormalizedLandmark[]) {
+  const candidates = [landmarks[15], landmarks[16]].filter((point) =>
+    isVisibleLandmark(point, 0.42),
+  );
+  return candidates[0];
+}
+
+function distance(first: NormalizedLandmark, second: NormalizedLandmark) {
+  return Math.hypot(first.x - second.x, first.y - second.y);
 }
 
 function palmCenter(hand: NormalizedLandmark[]) {
@@ -694,6 +787,21 @@ function stableTrackingStatus(mode: PoseMode) {
     return "Tracking stable hand signal";
   }
   return "Tracking stable body pose";
+}
+
+export function trackingStatusForFrame(
+  mode: PoseMode,
+  usable: boolean,
+  rawUsable: boolean,
+  landmarks: NormalizedLandmark[],
+) {
+  if (usable) {
+    return stableTrackingStatus(mode);
+  }
+  if ((mode === "reach" || mode === "seated") && rawUsable) {
+    return "Hold one open hand steady for camera lock";
+  }
+  return framingHint(mode, landmarks);
 }
 
 function hasDiagnosticPose(landmarks: NormalizedLandmark[], mode: PoseMode) {
