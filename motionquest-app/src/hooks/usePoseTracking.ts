@@ -167,14 +167,18 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
           setLandmarks(nextLandmarks);
           setConfidence(usable ? getPoseConfidence(nextLandmarks, mode) : "low");
           setStatus(
-            usable ? "Tracking stable body pose" : framingHint(mode, nextLandmarks),
+            usable ? stableTrackingStatus(mode) : framingHint(mode, nextLandmarks),
           );
           drawOverlay(nextLandmarks);
         } else {
           missingFramesRef.current += 1;
           setConfidence("low");
           setStatus(framingHint(mode, rawLandmarks));
-          if (missingFramesRef.current >= MAX_MISSING_FRAMES_BEFORE_CLEAR) {
+          if (mode === "seated" || mode === "reach") {
+            smoothedLandmarksRef.current = rawLandmarks;
+            setLandmarks(rawLandmarks);
+            drawOverlay(rawLandmarks);
+          } else if (missingFramesRef.current >= MAX_MISSING_FRAMES_BEFORE_CLEAR) {
             smoothedLandmarksRef.current = [];
             setLandmarks([]);
             drawOverlay([]);
@@ -470,6 +474,11 @@ export function mergeHandLandmarksIntoPose(
       },
   );
 
+  if (mode === "reach") {
+    merged[15] = hiddenLandmark();
+    merged[16] = hiddenLandmark();
+  }
+
   if (handLandmarks.length === 0) {
     return merged;
   }
@@ -479,7 +488,9 @@ export function mergeHandLandmarksIntoPose(
     if (!isVisibleLandmark(wrist, 0.2)) continue;
 
     const wristIndex = wrist.x < 0.5 ? 15 : 16;
-    const targetPoint = mode === "reach" ? palmCenter(hand) ?? wrist : wrist;
+    const palm = mode === "reach" ? palmCenter(hand) : null;
+    if (mode === "reach" && !palm) continue;
+    const targetPoint = palm ?? wrist;
     merged[wristIndex] = {
       x: targetPoint.x,
       y: targetPoint.y,
@@ -500,6 +511,10 @@ export function mergeHandLandmarksIntoPose(
   }
 
   return merged;
+}
+
+function hiddenLandmark(): NormalizedLandmark {
+  return { x: 0, y: 0, visibility: 0 };
 }
 
 function palmCenter(hand: NormalizedLandmark[]) {
@@ -672,6 +687,13 @@ function framingHint(mode: PoseMode, landmarks: NormalizedLandmark[]) {
   }
 
   return "Step back until shoulders, hips and knees are visible";
+}
+
+function stableTrackingStatus(mode: PoseMode) {
+  if (mode === "reach" || mode === "seated") {
+    return "Tracking stable hand signal";
+  }
+  return "Tracking stable body pose";
 }
 
 function hasDiagnosticPose(landmarks: NormalizedLandmark[], mode: PoseMode) {

@@ -105,7 +105,7 @@ export function CameraStage({
       <div className="relative overflow-hidden rounded-2xl border-4 border-[#075E54] bg-[#071B17] shadow-camera">
         <video
           ref={videoRef}
-          className="aspect-[4/3] w-full bg-[#071B17] object-cover"
+          className="aspect-[4/3] w-full bg-[#071B17] object-fill"
           playsInline
           muted
         />

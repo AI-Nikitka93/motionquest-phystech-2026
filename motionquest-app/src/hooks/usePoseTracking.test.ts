@@ -22,6 +22,18 @@ test("seated tracking keeps pose wrists when the hand model has no palm result",
   assert.equal(merged[15].visibility, 0.9);
 });
 
+test("reach tracking does not treat pose wrist fallback as a usable hand", () => {
+  const poseLandmarks = Array.from({ length: 33 }, () =>
+    landmark(0.5, 0.5, 0.02),
+  );
+  poseLandmarks[15] = landmark(0.32, 0.26, 0.9);
+
+  const merged = mergeHandLandmarksIntoPose(poseLandmarks, [], "reach");
+
+  assert.equal(merged[15].visibility, 0);
+  assert.equal(merged[16].visibility, 0);
+});
+
 test("hand model wrist overrides pose wrist when a palm is visible", () => {
   const poseLandmarks = Array.from({ length: 33 }, () =>
     landmark(0.5, 0.5, 0.02),
@@ -52,4 +64,22 @@ test("reach tracking uses the palm center so a visible hand can hit targets", ()
   assert.equal(merged[15].x.toFixed(2), "0.34");
   assert.equal(merged[15].y.toFixed(2), "0.31");
   assert.equal(merged[15].visibility, 0.96);
+});
+
+test("reach tracking rejects hand results without enough palm points", () => {
+  const poseLandmarks = Array.from({ length: 33 }, () =>
+    landmark(0.5, 0.5, 0.02),
+  );
+  const wristOnlyHand = Array.from({ length: 21 }, (_, index) =>
+    index === 0 ? landmark(0.22, 0.62, 0.95) : landmark(0.34, 0.31, 0.02),
+  );
+
+  const merged = mergeHandLandmarksIntoPose(
+    poseLandmarks,
+    [wristOnlyHand],
+    "reach",
+  );
+
+  assert.equal(merged[15].visibility, 0);
+  assert.equal(merged[16].visibility, 0);
 });
