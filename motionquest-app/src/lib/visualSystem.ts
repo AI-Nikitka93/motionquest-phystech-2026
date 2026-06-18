@@ -288,7 +288,8 @@ export const homeProofPathItems = [
 ];
 
 export const cameraSetupGuidance = [
-  "Place the camera at chest height when possible.",
+  "Place the camera at chest height when possible and keep a 4:3-style frame.",
+  "For a close laptop webcam, seated adaptive is the reliable path; standing needs hips and knees in view.",
   "Use steady front lighting instead of a bright window behind the participant.",
   "Keep one safe chair nearby and leave room for comfortable arm movement.",
   "If the app asks for visibility, adjust the camera or body position; it is not blaming the participant.",

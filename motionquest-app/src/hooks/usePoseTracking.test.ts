@@ -2,9 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import type { NormalizedLandmark } from "@/lib/gameLogic";
 import {
+  buildHandLandmarkerOptions,
   buildCameraAttempts,
+  buildPoseLandmarkerOptions,
+  getCameraFitNotes,
   HAND_STABLE_FRAME_THRESHOLD,
   mergeHandLandmarksIntoPose,
+  shouldRunVideoDetection,
   trackingStatusForFrame,
   updateHandSignalStability,
 } from "./usePoseTracking";
@@ -104,6 +108,49 @@ test("camera setup tries a stable 4:3 presenter frame before browser defaults", 
       facingMode: { ideal: "user" },
     },
   });
+});
+
+test("standing pose options use the full model and stricter confidence thresholds", () => {
+  const options = buildPoseLandmarkerOptions("chair", "GPU");
+
+  assert.match(
+    options.baseOptions.modelAssetPath,
+    /pose_landmarker_full\/float16\/latest\/pose_landmarker_full\.task$/,
+  );
+  assert.equal(options.baseOptions.delegate, "GPU");
+  assert.equal(options.minPoseDetectionConfidence, 0.6);
+  assert.equal(options.minTrackingConfidence, 0.6);
+});
+
+test("hand-mode options use the lightweight pose model and strict hand thresholds", () => {
+  const poseOptions = buildPoseLandmarkerOptions("reach", "CPU");
+  const handOptions = buildHandLandmarkerOptions("CPU");
+
+  assert.match(
+    poseOptions.baseOptions.modelAssetPath,
+    /pose_landmarker_lite\/float16\/latest\/pose_landmarker_lite\.task$/,
+  );
+  assert.equal(handOptions.baseOptions.delegate, "CPU");
+  assert.equal(handOptions.minHandDetectionConfidence, 0.6);
+  assert.equal(handOptions.minHandPresenceConfidence, 0.6);
+  assert.equal(handOptions.minTrackingConfidence, 0.6);
+});
+
+test("video detection skips duplicate video timestamps", () => {
+  assert.equal(shouldRunVideoDetection(12.25, null), true);
+  assert.equal(shouldRunVideoDetection(12.25, 12.24), true);
+  assert.equal(shouldRunVideoDetection(12.25, 12.25), false);
+});
+
+test("camera fit notes flag wide or slow camera settings", () => {
+  assert.deepEqual(
+    getCameraFitNotes({ width: 640, height: 480, frameRate: 30 }),
+    ["camera fit: 4:3 stable presenter frame"],
+  );
+  assert.deepEqual(getCameraFitNotes({ width: 1280, height: 720, frameRate: 12 }), [
+    "camera fit: wide frame may crop standing body; use seated adaptive or step back",
+    "camera fit: low frame rate can make landmarks jump; close other camera apps",
+  ]);
 });
 
 test("hand-mode tracking becomes usable only after consecutive visible frames", () => {

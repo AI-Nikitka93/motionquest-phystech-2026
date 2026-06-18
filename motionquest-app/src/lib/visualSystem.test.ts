@@ -26,7 +26,7 @@ test("visual trust system has concrete visible content for each Phase 4 surface"
   assert.equal(evidenceCards.length, 3);
   assert.equal(visualAssetStandards.length, 3);
   assert.equal(homeProofPathItems.length, 3);
-  assert.equal(cameraSetupGuidance.length, 4);
+  assert.equal(cameraSetupGuidance.length, 5);
   assert.equal(confidenceByMode.length, 3);
   assert.equal(miniBibliography.length, 3);
   assert.ok(phaseFourAcceptanceItems.length >= 5);
@@ -39,6 +39,15 @@ test("visual trust system has concrete visible content for each Phase 4 surface"
     assert.ok(item.title.length >= 10);
     assert.ok(item.body.length >= 40);
   }
+});
+
+test("camera setup guidance names close laptop and standing framing limits", () => {
+  assert.ok(
+    cameraSetupGuidance.some((item) => /close laptop webcam/i.test(item)),
+  );
+  assert.ok(
+    cameraSetupGuidance.some((item) => /4:3|640 x 480|hips and knees/i.test(item)),
+  );
 });
 
 test("evidence cards keep source provenance links", () => {

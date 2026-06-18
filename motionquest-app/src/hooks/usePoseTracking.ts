@@ -28,6 +28,8 @@ type CameraAttempt = {
   constraints: MediaStreamConstraints;
 };
 
+type VisionDelegate = "GPU" | "CPU";
+
 export type HandSignalStability = {
   frames: number;
   point?: NormalizedLandmark;
@@ -36,8 +38,10 @@ export type HandSignalStability = {
 
 const TASKS_VERSION = "0.10.35";
 const WASM_ROOT = `https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@${TASKS_VERSION}/wasm`;
-const MODEL_URL =
+const POSE_LITE_MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_lite/float16/latest/pose_landmarker_lite.task";
+const POSE_FULL_MODEL_URL =
+  "https://storage.googleapis.com/mediapipe-models/pose_landmarker/pose_landmarker_full/float16/latest/pose_landmarker_full.task";
 const HAND_MODEL_URL =
   "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task";
 
@@ -78,6 +82,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
   const smoothedLandmarksRef = useRef<NormalizedLandmark[]>([]);
   const missingFramesRef = useRef(0);
   const handSignalStabilityRef = useRef<HandSignalStability>({ frames: 0 });
+  const lastVideoTimeRef = useRef<number | null>(null);
 
   const [landmarks, setLandmarks] = useState<NormalizedLandmark[]>([]);
   const [confidence, setConfidence] = useState<PoseConfidence>("low");
@@ -152,6 +157,12 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
       const video = videoRef.current;
 
       if (landmarker && video && video.readyState >= 2) {
+        if (!shouldRunVideoDetection(video.currentTime, lastVideoTimeRef.current)) {
+          frameRef.current = window.requestAnimationFrame(runFrameRef.current);
+          return;
+        }
+        lastVideoTimeRef.current = video.currentTime;
+
         const now = performance.now();
         const result = landmarker.detectForVideo(video, now);
         const rawPoseLandmarks = result.landmarks?.[0] ?? [];
@@ -222,6 +233,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
     smoothedLandmarksRef.current = [];
     missingFramesRef.current = 0;
     handSignalStabilityRef.current = { frames: 0 };
+    lastVideoTimeRef.current = null;
     setLandmarks([]);
     drawOverlay([]);
     setConfidence("low");
@@ -244,6 +256,7 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
       setCameraDiagnostics([
         ...diagnostics,
         `active settings: ${formatTrackSettings(videoSettings)}`,
+        ...getCameraFitNotes(videoSettings),
       ]);
       setIsReady(true);
       setStatus("Loading pose model");
@@ -264,30 +277,12 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
       try {
         landmarkerRef.current = (await vision.PoseLandmarker.createFromOptions(
           filesetResolver,
-          {
-            baseOptions: {
-              modelAssetPath: MODEL_URL,
-              delegate: "GPU",
-            },
-            runningMode: "VIDEO",
-            numPoses: 1,
-            minPoseDetectionConfidence: 0.45,
-            minTrackingConfidence: 0.45,
-          },
+          buildPoseLandmarkerOptions(mode, "GPU"),
         )) as PoseLandmarkerInstance;
       } catch {
         landmarkerRef.current = (await vision.PoseLandmarker.createFromOptions(
           filesetResolver,
-          {
-            baseOptions: {
-              modelAssetPath: MODEL_URL,
-              delegate: "CPU",
-            },
-            runningMode: "VIDEO",
-            numPoses: 1,
-            minPoseDetectionConfidence: 0.45,
-            minTrackingConfidence: 0.45,
-          },
+          buildPoseLandmarkerOptions(mode, "CPU"),
         )) as PoseLandmarkerInstance;
       }
 
@@ -295,32 +290,12 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
         try {
           handmarkerRef.current = (await vision.HandLandmarker.createFromOptions(
             filesetResolver,
-            {
-              baseOptions: {
-                modelAssetPath: HAND_MODEL_URL,
-                delegate: "GPU",
-              },
-              runningMode: "VIDEO",
-              numHands: 2,
-              minHandDetectionConfidence: 0.35,
-              minHandPresenceConfidence: 0.35,
-              minTrackingConfidence: 0.35,
-            },
+            buildHandLandmarkerOptions("GPU"),
           )) as HandLandmarkerInstance;
         } catch {
           handmarkerRef.current = (await vision.HandLandmarker.createFromOptions(
             filesetResolver,
-            {
-              baseOptions: {
-                modelAssetPath: HAND_MODEL_URL,
-                delegate: "CPU",
-              },
-              runningMode: "VIDEO",
-              numHands: 2,
-              minHandDetectionConfidence: 0.35,
-              minHandPresenceConfidence: 0.35,
-              minTrackingConfidence: 0.35,
-            },
+            buildHandLandmarkerOptions("CPU"),
           )) as HandLandmarkerInstance;
         }
       }
@@ -367,6 +342,46 @@ export function usePoseTracking(mode: PoseMode, autoStart = false) {
     cameraDiagnostics,
     startCamera,
   };
+}
+
+export function buildPoseLandmarkerOptions(
+  mode: PoseMode,
+  delegate: VisionDelegate,
+) {
+  const needsFullBody = mode === "chair" || mode === "calibration";
+
+  return {
+    baseOptions: {
+      modelAssetPath: needsFullBody ? POSE_FULL_MODEL_URL : POSE_LITE_MODEL_URL,
+      delegate,
+    },
+    runningMode: "VIDEO",
+    numPoses: 1,
+    minPoseDetectionConfidence: 0.6,
+    minPosePresenceConfidence: 0.6,
+    minTrackingConfidence: 0.6,
+  } as const;
+}
+
+export function buildHandLandmarkerOptions(delegate: VisionDelegate) {
+  return {
+    baseOptions: {
+      modelAssetPath: HAND_MODEL_URL,
+      delegate,
+    },
+    runningMode: "VIDEO",
+    numHands: 2,
+    minHandDetectionConfidence: 0.6,
+    minHandPresenceConfidence: 0.6,
+    minTrackingConfidence: 0.6,
+  } as const;
+}
+
+export function shouldRunVideoDetection(
+  currentVideoTime: number,
+  previousVideoTime: number | null,
+) {
+  return previousVideoTime === null || currentVideoTime !== previousVideoTime;
 }
 
 class CameraStartError extends Error {
@@ -478,6 +493,36 @@ function formatTrackSettings(settings: MediaTrackSettings | undefined) {
     settings.facingMode ? `facingMode=${settings.facingMode}` : null,
   ].filter(Boolean);
   return parts.length > 0 ? parts.join(", ") : "unknown";
+}
+
+export function getCameraFitNotes(
+  settings:
+    | Pick<MediaTrackSettings, "width" | "height" | "frameRate">
+    | undefined,
+) {
+  if (!settings) return [];
+
+  const notes: string[] = [];
+  const { width, height, frameRate } = settings;
+
+  if (width && height) {
+    const aspectRatio = width / height;
+    if (Math.abs(aspectRatio - 4 / 3) <= 0.12) {
+      notes.push("camera fit: 4:3 stable presenter frame");
+    } else if (aspectRatio >= 1.6) {
+      notes.push(
+        "camera fit: wide frame may crop standing body; use seated adaptive or step back",
+      );
+    }
+  }
+
+  if (frameRate && frameRate < 18) {
+    notes.push(
+      "camera fit: low frame rate can make landmarks jump; close other camera apps",
+    );
+  }
+
+  return notes;
 }
 
 function formatCauseName(cause: unknown) {
