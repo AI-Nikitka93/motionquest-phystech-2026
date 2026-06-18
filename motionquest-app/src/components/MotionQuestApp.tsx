@@ -181,6 +181,7 @@ export function MotionQuestApp() {
         {screen === "chair" ? (
           <ChairStandScreen
             draft={draft}
+            onSwitchToSeated={() => setDraft(createInitialDraft("seated-adaptive"))}
             onComplete={(nextDraft) => {
               setDraft(nextDraft);
               setScreen("reach");
@@ -308,9 +309,11 @@ function HomeScreen({
 
 function ChairStandScreen({
   draft,
+  onSwitchToSeated,
   onComplete,
 }: {
   draft: SessionDraft;
+  onSwitchToSeated: () => void;
   onComplete: (draft: SessionDraft) => void;
 }) {
   const [confirmed, setConfirmed] = useState(false);
@@ -390,6 +393,7 @@ function ChairStandScreen({
             <ChairStandHud
               tracking={tracking}
               draft={draft}
+              onSwitchToSeated={onSwitchToSeated}
               onComplete={onComplete}
             />
           )}
@@ -402,10 +406,12 @@ function ChairStandScreen({
 function ChairStandHud({
   tracking,
   draft,
+  onSwitchToSeated,
   onComplete,
 }: {
   tracking: CameraTrackingData;
   draft: SessionDraft;
+  onSwitchToSeated: () => void;
   onComplete: (draft: SessionDraft) => void;
 }) {
   const [secondsLeft, setSecondsLeft] = useState(30);
@@ -497,8 +503,17 @@ function ChairStandHud({
       </HudChip>
       {!hasUsableChairPose ? (
         <div className="absolute bottom-28 left-4 max-w-xl rounded-xl bg-[#D8F3DC] p-4 text-xl font-bold text-[#10231F] shadow-camera">
-          Timer is paused. Keep shoulders, hips and knees visible before the
-          standing branch can count.
+          <p>
+            Standing needs hips and knees in frame. Step back, lower the camera,
+            or switch to seated adaptive.
+          </p>
+          <button
+            type="button"
+            onClick={onSwitchToSeated}
+            className="mt-3 min-h-12 rounded-xl bg-[#075E54] px-5 text-lg font-bold text-white hover:bg-[#064C45] focus-visible:outline focus-visible:outline-4 focus-visible:outline-[#F6C85F]"
+          >
+            Switch to seated adaptive
+          </button>
         </div>
       ) : null}
       {pulse ? (

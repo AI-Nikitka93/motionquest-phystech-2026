@@ -408,9 +408,12 @@ test("standing branch pauses measurement until full-body tracking is usable", as
 
   await expect(
     page.getByText(
-      "Timer is paused. Keep shoulders, hips and knees visible before the standing branch can count.",
+      "Standing needs hips and knees in frame. Step back, lower the camera, or switch to seated adaptive.",
     ),
   ).toBeVisible({ timeout: 15000 });
+  await expect(
+    page.getByRole("button", { name: "Switch to seated adaptive" }),
+  ).toBeVisible();
   await page.getByRole("button", { name: "Finish early" }).click();
   await page.getByRole("button", { name: "Start Reach Stars" }).click();
   await page.getByRole("button", { name: "Finish & View Report" }).click();

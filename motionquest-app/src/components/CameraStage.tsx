@@ -170,7 +170,9 @@ export function CameraStage({
                 ? poseUsable
                   ? "At least one reaching hand is visible"
                   : "Raise one open hand for tracking"
-                : "Shoulders, hips and knees are visible"}
+                : poseUsable
+                  ? "Shoulders, hips and knees are visible"
+                  : "Show shoulders, hips and knees before standing counts"}
           </StageStatusItem>
           <StageStatusItem tone={isReady ? "success" : "warning"}>
             {isReady ? "Camera is active" : "Camera not started"}
