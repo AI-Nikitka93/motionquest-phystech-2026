@@ -237,22 +237,24 @@ PHASE 8 — Public Artifact Package, Submission And Presentation
 [x] T144 [P0] Подготовить public project page/package that references actual outcome, not just plans.
 [x] T145 [P0] Подготовить submission checklist for required project link, title, abstract, contact info and presentation registration.
 [ ] T146 [P0] Проверить official registration link and process when organizers publish it.
-[ ] T147 [P0] Подготовить public verification proof that judges can open in the afternoon of June 27.
+[x] T147 [P0] Подготовить public verification proof that judges can open in the afternoon of June 27.
 [x] T148 [P0] Подготовить Devpost copy with Research, Social Impact and Entrepreneurship angles in one coherent story.
 [x] T149 [P0] Подготовить evidence appendix for public package with mini-bibliography and claim boundaries.
 [x] T150 [P0] Подготовить final screenshots: home, seated path, activity, report, evidence surface, fallback banner and before/after slide.
 [x] T151 [P0] Подготовить demo video or backup proof that is clearly labeled and not confused with live camera data.
     2026-06-04 result: T144/T145/T148/T149/T150/T151 are prepared locally. `docs/DEVPOST_SUBMISSION_COPY.md` now contains the actual-outcome package, public links, screenshots/video pointers and the Research/Social Impact/Entrepreneurship story. `docs/FINAL_SUBMISSION_CHECKLIST.md` includes title, abstract, public link, contact-info and country/time-zone registration fields. `docs/RELEASE_EVIDENCE_2026_05_05.md` has a 2026-06-04 refresh with claim boundaries, verification commands, screenshots, backup video technical check and open blockers. Final screenshots were regenerated in `output/devpost-screenshots/`, and the clearly labeled backup proof video was regenerated at `output/demo-video/motionquest-adaptive-demo.webm`.
-    T147 remains open because judge-openable proof still needs final public deploy/push and clean-browser public-link verification after publication.
+    2026-06-04 note: T147 remained open because judge-openable proof still needed final public deploy/push and clean-browser public-link verification after publication.
     2026-06-04 preliminary public-link smoke: a fresh Playwright Chromium context confirmed the currently published production app, safe-demo report, public GitHub repository, raw README/source links, Devpost page and Binnovative page opened with HTTP 200 / expected text. Evidence: `output/playwright/public-link-clean-browser-current-home-2026-06-04.png`, `output/playwright/public-link-clean-browser-current-report-2026-06-04.png`, `output/playwright/public-link-clean-browser-current-github-2026-06-04.png`. This is not final T147 proof because local changes are newer than the latest recorded public publication.
+    2026-06-18 final public proof: after commit `98c1c17`, push to `origin/master`, and production deploy `dpl_DdZAszhYf1u3nptc8FdHyejMqhQ1`, `npm run project:capture-public-proof` verified the production app, public GitHub source and raw README from a clean browser context. Evidence: `evidence/submission-proof/public-link-clean-browser.png` and `evidence/submission-proof/public-link-clean-browser.json`.
 [x] T152 [P0] Подготовить ten-minute presentation structure with time reserved for Q&A.
 [x] T153 [P0] Подготовить 30-second judge proof sentence and opening hook.
 [x] T154 [P1] Подготовить Since Prototype before/after slide with visual comparison and narrative arc.
 [x] T155 [P1] Подготовить judge Q&A answers for medical claims, privacy, seated users, research evidence, business path and camera limits.
 [x] T156 [P1] Подготовить live demo runbook with safe movement choice and fallback route.
 [x] T157 [P1] Подготовить fallback runbook with persistent sample-data disclosure.
-[ ] T158 [P1] Проверить all public links from a clean browser/session before submission.
-    2026-06-04 preliminary result: current public links were checked from a clean Playwright Chromium context and the current app/source/official pages opened. T158 remains open for the final pre-submission clean-browser check after final deploy/push and public package publication.
+[x] T158 [P1] Проверить all public links from a clean browser/session before submission.
+    2026-06-04 preliminary result: current public links were checked from a clean Playwright Chromium context and the current app/source/official pages opened. T158 remained open for the final pre-submission clean-browser check after final deploy/push and public package publication.
+    2026-06-18 final result: `npm run project:final-audit -- --public-smoke` verified production app, public source, raw README, Devpost and Binnovative content with HTTP 200 and expected current text. Remote `origin/master` matched local `HEAD` `98c1c173d7bca3cd361d1833c9dba52bb51b732e`.
 [x] T159 [P2] Подготовить final conditions reread task for the day before submission and the day of presentation.
     2026-06-04 result: T152-T157 and T159 are prepared. `docs/PRESENTATION_SCRIPT.md` now contains the 7-minute + 3-minute Q&A structure, 30-second hook/proof sentence, 90-second live demo runbook, fallback runbook and before/after frame. `docs/JUDGE_QA_ANSWER_BANK.md` explicitly covers medical claims, privacy, seated users, research evidence, business path and camera limits. `docs/FINAL_REHEARSAL_PLAN.md` uses the current seated path requirement: at least one open hand visible. `docs/FINAL_SUBMISSION_CHECKLIST.md` contains the final conditions reread task.
 [ ] T160 [P0] Сформировать Phase 8 acceptance note: public artifact package is complete, coherent and verifiable.

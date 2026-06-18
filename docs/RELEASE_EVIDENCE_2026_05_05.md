@@ -705,6 +705,43 @@ These tasks are not closed because they need physical, public-action or future e
 - T146: official registration link/process must be checked when organizers publish it in Discord.
 - T147: judge-openable public verification proof must be rechecked after final deploy/push from a clean browser/session.
 - T158 and T160-T161: clean-browser public-link checks and Phase 8 acceptance remain open until the full public package is externally verified after final public deploy/push.
+
+## 2026-06-18 Public Publication Closeout
+
+Scope: publish the latest public package, redeploy production, and capture final judge-openable public proof.
+
+Actions completed:
+
+- Committed public package polish and security/audit update as `98c1c17 polish public hackathon package`.
+- Pushed `master` to `origin/master`; remote `HEAD` now matches local `HEAD` `98c1c173d7bca3cd361d1833c9dba52bb51b732e`.
+- Deployed production with Vercel deployment `dpl_DdZAszhYf1u3nptc8FdHyejMqhQ1`.
+- Production alias updated to `https://motionquest-app.vercel.app`.
+- Captured final clean-browser public proof with `npm run project:capture-public-proof`.
+
+Proof artifacts:
+
+- `evidence/submission-proof/public-link-clean-browser.png`
+- `evidence/submission-proof/public-link-clean-browser.json`
+
+Verification:
+
+| Check | Result |
+|---|---|
+| `npm run project:readiness` | Passed. |
+| `npm test` | Passed, 37/37. |
+| `npm run lint` | Passed. |
+| `npm run build` | Passed. |
+| `npm audit --audit-level=moderate` | Passed, 0 vulnerabilities. |
+| `E2E_APP_URL=http://localhost:3013 npm run test:e2e` | Passed, 11/11. |
+| `npm run project:capture-public-proof` | Passed; production app, public source and raw README content verified. |
+| `npm run project:final-audit -- --public-smoke` | Public smoke returned HTTP 200 and expected current content for production app, public source, raw README, Devpost and Binnovative; remote branch freshness matched local HEAD. |
+
+Task status update:
+
+- T147 is closed with real judge-openable public proof.
+- T158 is closed with final clean-browser public-link proof.
+- External submission remains open until Devpost submission and presentation registration proof exist.
+- Real-camera evidence remains open until presenter-side camera screenshots plus copied live evidence exist.
 - T163: standing-path proof still needs a safe physical full-body setup.
 - T171-T173: real presenter-side camera smoke evidence and manual review are still separate from automated/fake-device screenshots.
 - T182-T186: actual Devpost submission, presentation registration, public verification-window proof and real rehearsals cannot be closed locally.

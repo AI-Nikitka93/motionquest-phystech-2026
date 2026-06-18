@@ -1,0 +1,50 @@
+{
+  "PROOF_STATUS": "REAL",
+  "generatedBy": "npm run project:capture-public-proof",
+  "sideEffects": "does not submit, register, push or deploy",
+  "capturedAtStart": "2026-06-18T11:54:02.784Z",
+  "capturedAtEnd": "2026-06-18T11:54:09.870Z",
+  "appUrl": "https://motionquest-app.vercel.app",
+  "sourceUrl": "https://github.com/AI-Nikitka93/motionquest-phystech-2026",
+  "rawReadmeUrl": "https://raw.githubusercontent.com/AI-Nikitka93/motionquest-phystech-2026/master/README.md",
+  "screenshot": "evidence/submission-proof/public-link-clean-browser.png",
+  "checks": [
+    {
+      "name": "production app",
+      "url": "https://motionquest-app.vercel.app",
+      "status": 200,
+      "expected": [
+        "MotionQuest",
+        "Adaptive Home Movement Lab",
+        "Safe demo"
+      ],
+      "missing": [],
+      "contentOk": true,
+      "screenshot": "evidence/submission-proof/public-link-clean-browser.png"
+    },
+    {
+      "name": "public source",
+      "url": "https://github.com/AI-Nikitka93/motionquest-phystech-2026",
+      "status": 200,
+      "expected": [
+        "motionquest-phystech-2026"
+      ],
+      "missing": [],
+      "contentOk": true,
+      "screenshot": null
+    },
+    {
+      "name": "raw README",
+      "url": "https://raw.githubusercontent.com/AI-Nikitka93/motionquest-phystech-2026/master/README.md",
+      "status": 200,
+      "expected": [
+        "MotionQuest",
+        "Adaptive Home Movement Lab",
+        "caregiver-readable"
+      ],
+      "missing": [],
+      "contentOk": true,
+      "screenshot": null
+    }
+  ]
+}
