@@ -216,7 +216,36 @@ function HomeScreen({
   return (
     <section className="space-y-5">
       <section className="rounded-lg bg-white p-5 shadow-camera">
-        <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+        <div className="grid gap-5 lg:grid-cols-[1.15fr_0.85fr] lg:items-start">
+          <div>
+            <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+              Adaptive Home Movement Lab
+            </p>
+            <h2 className="mt-2 max-w-4xl text-4xl font-black leading-tight md:text-5xl">
+              Movement practice that includes seated users and ends in a report.
+            </h2>
+            <p className="mt-4 max-w-4xl text-xl font-bold leading-relaxed text-[#394B45]">
+              MotionQuest turns one browser webcam into a short, confidence-aware
+              activity session for older adults, seated users and caregivers.
+            </p>
+          </div>
+          <div className="rounded-xl border-2 border-[#075E54] bg-[#D8F3DC] p-5">
+            <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+              90-second judge path
+            </p>
+            <ol className="mt-3 space-y-2 text-lg font-black leading-relaxed">
+              <li>1. Choose seated adaptive.</li>
+              <li>2. Run movement plus Reach Stars.</li>
+              <li>3. Verify the caregiver-readable report.</li>
+            </ol>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-3 md:grid-cols-3">
+          <ProofPillar title="Impact: seated users included" body="The product does not treat seated movement as failure." />
+          <ProofPillar title="Creativity: confidence-aware webcam lab" body="Camera limits become visible report language." />
+          <ProofPillar title="Presentation: report judges can verify" body="The outcome is a readable artifact, not only a score." />
+        </div>
+        <p className="mt-5 text-base font-black uppercase tracking-wide text-[#394B45]">
           Start
         </p>
         <p className="mt-2 text-2xl font-black leading-tight">
@@ -872,6 +901,22 @@ function ReportScreen({
           </p>
         ) : null}
       </article>
+
+      <section className="grid gap-4 rounded-lg border-2 border-[#075E54] bg-[#D8F3DC] p-6 shadow-camera md:grid-cols-[0.9fr_1.1fr] md:p-8">
+        <div>
+          <p className="text-base font-black uppercase tracking-wide text-[#394B45]">
+            Why this report matters
+          </p>
+          <h2 className="mt-2 text-3xl font-black leading-tight">
+            Observed movement, visible limitations, and next safe step in one handoff note.
+          </h2>
+        </div>
+        <div className="grid gap-3 sm:grid-cols-3">
+          <ReportProof title="Observed" body="Counts and reach hits stay tied to one session." />
+          <ReportProof title="Limited" body="Confidence and camera limits stay visible." />
+          <ReportProof title="Actionable" body="The next step is conservative and non-medical." />
+        </div>
+      </section>
 
       <section className="rounded-lg bg-white p-6 shadow-camera md:p-8">
         <p className="text-base font-bold uppercase tracking-wide text-[#394B45]">
@@ -1654,6 +1699,28 @@ function VerificationStep({
       </div>
       <h3 className="mt-4 text-2xl font-black leading-tight">{title}</h3>
       <p className="mt-3 text-lg font-bold leading-relaxed text-[#394B45]">
+        {body}
+      </p>
+    </article>
+  );
+}
+
+function ProofPillar({ title, body }: { title: string; body: string }) {
+  return (
+    <article className="rounded-lg border-2 border-[#D8F3DC] bg-[#FFF8E7] p-4">
+      <h3 className="text-xl font-black leading-tight">{title}</h3>
+      <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
+        {body}
+      </p>
+    </article>
+  );
+}
+
+function ReportProof({ title, body }: { title: string; body: string }) {
+  return (
+    <article className="rounded-lg bg-white p-4">
+      <h3 className="text-xl font-black leading-tight">{title}</h3>
+      <p className="mt-2 text-base font-bold leading-relaxed text-[#394B45]">
         {body}
       </p>
     </article>

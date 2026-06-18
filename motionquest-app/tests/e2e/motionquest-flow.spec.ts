@@ -11,6 +11,11 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
   await expect(page.getByRole("button", { name: "Safe demo" })).toBeVisible();
   await expect(page.getByRole("button", { name: "I can stand safely" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Seated adaptive" })).toBeVisible();
+  await expect(page.getByText("Adaptive Home Movement Lab")).toBeVisible();
+  await expect(page.getByText("90-second judge path")).toBeVisible();
+  await expect(page.getByText("Impact: seated users included")).toBeVisible();
+  await expect(page.getByText("Creativity: confidence-aware webcam lab")).toBeVisible();
+  await expect(page.getByText("Presentation: report judges can verify")).toBeVisible();
   await expect(page.getByText("No account. No wearable. Camera only during the session.")).toBeVisible();
   await expect(page.getByText("Research, safety and judge evidence")).toBeVisible();
   await expect(page.getByText("Required joints")).toBeVisible();
@@ -44,6 +49,8 @@ test("judge walkthrough reaches the caregiver report without camera hardware", a
   await page.getByRole("button", { name: "Finish & View Report" }).click();
 
   await expect(page.getByText("Caregiver Report")).toBeVisible();
+  await expect(page.getByText("Why this report matters")).toBeVisible();
+  await expect(page.getByText("Observed movement, visible limitations, and next safe step in one handoff note.")).toBeVisible();
   await expect(page.getByText("Interpretation", { exact: true })).toBeVisible();
   await expect(page.getByText("Observed activity", { exact: true })).toBeVisible();
   await expect(page.getByText("Confidence", { exact: true })).toBeVisible();
